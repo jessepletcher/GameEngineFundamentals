@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dc7dfsdxvjimg"]
+
+[ext_resource type="Script" uid="uid://cqwhppwyhosyb" path="res://receiver.gd" id="1_f0wvf"]
+
+[node name="Receiver" type="Node3D" unique_id=1507354288]
+script = ExtResource("1_f0wvf")

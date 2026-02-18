@@ -15,6 +15,8 @@
 [ext_resource type="ArrayMesh" uid="uid://dw52kqq3sgaoi" path="res://Assets/Models/OBJ format/building-n.obj" id="13_wesx8"]
 [ext_resource type="PackedScene" uid="uid://bw53o1d1ts408" path="res://Building1.tscn" id="14_esphl"]
 [ext_resource type="PackedScene" uid="uid://bmqvb43ho7o3c" path="res://building_2.tscn" id="15_5qkpu"]
+[ext_resource type="PackedScene" uid="uid://xyqne6bfpkdu" path="res://caller.tscn" id="16_dcckh"]
+[ext_resource type="PackedScene" uid="uid://dc7dfsdxvjimg" path="res://receiver.tscn" id="17_jftiw"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_qqkhr"]
 size = Vector2(200, 200)
@@ -105,3 +107,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.602481, 4.7683716e-07, -0.
 
 [node name="Building2" parent="BuildingL/BuildingM" unique_id=1268341579 instance=ExtResource("15_5qkpu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.602481, 4.7683716e-07, -0.82167625)
+
+[node name="Caller" parent="." unique_id=2077379662 node_paths=PackedStringArray("receiver") instance=ExtResource("16_dcckh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2342877, 0, -5.558226)
+receiver = NodePath("../Receiver")
+
+[node name="Receiver" parent="." unique_id=1507354288 instance=ExtResource("17_jftiw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8919816, 0, -5.8929715)
