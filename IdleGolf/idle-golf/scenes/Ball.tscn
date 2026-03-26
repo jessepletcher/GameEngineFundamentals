@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://dkdafrusip23t"]
+
+[ext_resource type="Script" uid="uid://ttg0opp1m177" path="res://Ball.gd" id="1_gk6bx"]
+[ext_resource type="Texture2D" uid="uid://c8vb6eulm2tik" path="res://GolfBall2.png" id="2_ja1hk"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_pa54t"]
+radius = 0.05
+
+[node name="Ball" type="RigidBody3D" unique_id=100555128]
+mass = 0.1
+script = ExtResource("1_gk6bx")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1053771621]
+shape = SubResource("SphereShape3D_pa54t")
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1748317070]
+transform = Transform3D(1.5981016, 0, 0, 0, 1.5981016, 0, 0, 0, 1, 0, 0, 0)
+billboard = 1
+texture_filter = 0
+texture = ExtResource("2_ja1hk")
+
+[connection signal="sleeping_state_changed" from="." to="." method="_on_sleeping_state_changed"]
