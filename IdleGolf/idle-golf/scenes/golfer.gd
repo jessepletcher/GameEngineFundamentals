@@ -5,6 +5,7 @@ signal swung
 @onready var sprite: AnimatedSprite3D = $GolferSprite
 
 func play_swing() -> void:
+    sprite.speed_scale = GameState.get_swing_speed()
     sprite.play("swing")
 
 

@@ -6,6 +6,7 @@ extends CanvasLayer
 	"fire_rate":   $Panel/VBoxContainer/FireRateRow,
 	"money_mult":  $Panel/VBoxContainer/MoneyMultRow,
 	"consistency": $Panel/VBoxContainer/ConsistencyRow,
+	"swing_speed": $Panel/VBoxContainer/SwingSpeedRow,
 }
 
 func _ready() -> void:

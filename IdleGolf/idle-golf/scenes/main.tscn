@@ -202,6 +202,18 @@ layout_mode = 2
 [node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/ConsistencyRow" unique_id=1003469390]
 layout_mode = 2
 
+[node name="SwingSpeedRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1278066890]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/SwingSpeedRow" unique_id=1896339477]
+layout_mode = 2
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/SwingSpeedRow" unique_id=1222644701]
+layout_mode = 2
+
+[node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/SwingSpeedRow" unique_id=2049811991]
+layout_mode = 2
+
 [node name="Golfer" type="Node3D" parent="." unique_id=264766340]
 script = ExtResource("4_tefeu")
 
