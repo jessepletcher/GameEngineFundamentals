@@ -36,4 +36,5 @@ func _land() -> void:
 		return
 	_has_landed = true
 	var yards = (global_position.z - _start_z) * 1.094
+	print(yards)
 	landed.emit(abs(yards))
