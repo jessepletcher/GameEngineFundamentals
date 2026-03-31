@@ -235,6 +235,32 @@ layout_mode = 2
 [node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/SwingSpeedRow" unique_id=2049811991]
 layout_mode = 2
 
+[node name="OpenShopButton" type="Button" parent="CanvasLayer" unique_id=28586072]
+offset_left = 1722.0
+offset_top = 394.0
+offset_right = 1903.0
+offset_bottom = 490.0
+theme_override_font_sizes/font_size = 64
+text = "SHOP"
+
+[node name="XPBar" type="VBoxContainer" parent="CanvasLayer" unique_id=1347500610]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -27.0
+offset_right = 27.0
+offset_bottom = 54.0
+grow_horizontal = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/XPBar" unique_id=2008835539]
+layout_mode = 2
+text = "Level 1"
+
+[node name="XPProgress" type="ProgressBar" parent="CanvasLayer/XPBar" unique_id=881976446]
+layout_mode = 2
+
 [node name="Golfer" type="Node3D" parent="." unique_id=264766340]
 script = ExtResource("4_tefeu")
 
@@ -250,19 +276,19 @@ volume_db = -8.62
 
 [node name="Flags" type="Node3D" parent="." unique_id=1592995379]
 
-[node name="BlackFlag" parent="Flags" unique_id=196980026 instance=ExtResource("9_85g3d")]
+[node name="BlackFlag" parent="Flags" unique_id=196980026 groups=["flags"] instance=ExtResource("9_85g3d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 200)
 radius = 20.0
 distance_mult = 3.0
 flag_texture = ExtResource("8_tipki")
 
-[node name="BlueFlag" parent="Flags" unique_id=1818691062 instance=ExtResource("9_85g3d")]
+[node name="BlueFlag" parent="Flags" unique_id=1818691062 groups=["flags"] instance=ExtResource("9_85g3d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.305, 0, 150)
 radius = 20.0
 distance_mult = 2.0
 flag_texture = ExtResource("7_tipki")
 
-[node name="RedFlag" parent="Flags" unique_id=126990683 instance=ExtResource("9_85g3d")]
+[node name="RedFlag" parent="Flags" unique_id=126990683 groups=["flags"] instance=ExtResource("9_85g3d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.8, 0, 100)
 radius = 15.0
 distance_mult = 1.5

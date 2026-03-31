@@ -12,6 +12,9 @@ const Ball = preload("res://scenes/Ball.tscn")
 @onready var flags = $Flags
 @onready var hit_sound: AudioStreamPlayer3D = $Golfer/GolfHit
 @onready var flag_sound: AudioStreamPlayer3D = $FlagSound
+@onready var open_shop_button: Button = $CanvasLayer/OpenShopButton
+@onready var xp_progress: ProgressBar = $CanvasLayer/XPBar/XPProgress
+@onready var level_label: Label = $CanvasLayer/XPBar/LevelLabel
 
 const SHOT_INTERVAL := 5.0
 const BALL_SPEED := 100
@@ -22,14 +25,44 @@ const BASE_SPREAD := 8.0
 const FloatingText = preload("res://scenes/FloatingText.tscn")
 
 func _ready() -> void:
+    money_label.text = "$%.2f" % GameState.money
+    level_label.text = "Level %d" % GameState.level
+    xp_progress.max_value = GameState.xp_to_next_level
+    xp_progress.value = GameState.xp
+    GameState.xp_changed.connect(_on_xp_changed)
+    GameState.leveled_up.connect(_on_leveled_up)
     GameState.money_changed.connect(_on_money_changed)
     golfer.swung.connect(_on_golfer_swung)
+    open_shop_button.pressed.connect(_on_open_shop_pressed)
     shot_timer.timeout.connect(_on_ShotTimer_timeout)
-    shot_timer.wait_time = SHOT_INTERVAL
-    shot_timer.start()
+    shot_timer.wait_time = BASE_INTERVAL / GameState.get_fire_rate()
     shop_button.pressed.connect(_on_shop_button_pressed)
+    shot_timer.start()
 
 
+func _on_xp_changed(current_xp: float, required_xp: float) -> void:
+    xp_progress.max_value = required_xp
+    xp_progress.value = current_xp
+
+func _on_leveled_up(new_level: int, stat_boosted: String) -> void:
+    level_label.text = "Level %d" % new_level
+    _show_level_up_popup(new_level, stat_boosted)
+
+func _show_level_up_popup(new_level: int, stat: String) -> void:
+    var label = Label.new()
+    label.text = "LEVEL UP! %d\n+%s" % [new_level, GameState.upgrades[stat]["label"]]
+    label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    $CanvasLayer.add_child(label)
+    label.position = Vector2(get_viewport().size.x / 2 - 100, get_viewport().size.y / 2)
+    
+    var tween = create_tween()
+    tween.tween_property(label, "position:y", label.position.y - 100, 1.5)
+    tween.parallel().tween_property(label, "modulate:a", 0.0, 1.5)
+    tween.tween_callback(label.queue_free)
+
+func _on_open_shop_pressed() -> void:
+    GameState.save()
+    get_tree().change_scene_to_file("res://Shop.tscn")
 
 func _on_shop_button_pressed() -> void:
     shop.toggle()
@@ -51,7 +84,7 @@ func _hit_ball() -> void:
     var ball = Ball.instantiate()
     ball._speed = BASE_SPEED * GameState.get_ball_speed()
     ball._spread = BASE_SPREAD / GameState.get_consistency()
-    ball._aim = aim_slider.value
+    ball._aim = -aim_slider.value
     ball.position = tee_position.global_position
     add_child(ball)
     ball.landed.connect(_on_ball_landed.bind(ball))
@@ -66,11 +99,13 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
             best_bonus = bonus
     
     if best_bonus > 0.0:
+        flag_sound.play(1.0)
         base_money += best_bonus
     
     var final_money = base_money * GameState.get_money_mult()
     GameState.money += final_money
     GameState.money_changed.emit(GameState.money)
+    GameState.add_xp(final_money * 0.1)  # just call add_xp directly here
     
     var text = FloatingText.instantiate()
     add_child(text)

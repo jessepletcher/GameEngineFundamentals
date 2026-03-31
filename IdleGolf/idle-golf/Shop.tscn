@@ -1,0 +1,87 @@
+[gd_scene format=3 uid="uid://depe7ovvl2pxt"]
+
+[ext_resource type="Script" uid="uid://cdd14jwx675sy" path="res://Shop.gd" id="1_7ae35"]
+[ext_resource type="Texture2D" uid="uid://b1nwh7mjxcrsc" path="res://IdleGolfBackgroundfairway3.png" id="1_c53l5"]
+
+[node name="Control" type="Control" unique_id=1456849512]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7ae35")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=479059599]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_c53l5")
+
+[node name="Label" type="Label" parent="." unique_id=1477967272]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -173.0
+offset_right = 173.0
+offset_bottom = 353.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 128
+text = "SHOP
+"
+horizontal_alignment = 1
+
+[node name="BackButton" type="Button" parent="." unique_id=830939692]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 973.0
+offset_right = 191.0
+offset_bottom = 1069.0
+theme_override_font_sizes/font_size = 64
+text = "BACK"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1683607330]
+layout_mode = 0
+offset_left = 1424.0
+offset_top = 255.0
+offset_right = 1527.0
+offset_bottom = 295.0
+
+[node name="BallsColumn" type="VBoxContainer" parent="HBoxContainer" unique_id=1212397359]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/BallsColumn" unique_id=1077338299]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "BALLS"
+
+[node name="BallList" type="VBoxContainer" parent="HBoxContainer/BallsColumn" unique_id=2005133609]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ClubsColumn" type="VBoxContainer" parent="HBoxContainer" unique_id=1965175133]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/ClubsColumn" unique_id=78506896]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "CLUBS"
+
+[node name="ClubList" type="VBoxContainer" parent="HBoxContainer/ClubsColumn" unique_id=1758730754]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MoneyLabel" type="Label" parent="." unique_id=1610368009]
+layout_mode = 0
+offset_left = 1547.0
+offset_top = 26.0
+offset_right = 1587.0
+offset_bottom = 114.0
+theme_override_font_sizes/font_size = 64

@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://ixfgi5vysl82"]
+
+[ext_resource type="Script" uid="uid://de3yivc76hmok" path="res://ShopItem.gd" id="1_4eib6"]
+[ext_resource type="Texture2D" uid="uid://c8vb6eulm2tik" path="res://GolfBall2.png" id="1_vfou5"]
+
+[node name="PanelContainer" type="PanelContainer" unique_id=1602042632]
+offset_right = 81.0
+offset_bottom = 50.0
+script = ExtResource("1_4eib6")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1672567150]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer" unique_id=1552362067]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="HBoxContainer/VBoxContainer" unique_id=2029863367]
+layout_mode = 2
+text = "Ball 1"
+
+[node name="DescLabel" type="Label" parent="HBoxContainer/VBoxContainer" unique_id=1290840658]
+layout_mode = 2
+text = "crazy stuff"
+
+[node name="ItemIcon" type="TextureRect" parent="HBoxContainer" unique_id=754316225]
+texture_filter = 1
+layout_mode = 2
+texture = ExtResource("1_vfou5")
+expand_mode = 2
+
+[node name="BuyButton" type="Button" parent="HBoxContainer" unique_id=256065745]
+layout_mode = 2
+text = "Buy"
