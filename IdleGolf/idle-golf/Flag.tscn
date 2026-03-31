@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://cqochshxmtwgp"]
+
+[ext_resource type="Texture2D" uid="uid://j1a8yd64gan7" path="res://RedFlag.png" id="1_oftpb"]
+[ext_resource type="Script" uid="uid://cvdju0iaa1ejw" path="res://Flag.gd" id="1_xhxf4"]
+
+[node name="Flag" type="Node3D" unique_id=196980026]
+script = ExtResource("1_xhxf4")
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=783599252]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+offset = Vector2(0, 32.02)
+texture_filter = 0
+texture = ExtResource("1_oftpb")
