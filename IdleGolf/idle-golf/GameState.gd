@@ -34,10 +34,9 @@ var upgrades = {
 }
 
 var balls = {
-    "standard": {"name": "Standard Ball", "desc": "Your trusty golf ball", "cost": 0.0, "owned": true, "speed_mult": 1.0, "money_mult": 1.0},
-    "power_ball": {"name": "Power Ball", "desc": "+50% distance", "cost": 500.0, "owned": false, "speed_mult": 1.5, "money_mult": 1.0},
-    "golden_ball": {"name": "Golden Ball", "desc": "+100% money", "cost": 1000.0, "owned": false, "speed_mult": 1.0, "money_mult": 2.0},
-    "homing_ball": {"name": "Homing Ball", "desc": "Homes in on nearest flag", "cost": 2000.0, "owned": false, "speed_mult": 1.0, "money_mult": 1.5, "can_home": true},
+    "standard": {"name": "Standard Ball", "desc": "Your trusty golf ball", "cost": 0.0, "owned": true, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.WHITE, "texture": preload("res://GolfBall2.png")},
+    "homing_ball": {"name": "Homing Ball", "desc": "Homes in on nearest flag", "cost": 2000.0, "owned": false, "speed_mult": 1.0, "money_mult": 1.5, "can_home": true, "trail_color": Color.LIME_GREEN, "texture": preload("res://GolfBall2.png")},
+    # ... etc
 }
 
 var clubs = {

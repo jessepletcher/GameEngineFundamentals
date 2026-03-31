@@ -5,12 +5,14 @@
 [ext_resource type="Texture2D" uid="uid://b1nwh7mjxcrsc" path="res://IdleGolfBackgroundfairway3.png" id="3_tbgi4"]
 [ext_resource type="Texture2D" uid="uid://b8l1suyvq4pm6" path="res://GolfSwing-Sheet.png" id="4_tbgi4"]
 [ext_resource type="Script" uid="uid://dvlxily612f3h" path="res://scenes/golfer.gd" id="4_tefeu"]
+[ext_resource type="FontFile" uid="uid://dg4ug6srbh1wt" path="res://balatro.otf" id="4_trceg"]
 [ext_resource type="AudioStream" uid="uid://pwbje5jq4ie5" path="res://GolfHit.mp3" id="6_choun"]
 [ext_resource type="Texture2D" uid="uid://j1a8yd64gan7" path="res://RedFlag.png" id="6_o6xl0"]
 [ext_resource type="Texture2D" uid="uid://1wtx0anscbc8" path="res://BlueFlag.png" id="7_tipki"]
 [ext_resource type="Texture2D" uid="uid://cb0xw8x2ejuin" path="res://BlackFlag.png" id="8_tipki"]
 [ext_resource type="PackedScene" uid="uid://cqochshxmtwgp" path="res://Flag.tscn" id="9_85g3d"]
 [ext_resource type="AudioStream" uid="uid://mbplthjf2jpc" path="res://FlagHit.mp3" id="11_ya4ey"]
+[ext_resource type="AudioStream" uid="uid://bxqx4c7vchusb" path="res://kinda zelda sounding.wav" id="12_eb6dy"]
 
 [sub_resource type="GDScript" id="GDScript_jyhfs"]
 script/source = "extends Camera3D
@@ -37,6 +39,24 @@ sky = SubResource("Sky_h2yge")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_jyhfs"]
 size = Vector3(225.4649, 1, 484.55878)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_trceg"]
+bg_color = Color(0.49, 0.35182002, 0.2597, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.32170263, 0.2242406, 0.15718931, 1)
+expand_margin_top = 4.0
+expand_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a8y0u"]
+bg_color = Color(0.49019608, 0.3529412, 0.25882354, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.32156864, 0.22352941, 0.15686275, 1)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_tefeu"]
 atlas = ExtResource("4_tbgi4")
@@ -130,17 +150,24 @@ stretch_mode = 6
 [node name="MoneyLabel" type="Label" parent="CanvasLayer" unique_id=220844088]
 z_index = 1
 texture_filter = 1
-offset_right = 384.0
-offset_bottom = 132.0
-theme_override_colors/font_color = Color(0.22000003, 1, 0.3630001, 1)
-theme_override_font_sizes/font_size = 96
+offset_left = 19.0
+offset_top = 12.0
+offset_right = 403.0
+offset_bottom = 144.0
+theme_override_colors/font_color = Color(0.24158579, 0.5506578, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_font_sizes/font_size = 64
 text = "$0.00"
 
 [node name="ShopButton" type="Button" parent="CanvasLayer" unique_id=1134168048]
-offset_top = 356.0
+offset_top = 349.915
 offset_right = 384.0
-offset_bottom = 387.0
-text = "Shop"
+offset_bottom = 390.915
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+text = "UPGRADES"
 
 [node name="AimSlider" type="HSlider" parent="CanvasLayer" unique_id=811697383]
 anchors_preset = 7
@@ -161,86 +188,108 @@ step = 0.01
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_top = -145.41501
+offset_top = -144.565
 offset_right = 384.0
-offset_bottom = 21.0
+offset_bottom = 95.964966
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_a8y0u")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Panel" unique_id=1733494368]
 layout_mode = 0
-offset_right = 84.0
-offset_bottom = 166.0
-
-[node name="Label" type="Label" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1867837130]
-layout_mode = 2
-text = "UPGRADES"
+offset_left = 15.0
+offset_top = 17.565002
+offset_right = 99.0
+offset_bottom = 183.565
+theme_override_constants/separation = 18
 
 [node name="BallSpeedRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=98483021]
 layout_mode = 2
 
 [node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/BallSpeedRow" unique_id=406791096]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
 
 [node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/BallSpeedRow" unique_id=1684960448]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
 
 [node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/BallSpeedRow" unique_id=268026691]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
 
 [node name="FireRateRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=365005602]
 layout_mode = 2
 
 [node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/FireRateRow" unique_id=2007074903]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
 
 [node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/FireRateRow" unique_id=1205916336]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
 
 [node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/FireRateRow" unique_id=2001506790]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
 
 [node name="MoneyMultRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1306246441]
 layout_mode = 2
 
 [node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/MoneyMultRow" unique_id=77518754]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
 
 [node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/MoneyMultRow" unique_id=1783862080]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
 
 [node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/MoneyMultRow" unique_id=120206325]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
 
 [node name="ConsistencyRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1614771815]
 layout_mode = 2
 
 [node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/ConsistencyRow" unique_id=1053258118]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
 
 [node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/ConsistencyRow" unique_id=594187679]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
 
 [node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/ConsistencyRow" unique_id=1003469390]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
 
 [node name="SwingSpeedRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1278066890]
 layout_mode = 2
 
 [node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/SwingSpeedRow" unique_id=1896339477]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
 
 [node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/SwingSpeedRow" unique_id=1222644701]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
 
 [node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/SwingSpeedRow" unique_id=2049811991]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
 
 [node name="OpenShopButton" type="Button" parent="CanvasLayer" unique_id=28586072]
 offset_left = 1722.0
 offset_top = 394.0
 offset_right = 1903.0
 offset_bottom = 490.0
+theme_override_fonts/font = ExtResource("4_trceg")
 theme_override_font_sizes/font_size = 64
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
 text = "SHOP"
 
 [node name="XPBar" type="VBoxContainer" parent="CanvasLayer" unique_id=1347500610]
@@ -256,10 +305,12 @@ size_flags_vertical = 4
 
 [node name="LevelLabel" type="Label" parent="CanvasLayer/XPBar" unique_id=2008835539]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
 text = "Level 1"
 
 [node name="XPProgress" type="ProgressBar" parent="CanvasLayer/XPBar" unique_id=881976446]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
 
 [node name="Golfer" type="Node3D" parent="." unique_id=264766340]
 script = ExtResource("4_tefeu")
@@ -272,7 +323,7 @@ animation = &"swing"
 
 [node name="GolfHit" type="AudioStreamPlayer3D" parent="Golfer" unique_id=1065156398]
 stream = ExtResource("6_choun")
-volume_db = -8.62
+volume_db = -12.868
 
 [node name="Flags" type="Node3D" parent="." unique_id=1592995379]
 
@@ -296,7 +347,12 @@ flag_texture = ExtResource("6_o6xl0")
 
 [node name="FlagSound" type="AudioStreamPlayer3D" parent="." unique_id=987556024]
 stream = ExtResource("11_ya4ey")
-volume_db = -7.788
+volume_db = -10.62
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=912753352]
+stream = ExtResource("12_eb6dy")
+volume_db = -31.964
+autoplay = true
 
 [connection signal="timeout" from="ShotTimer" to="." method="_on_shot_timer_timeout"]
 [connection signal="frame_changed" from="Golfer/GolferSprite" to="." method="_on_golfer_sprite_frame_changed"]

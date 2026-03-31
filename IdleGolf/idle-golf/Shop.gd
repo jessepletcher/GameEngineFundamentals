@@ -4,14 +4,15 @@ const ShopItem = preload("res://ShopItem.tscn")
 
 @onready var ball_list = $HBoxContainer/BallsColumn/BallList
 @onready var club_list = $HBoxContainer/ClubsColumn/ClubList
-@onready var money_label: Label = $MoneyLabel
 @onready var back_button: Button = $BackButton
+@onready var money_label: Label = $MoneyLabel
 
 func _ready() -> void:
     back_button.pressed.connect(_on_back_pressed)
+    money_label.text = "$%.2f" % GameState.money
     GameState.money_changed.connect(_on_money_changed)
     _populate_shop()
-    money_label.text = "$%.2f" % GameState.money
+
 
 func _populate_shop() -> void:
     print("populating shop, balls: ", GameState.balls.keys())
@@ -26,25 +27,27 @@ func _populate_shop() -> void:
         var item = ShopItem.instantiate()
         ball_list.add_child(item)
         item.setup(id, data["name"], data["desc"], data["cost"], null, data["owned"], GameState.equipped_ball == id)
-        # remove the purchase_requested.connect line here
+        item.purchase_requested.connect(_on_ball_purchase)
 
     for id in GameState.clubs:
         var data = GameState.clubs[id]
         var item = ShopItem.instantiate()
         club_list.add_child(item)
         item.setup(id, data["name"], data["desc"], data["cost"], null, data["owned"], GameState.equipped_club == id)
-        # remove the purchase_requested.connect line here
+        item.purchase_requested.connect(_on_club_purchase)
 
 func _on_ball_purchase(id: String) -> void:
+    print("Purchase requested for: ", id)
     var data = GameState.balls[id]
     if data["owned"]:
-        # already owned, just equip it
+        print("Already owned, equipping: ", id)
         GameState.equipped_ball = id
     elif GameState.money >= data["cost"]:
         GameState.money -= data["cost"]
         GameState.money_changed.emit(GameState.money)
         GameState.balls[id]["owned"] = true
         GameState.equipped_ball = id
+    print("Equipped ball is now: ", GameState.equipped_ball)
     _populate_shop()
 
 func _on_club_purchase(id: String) -> void:

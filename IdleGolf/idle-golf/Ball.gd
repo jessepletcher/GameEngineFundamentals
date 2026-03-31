@@ -26,7 +26,7 @@ func _process(delta: float) -> void:
         var ball_data = GameState.balls[GameState.equipped_ball]
         
         # detect apex — when ball starts falling
-        if not _has_peaked and linear_velocity.y < 0:
+        if not _has_peaked and linear_velocity.y < 15.0:
             _has_peaked = true
             if ball_data.get("can_home", false):
                 _start_homing()
@@ -35,10 +35,11 @@ func _process(delta: float) -> void:
         if _is_homing and _target_flag:
             _home_toward_flag(delta)
         
-        if global_position.y < 0.2 and abs(linear_velocity.y) < 1.0:
+        if global_position.y < 0.5 and abs(linear_velocity.y) < 10.0:
             _land()
 
 func _start_homing() -> void:
+    
     # find nearest flag
     var flags = get_tree().get_nodes_in_group("flags")
     var nearest: Node3D = null
@@ -53,16 +54,30 @@ func _start_homing() -> void:
         _is_homing = true
 
 func _home_toward_flag(delta: float) -> void:
+    var flat_dist = Vector2(global_position.x - _target_flag.global_position.x, 
+                            global_position.z - _target_flag.global_position.z).length()
+    if flat_dist < 20.0:
+        _is_homing = false
+        return
+    
     var target_pos = _target_flag.global_position
     var direction = (target_pos - global_position).normalized()
-    var home_strength = 15.0  # how strongly it steers, tweak this
+    var home_strength = 1.0
     linear_velocity = linear_velocity.lerp(direction * linear_velocity.length(), delta * home_strength)
-
+    
 func _ready() -> void:
     _start_z = global_position.z
     
     var ball_data = GameState.balls[GameState.equipped_ball]
     var ball_speed_mult = ball_data["speed_mult"]
+    
+    sprite.texture = ball_data["texture"]
+    
+    var trail: GPUParticles3D = $GPUParticles3D
+    if trail:
+        var mat = trail.draw_pass_1.material.duplicate()
+        mat.albedo_color = ball_data["trail_color"]
+        trail.draw_pass_1.material = mat
     
     var spread_rad = deg_to_rad(randf_range(-_spread, _spread))
     var aim_angle = _aim * deg_to_rad(45.0)

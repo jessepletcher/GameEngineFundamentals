@@ -1,10 +1,11 @@
 [gd_scene format=3 uid="uid://6a8iigkvwbon"]
 
 [ext_resource type="Script" uid="uid://qxtv5cmhx3xm" path="res://FloatingText.gd" id="1_bmcqi"]
+[ext_resource type="FontFile" uid="uid://dg4ug6srbh1wt" path="res://balatro.otf" id="2_fc4js"]
 
 [node name="FloatingText" type="Node3D" unique_id=596001657]
 script = ExtResource("1_bmcqi")
 
 [node name="Label3D" type="Label3D" parent="." unique_id=1708695404]
 billboard = 1
-font_size = 64
+font = ExtResource("2_fc4js")

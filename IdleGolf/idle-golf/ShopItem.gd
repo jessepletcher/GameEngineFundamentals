@@ -10,6 +10,7 @@ signal purchase_requested(item_id: String)
 var item_id: String
 
 func setup(id: String, item_name: String, desc: String, cost: float, texture: Texture2D, owned: bool, equipped: bool) -> void:
+	print("Setting up item: ", id)
 	item_id = id
 	name_label.text = item_name
 	desc_label.text = desc

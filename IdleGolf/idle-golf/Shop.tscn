@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cdd14jwx675sy" path="res://Shop.gd" id="1_7ae35"]
 [ext_resource type="Texture2D" uid="uid://b1nwh7mjxcrsc" path="res://IdleGolfBackgroundfairway3.png" id="1_c53l5"]
+[ext_resource type="FontFile" uid="uid://dg4ug6srbh1wt" path="res://balatro.otf" id="3_f511j"]
 
 [node name="Control" type="Control" unique_id=1456849512]
 layout_mode = 3
@@ -31,6 +32,7 @@ offset_left = -173.0
 offset_right = 173.0
 offset_bottom = 353.0
 grow_horizontal = 2
+theme_override_fonts/font = ExtResource("3_f511j")
 theme_override_font_sizes/font_size = 128
 text = "SHOP
 "
@@ -42,23 +44,25 @@ offset_left = 17.0
 offset_top = 973.0
 offset_right = 191.0
 offset_bottom = 1069.0
+theme_override_fonts/font = ExtResource("3_f511j")
 theme_override_font_sizes/font_size = 64
 text = "BACK"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1683607330]
 layout_mode = 0
-offset_left = 1424.0
-offset_top = 255.0
-offset_right = 1527.0
-offset_bottom = 295.0
+offset_left = 1238.0
+offset_top = 234.0
+offset_right = 1701.0
+offset_bottom = 303.0
 
 [node name="BallsColumn" type="VBoxContainer" parent="HBoxContainer" unique_id=1212397359]
 layout_mode = 2
 
 [node name="Label" type="Label" parent="HBoxContainer/BallsColumn" unique_id=1077338299]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_f511j")
 theme_override_font_sizes/font_size = 64
-text = "BALLS"
+text = " BALLS "
 
 [node name="BallList" type="VBoxContainer" parent="HBoxContainer/BallsColumn" unique_id=2005133609]
 layout_mode = 2
@@ -70,18 +74,16 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="HBoxContainer/ClubsColumn" unique_id=78506896]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_f511j")
 theme_override_font_sizes/font_size = 64
-text = "CLUBS"
+text = " CLUBS "
 
 [node name="ClubList" type="VBoxContainer" parent="HBoxContainer/ClubsColumn" unique_id=1758730754]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="MoneyLabel" type="Label" parent="." unique_id=1610368009]
+[node name="MoneyLabel" type="Label" parent="." unique_id=148188558]
 layout_mode = 0
-offset_left = 1547.0
-offset_top = 26.0
-offset_right = 1587.0
-offset_bottom = 114.0
-theme_override_font_sizes/font_size = 64
+offset_right = 40.0
+offset_bottom = 23.0
