@@ -312,6 +312,57 @@ text = "Level 1"
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
 
+[node name="RetireButton" type="Button" parent="CanvasLayer" unique_id=1454019025]
+offset_left = 1686.0
+offset_top = 19.0
+offset_right = 1896.0
+offset_bottom = 84.0
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_font_sizes/font_size = 64
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+text = "RETIRE"
+
+[node name="RetireDialog" type="PanelContainer" parent="CanvasLayer" unique_id=1455203785]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -121.5
+offset_top = -56.5
+offset_right = 121.5
+offset_bottom = 56.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/RetireDialog" unique_id=804656745]
+layout_mode = 2
+
+[node name="RetireInfoLabel" type="Label" parent="CanvasLayer/RetireDialog/VBoxContainer" unique_id=2138559218]
+layout_mode = 2
+
+[node name="ConfirmRetireButton" type="Button" parent="CanvasLayer/RetireDialog/VBoxContainer" unique_id=623537835]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+text = "Confirm Retire"
+
+[node name="CancelRetireButton" type="Button" parent="CanvasLayer/RetireDialog/VBoxContainer" unique_id=1074592936]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+text = "Cancel"
+
+[node name="MedalsLabel" type="Label" parent="CanvasLayer" unique_id=805189382]
+offset_left = 1538.0
+offset_top = 20.0
+offset_right = 1578.0
+offset_bottom = 53.0
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_font_sizes/font_size = 32
+
 [node name="Golfer" type="Node3D" parent="." unique_id=264766340]
 script = ExtResource("4_tefeu")
 

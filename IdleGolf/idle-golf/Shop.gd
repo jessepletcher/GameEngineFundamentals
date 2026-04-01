@@ -26,7 +26,7 @@ func _populate_shop() -> void:
         var data = GameState.balls[id]
         var item = ShopItem.instantiate()
         ball_list.add_child(item)
-        item.setup(id, data["name"], data["desc"], data["cost"], null, data["owned"], GameState.equipped_ball == id)
+        item.setup(id, data["name"], data["desc"], 0.0, null, data["owned"], GameState.equipped_ball == id, data.get("medal_cost", 0))
         item.purchase_requested.connect(_on_ball_purchase)
 
     for id in GameState.clubs:
@@ -37,17 +37,14 @@ func _populate_shop() -> void:
         item.purchase_requested.connect(_on_club_purchase)
 
 func _on_ball_purchase(id: String) -> void:
-    print("Purchase requested for: ", id)
     var data = GameState.balls[id]
     if data["owned"]:
-        print("Already owned, equipping: ", id)
         GameState.equipped_ball = id
-    elif GameState.money >= data["cost"]:
-        GameState.money -= data["cost"]
-        GameState.money_changed.emit(GameState.money)
+    elif GameState.medals >= data["medal_cost"]:
+        GameState.medals -= data["medal_cost"]
+        GameState.medals_changed.emit(GameState.medals)
         GameState.balls[id]["owned"] = true
         GameState.equipped_ball = id
-    print("Equipped ball is now: ", GameState.equipped_ball)
     _populate_shop()
 
 func _on_club_purchase(id: String) -> void:

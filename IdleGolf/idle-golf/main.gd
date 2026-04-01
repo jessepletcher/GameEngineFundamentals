@@ -15,6 +15,12 @@ const Ball = preload("res://scenes/Ball.tscn")
 @onready var open_shop_button: Button = $CanvasLayer/OpenShopButton
 @onready var xp_progress: ProgressBar = $CanvasLayer/XPBar/XPProgress
 @onready var level_label: Label = $CanvasLayer/XPBar/LevelLabel
+@onready var retire_button: Button = $CanvasLayer/RetireButton
+@onready var retire_dialog = $CanvasLayer/RetireDialog
+@onready var retire_info_label: Label = $CanvasLayer/RetireDialog/VBoxContainer/RetireInfoLabel
+@onready var confirm_retire: Button = $CanvasLayer/RetireDialog/VBoxContainer/ConfirmRetireButton
+@onready var cancel_retire: Button = $CanvasLayer/RetireDialog/VBoxContainer/CancelRetireButton
+@onready var medals_label: Label = $CanvasLayer/MedalsLabel
 
 const SHOT_INTERVAL := 5.0
 const BALL_SPEED := 100
@@ -38,11 +44,38 @@ func _ready() -> void:
     shot_timer.wait_time = BASE_INTERVAL / GameState.get_fire_rate()
     shop_button.pressed.connect(_on_shop_button_pressed)
     shot_timer.start()
+    retire_button.pressed.connect(_on_retire_pressed)
+    confirm_retire.pressed.connect(_on_confirm_retire)
+    cancel_retire.pressed.connect(_on_cancel_retire)
+    retire_dialog.visible = false
+    GameState.medals_changed.connect(_on_medals_changed)
+    medals_label.text = "🏅 %.0f" % GameState.medals
 
 
 func _on_xp_changed(current_xp: float, required_xp: float) -> void:
     xp_progress.max_value = required_xp
     xp_progress.value = current_xp
+
+func _on_confirm_retire() -> void:
+    retire_dialog.visible = false
+    GameState.retire()
+    # refresh UI
+    money_label.text = "$%.2f" % GameState.money
+    level_label.text = "Level %d" % GameState.level
+    xp_progress.value = 0
+    xp_progress.max_value = GameState.xp_to_next_level
+    shot_timer.wait_time = BASE_INTERVAL / GameState.get_fire_rate()
+
+func _on_cancel_retire() -> void:
+    retire_dialog.visible = false
+
+func _on_medals_changed(amount: float) -> void:
+    medals_label.text = "🏅 %.0f" % amount
+
+func _on_retire_pressed() -> void:
+    var medals = GameState.get_medal_reward()
+    retire_info_label.text = "You will earn %.0f Medals!\n\nUpgrades will be reset.\nBalls, clubs and levels are kept." % medals
+    retire_dialog.visible = true
 
 func _on_leveled_up(new_level: int, stat_boosted: String) -> void:
     level_label.text = "Level %d" % new_level
