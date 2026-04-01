@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://depe7ovvl2pxt"]
 
 [ext_resource type="Script" uid="uid://cdd14jwx675sy" path="res://Shop.gd" id="1_7ae35"]
-[ext_resource type="Texture2D" uid="uid://b1nwh7mjxcrsc" path="res://IdleGolfBackgroundfairway3.png" id="1_c53l5"]
+[ext_resource type="Texture2D" uid="uid://dvl1rfqybghfv" path="res://ProShop.png" id="2_f511j"]
 [ext_resource type="FontFile" uid="uid://dg4ug6srbh1wt" path="res://balatro.otf" id="3_f511j"]
 
 [node name="Control" type="Control" unique_id=1456849512]
@@ -21,7 +21,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("1_c53l5")
+texture = ExtResource("2_f511j")
 
 [node name="Label" type="Label" parent="." unique_id=1477967272]
 layout_mode = 1
