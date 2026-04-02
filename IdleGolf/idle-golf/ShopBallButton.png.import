@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://4la3vi6ctch5"
-path="res://.godot/imported/ProShop.png-b57964a2b1b9523abb39c8201c9affc6.ctex"
+uid="uid://b14y43nrma0a0"
+path="res://.godot/imported/ShopBallButton.png-8d64093a2ca6862f6682d5917a1d8f15.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ProShop.png"
-dest_files=["res://.godot/imported/ProShop.png-b57964a2b1b9523abb39c8201c9affc6.ctex"]
+source_file="res://ShopBallButton.png"
+dest_files=["res://.godot/imported/ShopBallButton.png-8d64093a2ca6862f6682d5917a1d8f15.ctex"]
 
 [params]
 

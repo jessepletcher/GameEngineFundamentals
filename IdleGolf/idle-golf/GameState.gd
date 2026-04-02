@@ -46,10 +46,10 @@ var balls = {
 }
 
 var clubs = {
-    "standard": {"name": "Standard Club", "desc": "A reliable iron", "cost": 0.0, "owned": true, "speed_mult": 1.0, "fire_rate_mult": 1.0},
-    "driver": {"name": "Driver", "desc": "+30% distance", "cost": 750.0, "owned": false, "speed_mult": 1.3, "fire_rate_mult": 0.9},
-    "rapid_iron": {"name": "Rapid Iron", "desc": "+50% fire rate", "cost": 1500.0, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.5},
-    "golden_club": {"name": "Golden Club", "desc": "+50% money, +20% distance", "cost": 5000.0, "owned": false, "speed_mult": 1.2, "fire_rate_mult": 1.0},
+    "standard":    {"name": "Standard Club",  "desc": "A reliable iron",          "medal_cost": 0,  "owned": true,  "speed_mult": 1.0, "fire_rate_mult": 1.0},
+    "driver":      {"name": "Driver",         "desc": "+30% distance",            "medal_cost": 3,  "owned": false, "speed_mult": 1.3, "fire_rate_mult": 0.9},
+    "rapid_iron":  {"name": "Rapid Iron",     "desc": "+50% fire rate",           "medal_cost": 5,  "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.5},
+    "golden_club": {"name": "Golden Club",    "desc": "+50% money +20% distance", "medal_cost": 10, "owned": false, "speed_mult": 1.2, "fire_rate_mult": 1.0},
 }
 
 var equipped_ball: String = "standard"
@@ -204,4 +204,4 @@ func get_money_mult() -> float:
     return 10.0 + upgrades["money_mult"]["level"] * 1
 
 func get_consistency() -> float:
-    return .3 + upgrades["consistency"]["level"] * 0.25
+    return .5 + upgrades["consistency"]["level"] * 0.25
