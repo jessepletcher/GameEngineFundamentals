@@ -140,6 +140,9 @@ func _hit_ball() -> void:
 		ball.position = tee_position.global_position
 		add_child(ball)
 		ball.landed.connect(_on_ball_landed.bind(ball))
+		ball.exploded.connect(_on_ball_exploded)
+		if ball._is_whiff:
+			_on_ball_whiffed()
 
 func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 	var base_money = pow(yards, 2) * 0.0002 + 5
@@ -152,7 +155,8 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 	
 	if best_bonus > 0.0:
 		flag_sound.play(1.0)
-		base_money += best_bonus
+		var flag_mult = GameState.balls[GameState.equipped_ball].get("flag_mult", 1.0)
+		base_money += best_bonus * flag_mult
 	
 	var final_money = base_money * GameState.get_money_mult()
 	GameState.money += final_money
@@ -168,6 +172,29 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 	if is_instance_valid(ball):
 		ball.queue_free()
 
+
+func _on_ball_exploded(fragments: Array) -> void:
+	for frag in fragments:
+		frag.landed.connect(_on_ball_landed.bind(frag))
+
+func _on_ball_whiffed() -> void:
+	var label = Label.new()
+	label.text = "!!!"
+	label.add_theme_color_override("font_color", Color.RED)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	$CanvasLayer.add_child(label)
+	var golfer_screen_pos = get_viewport().get_camera_3d().unproject_position(golfer.global_position)
+	label.position = golfer_screen_pos + Vector2(-40, -400)
+	label.add_theme_font_size_override("font_size", 64)
+
+	# use a custom font (load a .ttf or .otf file)
+	var font = load("res://balatro.otf")
+	label.add_theme_font_override("font", font)
+
+	var tween = create_tween()
+	tween.tween_property(label, "position:y", label.position.y - 50, 1.0)
+	tween.parallel().tween_property(label, "modulate:a", 0.0, 1.0)
+	tween.tween_callback(label.queue_free)
 
 func _on_reset_pressed() -> void:
 	reset_dialog.visible = true

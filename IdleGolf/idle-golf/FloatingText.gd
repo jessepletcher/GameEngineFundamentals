@@ -13,5 +13,5 @@ func setup(money: float, yards: float) -> void:
 
 func _process(_delta: float) -> void:
 	var distance = global_position.distance_to(camera.global_position)
-	var scale_factor = pow(distance * 0.05, 1.5)
+	var scale_factor = max(pow(distance * 0.05, 1.5), 0.8)
 	label.scale = Vector3(scale_factor, scale_factor, scale_factor)

@@ -11,3 +11,9 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 offset = Vector2(0, 32.02)
 texture_filter = 0
 texture = ExtResource("1_oftpb")
+
+[node name="DistanceLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+billboard = 1
+text = ""
+font_size = 48

@@ -15,6 +15,7 @@
 [ext_resource type="AudioStream" uid="uid://mbplthjf2jpc" path="res://FlagHit.mp3" id="11_ya4ey"]
 [ext_resource type="AudioStream" uid="uid://biqrtonns0wht" path="res://u_vr5icvkppa-nature-ambience-323729.mp3" id="13_a8y0u"]
 [ext_resource type="AudioStream" uid="uid://c3prc3scrcaaw" path="res://good golf.wav" id="14_a8y0u"]
+[ext_resource type="Script" uid="uid://dvcvompk6cw5p" path="res://DebugCamera.gd" id="debug_cam"]
 
 [sub_resource type="GDScript" id="GDScript_jyhfs"]
 script/source = "extends Camera3D
@@ -530,6 +531,10 @@ autoplay = true
 stream = ExtResource("14_a8y0u")
 volume_db = -31.964
 autoplay = true
+
+[node name="DebugCamera" type="Camera3D" parent="." unique_id=2072627228]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -10)
+script = ExtResource("debug_cam")
 
 [connection signal="timeout" from="ShotTimer" to="." method="_on_shot_timer_timeout"]
 [connection signal="frame_changed" from="Golfer/GolferSprite" to="." method="_on_golfer_sprite_frame_changed"]

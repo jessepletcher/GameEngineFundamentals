@@ -42,9 +42,10 @@ var upgrades = {
 }
 
 var balls = {
-    "standard": {"name": "Standard Ball", "desc": "Your trusty golf ball", "medal_cost": 0.0, "owned": true, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.WHITE, "texture": preload("res://GolfBall2.png")},
-    "homing_ball": {"name": "Homing Ball", "desc": "Homes in on nearest flag", "medal_cost": 5, "owned": false, "speed_mult": 1.0, "money_mult": 1.5, "can_home": true, "trail_color": Color.LIME_GREEN, "texture": preload("res://GolfBall2.png")},
-    # ... etc
+    "standard": {"name": "Standard Ball", "desc": "Your trusty golf ball", "medal_cost": 0.0, "owned": true, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.WHITE, "texture": preload("res://GolfBall2.png"), "flag_mult": 1.0},
+    "homing_ball": {"name": "Homing Ball", "desc": "Homes in on nearest flag", "medal_cost": 5, "owned": false, "speed_mult": 1.0, "money_mult": 1.5, "can_home": true, "trail_color": Color.LIME_GREEN, "texture": preload("res://GolfBall2.png"), "flag_mult": 1.0},
+    "pin_seeker": {"name": "Pin Seeker", "desc": "2x flag bonus money", "medal_cost": 8, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.GOLD, "texture": preload("res://GolfBall2.png"), "flag_mult": 2.0},
+    "firework": {"name": "Firework Ball", "desc": "Explodes into 6 balls at apex", "medal_cost": 12, "owned": false, "speed_mult": 1.0, "money_mult": 0.5, "can_home": false, "trail_color": Color.ORANGE_RED, "texture": preload("res://GolfBall2.png"), "flag_mult": 1.0, "is_firework": true},
 }
 
 var clubs = {
@@ -160,18 +161,14 @@ func save() -> void:
         config.set_value("clubs", key, clubs[key]["owned"])
     
     config.save(SAVE_PATH)
-    print("Game saved")
 
 func load_game() -> void:
     var config = ConfigFile.new()
     var err = config.load(SAVE_PATH)
-    print("Load error code: ", err)  # 0 = OK, anything else = problem
     if err != OK:
-        print("No save file found at: ", SAVE_PATH)
         return
-    
+
     money = config.get_value("player", "money", 0.0)
-    print("Loaded money: ", money)
     xp = config.get_value("player", "xp", 0.0)
     level = config.get_value("player", "level", 1)
     xp_to_next_level = config.get_value("player", "xp_to_next_level", 100.0)
@@ -194,8 +191,6 @@ func load_game() -> void:
     
     for key in clubs:
         clubs[key]["owned"] = config.get_value("clubs", key, false)
-    
-    print("Game loaded, money: ", money)
 
 func add_xp(amount: float) -> void:
     var gained = amount * get_xp_mult()

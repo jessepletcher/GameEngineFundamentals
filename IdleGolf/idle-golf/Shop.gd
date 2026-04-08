@@ -15,12 +15,6 @@ const ShopItem = preload("res://ShopItem.tscn")
 @onready var courses_tab: Button = $VBoxContainer/TabBar/CoursesTabBtn
 
 func _ready() -> void:
-	print("ball_list: ", ball_list)
-	print("club_list: ", club_list)
-	print("course_list: ", course_list)
-	print("balls_panel: ", balls_panel)
-	print("clubs_panel: ", clubs_panel)
-	print("courses_panel: ", courses_panel)
 	back_button.pressed.connect(_on_back_pressed)
 	balls_tab.pressed.connect(_show_balls)
 	clubs_tab.pressed.connect(_show_clubs)
