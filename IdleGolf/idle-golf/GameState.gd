@@ -37,6 +37,7 @@ var upgrades = {
     "money_mult":   {"level": 0, "base_cost": 20.0,  "label": "Money Multiplier"},
     "consistency":  {"level": 0, "base_cost": 12.0,  "label": "Consistency"},
     "swing_speed":  {"level": 0, "base_cost": 8.0,   "label": "Swing Speed"},
+    "flat_distance": {"level": 0, "base_cost": 3.0, "label": "Flat Distance", "use_medals": true},
 }
 
 var balls = {
@@ -58,6 +59,9 @@ var equipped_club: String = "standard"
 func _ready() -> void:
     get_tree().set_auto_accept_quit(false)
     load_game()
+    
+func get_flat_distance() -> float:
+    return upgrades["flat_distance"]["level"] * 5.0  # +10 yards per level
 
 func get_medal_reward() -> float:
     var xp_improvement = max(lifetime_xp - prev_run_xp, 0.0)
@@ -198,7 +202,7 @@ func get_ball_speed() -> float:
     return 1.0 + upgrades["ball_speed"]["level"] * 0.2
 
 func get_fire_rate() -> float:
-    return 1.0 + upgrades["fire_rate"]["level"] * 0.15
+    return 1.0 + upgrades["fire_rate"]["level"] * 0.2
 
 func get_money_mult() -> float:
     return 10.0 + upgrades["money_mult"]["level"] * 1

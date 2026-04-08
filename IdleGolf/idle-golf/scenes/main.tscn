@@ -6,14 +6,15 @@
 [ext_resource type="Texture2D" uid="uid://b8l1suyvq4pm6" path="res://GolfSwing-Sheet.png" id="4_tbgi4"]
 [ext_resource type="Script" uid="uid://dvlxily612f3h" path="res://scenes/golfer.gd" id="4_tefeu"]
 [ext_resource type="FontFile" uid="uid://dg4ug6srbh1wt" path="res://balatro.otf" id="4_trceg"]
+[ext_resource type="Script" uid="uid://ct1p3uy4d1sxc" path="res://scenes/ShotControl.gd" id="5_jkv2x"]
 [ext_resource type="AudioStream" uid="uid://pwbje5jq4ie5" path="res://GolfHit.mp3" id="6_choun"]
 [ext_resource type="Texture2D" uid="uid://j1a8yd64gan7" path="res://RedFlag.png" id="6_o6xl0"]
 [ext_resource type="Texture2D" uid="uid://1wtx0anscbc8" path="res://BlueFlag.png" id="7_tipki"]
 [ext_resource type="Texture2D" uid="uid://cb0xw8x2ejuin" path="res://BlackFlag.png" id="8_tipki"]
 [ext_resource type="PackedScene" uid="uid://cqochshxmtwgp" path="res://Flag.tscn" id="9_85g3d"]
 [ext_resource type="AudioStream" uid="uid://mbplthjf2jpc" path="res://FlagHit.mp3" id="11_ya4ey"]
-[ext_resource type="AudioStream" uid="uid://bxqx4c7vchusb" path="res://kinda zelda sounding.wav" id="12_eb6dy"]
 [ext_resource type="AudioStream" uid="uid://biqrtonns0wht" path="res://u_vr5icvkppa-nature-ambience-323729.mp3" id="13_a8y0u"]
+[ext_resource type="AudioStream" uid="uid://c3prc3scrcaaw" path="res://good golf.wav" id="14_a8y0u"]
 
 [sub_resource type="GDScript" id="GDScript_jyhfs"]
 script/source = "extends Camera3D
@@ -283,6 +284,22 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
 theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
 
+[node name="FlatDistanceRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1886452523]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/FlatDistanceRow" unique_id=167341021]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/FlatDistanceRow" unique_id=548035724]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/FlatDistanceRow" unique_id=548241790]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+
 [node name="OpenShopButton" type="Button" parent="CanvasLayer" unique_id=28586072]
 offset_left = 1722.0
 offset_top = 394.0
@@ -364,6 +381,49 @@ offset_bottom = 53.0
 theme_override_fonts/font = ExtResource("4_trceg")
 theme_override_font_sizes/font_size = 32
 
+[node name="ShotControl" type="Control" parent="CanvasLayer" unique_id=1544696376]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -300.0
+grow_horizontal = 0
+grow_vertical = 0
+script = ExtResource("5_jkv2x")
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/ShotControl" unique_id=1110494323]
+layout_mode = 0
+offset_right = 300.0
+offset_bottom = 300.0
+mouse_filter = 2
+color = Color(0.12955844, 0.12955847, 0.12955844, 1)
+
+[node name="DragPoint" type="Control" parent="CanvasLayer/ShotControl" unique_id=660342021]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/ShotControl/DragPoint" unique_id=1435810513]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+color = Color(0.5132329, 0.5132329, 0.5132329, 1)
+
 [node name="Golfer" type="Node3D" parent="." unique_id=264766340]
 script = ExtResource("4_tefeu")
 
@@ -407,7 +467,7 @@ volume_db = -12.036
 autoplay = true
 
 [node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=912753352]
-stream = ExtResource("12_eb6dy")
+stream = ExtResource("14_a8y0u")
 volume_db = -31.964
 autoplay = true
 

@@ -21,6 +21,7 @@ const Ball = preload("res://scenes/Ball.tscn")
 @onready var confirm_retire: Button = $CanvasLayer/RetireDialog/VBoxContainer/ConfirmRetireButton
 @onready var cancel_retire: Button = $CanvasLayer/RetireDialog/VBoxContainer/CancelRetireButton
 @onready var medals_label: Label = $CanvasLayer/MedalsLabel
+@onready var shot_control = $CanvasLayer/ShotControl
 
 const SHOT_INTERVAL := 5.0
 const BALL_SPEED := 100
@@ -114,16 +115,18 @@ func _on_ShotTimer_timeout() -> void:
 
 func _hit_ball() -> void:
     hit_sound.play()
+    var modifier = shot_control.get_launch_modifier()
     var ball = Ball.instantiate()
     ball._speed = BASE_SPEED * GameState.get_ball_speed()
     ball._spread = BASE_SPREAD / GameState.get_consistency()
     ball._aim = -aim_slider.value
+    ball._launch_modifier = modifier
     ball.position = tee_position.global_position
     add_child(ball)
     ball.landed.connect(_on_ball_landed.bind(ball))
 
 func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
-    var base_money = yards * 0.05
+    var base_money = pow(yards, 2) * 0.0002 + 5
     
     var best_bonus = 0.0
     for flag in flags.get_children():

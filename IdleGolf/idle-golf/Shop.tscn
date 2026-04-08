@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://depe7ovvl2pxt"]
 
 [ext_resource type="Script" uid="uid://cdd14jwx675sy" path="res://Shop.gd" id="1_7ae35"]
-[ext_resource type="Texture2D" uid="uid://4la3vi6ctch5" path="res://ProShop.png" id="2_f511j"]
+[ext_resource type="Texture2D" uid="uid://duplbd5q6fc5" path="res://ProShop.png" id="2_f511j"]
 [ext_resource type="FontFile" uid="uid://dg4ug6srbh1wt" path="res://balatro.otf" id="3_f511j"]
 [ext_resource type="Texture2D" uid="uid://b14y43nrma0a0" path="res://ShopBallButton.png" id="4_svtxo"]
 [ext_resource type="Texture2D" uid="uid://balughlvgfiwb" path="res://ShopBallButtonPressed.png" id="5_odqjv"]
