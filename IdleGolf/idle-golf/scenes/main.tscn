@@ -192,8 +192,10 @@ anchor_top = 0.5
 anchor_bottom = 0.5
 offset_top = -144.565
 offset_right = 384.0
-offset_bottom = 95.964966
+offset_bottom = 246.0
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_a8y0u")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Panel" unique_id=1733494368]
@@ -201,7 +203,7 @@ layout_mode = 0
 offset_left = 15.0
 offset_top = 17.565002
 offset_right = 99.0
-offset_bottom = 183.565
+offset_bottom = 244.565
 theme_override_constants/separation = 18
 
 [node name="BallSpeedRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=98483021]
@@ -252,6 +254,22 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
 theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
 
+[node name="XPMultRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1927888584]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/XPMultRow" unique_id=316341780]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/XPMultRow" unique_id=656682704]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/XPMultRow" unique_id=1818994324]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+
 [node name="ConsistencyRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1614771815]
 layout_mode = 2
 
@@ -268,22 +286,6 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
 theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
 
-[node name="SwingSpeedRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1278066890]
-layout_mode = 2
-
-[node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/SwingSpeedRow" unique_id=1896339477]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/SwingSpeedRow" unique_id=1222644701]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/SwingSpeedRow" unique_id=2049811991]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
-
 [node name="FlatDistanceRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1886452523]
 layout_mode = 2
 
@@ -296,6 +298,22 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
 
 [node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/FlatDistanceRow" unique_id=548241790]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+
+[node name="MultiBallRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1714524131]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/MultiBallRow" unique_id=1028440102]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/MultiBallRow" unique_id=236323619]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/MultiBallRow" unique_id=1373548310]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
 theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
@@ -423,6 +441,48 @@ offset_right = 40.0
 offset_bottom = 40.0
 mouse_filter = 2
 color = Color(0.5132329, 0.5132329, 0.5132329, 1)
+
+[node name="ResetButton" type="Button" parent="CanvasLayer" unique_id=176597736]
+offset_left = 1804.0
+offset_top = 105.0
+offset_right = 1904.0
+offset_bottom = 158.0
+theme_override_font_sizes/font_size = 32
+text = "RESET"
+
+[node name="ResetDialog" type="Panel" parent="CanvasLayer" unique_id=117300160]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -328.5
+offset_top = -84.0
+offset_right = 314.0
+offset_bottom = 84.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/ResetDialog" unique_id=941258793]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="CanvasLayer/ResetDialog/VBoxContainer" unique_id=775044408]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Are you sure? This will erase ALL progress"
+
+[node name="ConfirmResetButton" type="Button" parent="CanvasLayer/ResetDialog/VBoxContainer" unique_id=1579618663]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Confirm"
+
+[node name="CancelResetButton" type="Button" parent="CanvasLayer/ResetDialog/VBoxContainer" unique_id=1609035464]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Cancel"
 
 [node name="Golfer" type="Node3D" parent="." unique_id=264766340]
 script = ExtResource("4_tefeu")

@@ -22,7 +22,7 @@ const LEVEL_REWARDS = [
     "money_mult",
     "fire_rate",
     "consistency",
-    "swing_speed",
+    "fire_rate",
     "money_mult",
     "ball_speed",
     "consistency",
@@ -36,8 +36,9 @@ var upgrades = {
     "fire_rate":    {"level": 0, "base_cost": 15.0,  "label": "Fire Rate"},
     "money_mult":   {"level": 0, "base_cost": 20.0,  "label": "Money Multiplier"},
     "consistency":  {"level": 0, "base_cost": 12.0,  "label": "Consistency"},
-    "swing_speed":  {"level": 0, "base_cost": 8.0,   "label": "Swing Speed"},
+    "xp_mult":      {"level": 0, "base_cost": 20.0,  "label": "XP Multiplier"},
     "flat_distance": {"level": 0, "base_cost": 3.0, "label": "Flat Distance", "use_medals": true},
+    "multi_ball": {"level": 0, "base_cost": 50.0, "label": "Multi Ball", "use_medals": true},
 }
 
 var balls = {
@@ -55,6 +56,14 @@ var clubs = {
 
 var equipped_ball: String = "standard"
 var equipped_club: String = "standard"
+
+var level_bonuses = {
+    "ball_speed": 0.0,
+    "fire_rate": 0.0,
+    "money_mult": 0.0,
+    "consistency": 0.0,
+    "xp_mult": 0.0,
+}
 
 func _ready() -> void:
     get_tree().set_auto_accept_quit(false)
@@ -80,9 +89,6 @@ func retire() -> void:
     lifetime_xp = 0.0
     lifetime_money = 0.0
     money = 0.0
-    xp = 0.0
-    level = 1
-    xp_to_next_level = 100.0
     
     # reset upgrades
     for key in upgrades:
@@ -91,6 +97,36 @@ func retire() -> void:
     medals_changed.emit(medals)
     save()
     
+func full_reset() -> void:
+    money = 0.0
+    xp = 0.0
+    level = 1
+    xp_to_next_level = 100.0
+    medals = 0.0
+    lifetime_xp = 0.0
+    lifetime_money = 0.0
+    prev_run_xp = 0.0
+    prev_run_money = 0.0
+    equipped_ball = "standard"
+    equipped_club = "standard"
+
+    for key in upgrades:
+        upgrades[key]["level"] = 0
+
+    for key in level_bonuses:
+        level_bonuses[key] = 0.0
+
+    for key in balls:
+        balls[key]["owned"] = (key == "standard")
+
+    for key in clubs:
+        clubs[key]["owned"] = (key == "standard")
+
+    money_changed.emit(money)
+    medals_changed.emit(medals)
+    xp_changed.emit(xp, xp_to_next_level)
+    save()
+
 func _notification(what: int) -> void:
     if what == NOTIFICATION_WM_CLOSE_REQUEST:
         save()
@@ -113,7 +149,10 @@ func save() -> void:
     
     for key in upgrades:
         config.set_value("upgrades", key, upgrades[key]["level"])
-    
+
+    for key in level_bonuses:
+        config.set_value("level_bonuses", key, level_bonuses[key])
+
     for key in balls:
         config.set_value("balls", key, balls[key]["owned"])
     
@@ -146,7 +185,10 @@ func load_game() -> void:
     
     for key in upgrades:
         upgrades[key]["level"] = config.get_value("upgrades", key, 0)
-    
+
+    for key in level_bonuses:
+        level_bonuses[key] = config.get_value("level_bonuses", key, 0.0)
+
     for key in balls:
         balls[key]["owned"] = config.get_value("balls", key, false)
     
@@ -156,7 +198,7 @@ func load_game() -> void:
     print("Game loaded, money: ", money)
 
 func add_xp(amount: float) -> void:
-    var gained = amount * exp_mult
+    var gained = amount * get_xp_mult()
     xp += gained
     lifetime_xp += gained
     xp_changed.emit(xp, xp_to_next_level)
@@ -166,17 +208,21 @@ func add_xp(amount: float) -> void:
 
 func _level_up() -> void:
     level += 1
-    xp_to_next_level = floor(100.0 * pow(1.4, level - 1))  # increases each level
+    xp_to_next_level = floor(100.0 * pow(1.4, level - 1))
     var reward_index = (level - 2) % LEVEL_REWARDS.size()
     var stat = LEVEL_REWARDS[reward_index]
-    upgrades[stat]["level"] += 1
+    level_bonuses[stat] += 0.05  # +5% multiplier per level
     leveled_up.emit(level, stat)
-    money_changed.emit(money)  # refresh shop button states
+    money_changed.emit(money)
 
-var exp_mult: float = 1.0
+func get_level_mult(stat: String) -> float:
+    return 1.0 + level_bonuses.get(stat, 0.0)
+
+func get_xp_mult() -> float:
+    return (10.0 + upgrades["xp_mult"]["level"] * 1) * get_level_mult("xp_mult")
 
 func get_swing_speed() -> float:
-    return 1.0 + upgrades["swing_speed"]["level"] * 0.2
+    return (1.0 + upgrades["fire_rate"]["level"] * 0.2) * get_level_mult("fire_rate")
 
 func add_money(amount: float) -> void:
     var final = amount * get_money_mult()
@@ -185,8 +231,13 @@ func add_money(amount: float) -> void:
     money_changed.emit(money)
     add_xp(final * 0.1)
 
+func get_ball_count() -> int:
+    return 1 + upgrades["multi_ball"]["level"]
+
 func get_cost(upgrade: String) -> float:
     var level = upgrades[upgrade]["level"]
+    if upgrade == "multi_ball":
+        return floor(upgrades[upgrade]["base_cost"] * pow(3.0, level))
     return floor(upgrades[upgrade]["base_cost"] * pow(1.6, level))
 
 func try_purchase(upgrade: String) -> bool:
@@ -199,13 +250,13 @@ func try_purchase(upgrade: String) -> bool:
     return false
 
 func get_ball_speed() -> float:
-    return 1.0 + upgrades["ball_speed"]["level"] * 0.2
+    return (1.0 + upgrades["ball_speed"]["level"] * 0.2) * get_level_mult("ball_speed")
 
 func get_fire_rate() -> float:
-    return 1.0 + upgrades["fire_rate"]["level"] * 0.2
+    return (1.0 + upgrades["fire_rate"]["level"] * 0.2) * get_level_mult("fire_rate")
 
 func get_money_mult() -> float:
-    return 10.0 + upgrades["money_mult"]["level"] * 1
+    return (10.0 + upgrades["money_mult"]["level"] * 1) * get_level_mult("money_mult")
 
 func get_consistency() -> float:
-    return .5 + upgrades["consistency"]["level"] * 0.25
+    return (.5 + upgrades["consistency"]["level"] * 0.25) * get_level_mult("consistency")

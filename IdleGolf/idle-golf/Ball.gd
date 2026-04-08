@@ -10,6 +10,7 @@ var _aim: float = 0.0  # -1.0 to 1.0
 var _is_homing := false
 var _target_flag: Node3D = null
 var _has_peaked := false
+var _homing_time := 0.0
 var _launch_modifier := Vector2.ZERO  # x = curve, y = launch angle
 @onready var sprite: Sprite3D = $Sprite3D
 @onready var trail: GPUParticles3D = $GPUParticles3D
@@ -29,53 +30,60 @@ func _physics_process(delta: float) -> void:
     sprite.scale = Vector3(scale_factor, scale_factor, scale_factor)
     
     # homing
-    var ball_data = GameState.balls[GameState.equipped_ball]
-    if not _has_peaked and linear_velocity.y < 5.0:
-       _has_peaked = true
-       if ball_data.get("can_home", false):
-           _start_homing()
-    
     if _is_homing and _target_flag:
+        _homing_time += delta
         _home_toward_flag(delta)
     
     if not _has_landed and global_position.y < 0.5 and abs(linear_velocity.y) < 2.0:
         _land()
         
 func _start_homing() -> void:
-    print("Starting homing")
     var flags = get_tree().get_nodes_in_group("flags")
-    print("Flags found: ", flags.size())
-    if flags.size() > 0:
-        print("Nearest flag position: ", flags[0].global_position)
-    var nearest: Node3D = null
-    var nearest_dist = INF
-    for flag in flags:
-        var d = global_position.distance_to(flag.global_position)
-        if d < nearest_dist:
-            nearest_dist = d
-            nearest = flag
-    if nearest:
-        _target_flag = nearest
-        _is_homing = true
-        print("Homing toward: ", nearest.global_position)
-    else:
-        print("No flag found to home toward")
+    if flags.size() == 0:
+        return
+
+    # estimate landing Z based on current speed
+    var forward_speed = abs(linear_velocity.z)
+    var time_to_land = 0.0
+    if linear_velocity.y > 0:
+        time_to_land = (linear_velocity.y * 2.0) / 9.8
+    var estimated_landing_z = global_position.z + forward_speed * time_to_land
+
+    # sort flags by Z distance (furthest first)
+    var sorted_flags = flags.duplicate()
+    sorted_flags.sort_custom(func(a, b): return a.global_position.z > b.global_position.z)
+
+    # pick the furthest flag the ball can realistically reach
+    var best_flag: Node3D = null
+    for flag in sorted_flags:
+        if flag.global_position.z <= estimated_landing_z * 1.2:
+            best_flag = flag
+            break
+
+    # fallback to closest flag if none are reachable
+    if not best_flag:
+        best_flag = sorted_flags[sorted_flags.size() - 1]
+
+    _target_flag = best_flag
+    _is_homing = true
 
 func _home_toward_flag(delta: float) -> void:
     var flat_pos = Vector3(global_position.x, 0, global_position.z)
     var flat_target = Vector3(_target_flag.global_position.x, 0, _target_flag.global_position.z)
     var flat_dist = flat_pos.distance_to(flat_target)
-    
-    if flat_dist < 5.0:
+
+    if flat_dist < 3.0:
         _is_homing = false
         _land()
         return
-    
+
+    # steer toward flag — starts gentle, gets stronger over time
     var direction = (flat_target - flat_pos).normalized()
-    # speed needed to reach flag in 1 second, clamped so it doesnt go crazy
-    var needed_speed = clamp(flat_dist, 5.0, 50.0)
-    linear_velocity.x = direction.x * needed_speed
-    linear_velocity.z = direction.z * needed_speed
+    var current_flat_vel = Vector3(linear_velocity.x, 0, linear_velocity.z)
+    var desired_vel = direction * current_flat_vel.length()
+    var strength = clamp(_homing_time * 0.3, 0.05, 2.0)
+    var steer = (desired_vel - current_flat_vel) * strength
+    apply_central_force(steer)
     
 func _ready() -> void:
     _start_z = global_position.z
@@ -106,6 +114,10 @@ func _ready() -> void:
     
     # store curve for _process
     _curve = curve
+
+    # start homing immediately if ball supports it
+    if ball_data.get("can_home", false):
+        _start_homing()
 
 var _curve := 0.0
 
