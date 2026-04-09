@@ -4,23 +4,22 @@ const Ball = preload("res://scenes/Ball.tscn")
 
 @onready var shot_timer: Timer = $ShotTimer
 @onready var tee_position: Marker3D = $TeePosition  # place this in your scene at tee location
-@onready var money_label: Label = $CanvasLayer/MoneyLabel
+@onready var money_label: Label = $CanvasLayer/LeftVBox/Money/MoneyLabel
 @onready var golfer = $Golfer
 @onready var shop = $CanvasLayer
-@onready var shop_button: Button = $CanvasLayer/ShopButton
 @onready var aim_slider: HSlider = $CanvasLayer/AimSlider
 @onready var flags = $Flags
 @onready var hit_sound: AudioStreamPlayer3D = $Golfer/GolfHit
 @onready var flag_sound: AudioStreamPlayer3D = $FlagSound
 @onready var open_shop_button: Button = $CanvasLayer/OpenShopButton
-@onready var xp_progress: ProgressBar = $CanvasLayer/XPBar/XPProgress
-@onready var level_label: Label = $CanvasLayer/XPBar/LevelLabel
-@onready var retire_button: Button = $CanvasLayer/RetireButton
+@onready var xp_progress: ProgressBar = $CanvasLayer/LeftVBox/XPBar/XPProgress
+@onready var level_label: Label = $CanvasLayer/LeftVBox/XPBar/LevelLabel
+@onready var retire_button: Button = $CanvasLayer/LeftVBox/LeftMenu/TopBar/RetireButton
 @onready var retire_dialog = $CanvasLayer/RetireDialog
 @onready var retire_info_label: Label = $CanvasLayer/RetireDialog/VBoxContainer/RetireInfoLabel
 @onready var confirm_retire: Button = $CanvasLayer/RetireDialog/VBoxContainer/ConfirmRetireButton
 @onready var cancel_retire: Button = $CanvasLayer/RetireDialog/VBoxContainer/CancelRetireButton
-@onready var medals_label: Label = $CanvasLayer/MedalsLabel
+@onready var medals_label: Label = $CanvasLayer/LeftVBox/Medals/MedalsLabel
 @onready var shot_control = $CanvasLayer/ShotControl
 @onready var reset_button: Button = $CanvasLayer/ResetButton
 @onready var reset_dialog = $CanvasLayer/ResetDialog
@@ -36,7 +35,7 @@ const BASE_SPREAD := 8.0
 const FloatingText = preload("res://scenes/FloatingText.tscn")
 
 func _ready() -> void:
-	money_label.text = "$%.2f" % GameState.money
+	money_label.text = "%.2f" % GameState.money
 	level_label.text = "Level %d" % GameState.level
 	xp_progress.max_value = GameState.xp_to_next_level
 	xp_progress.value = GameState.xp
@@ -47,14 +46,13 @@ func _ready() -> void:
 	open_shop_button.pressed.connect(_on_open_shop_pressed)
 	shot_timer.timeout.connect(_on_ShotTimer_timeout)
 	shot_timer.wait_time = BASE_INTERVAL / GameState.get_fire_rate()
-	shop_button.pressed.connect(_on_shop_button_pressed)
 	shot_timer.start()
 	retire_button.pressed.connect(_on_retire_pressed)
 	confirm_retire.pressed.connect(_on_confirm_retire)
 	cancel_retire.pressed.connect(_on_cancel_retire)
 	retire_dialog.visible = false
 	GameState.medals_changed.connect(_on_medals_changed)
-	medals_label.text = "🏅 %.0f" % GameState.medals
+	medals_label.text = "%.0f" % GameState.medals
 
 	# auto-save every 15 seconds
 	var save_timer = Timer.new()
@@ -112,9 +110,6 @@ func _on_open_shop_pressed() -> void:
 	GameState.save()
 	get_tree().change_scene_to_file("res://Shop.tscn")
 
-func _on_shop_button_pressed() -> void:
-	shop.toggle()
-	
 func _on_golfer_swung() -> void:
 	_hit_ball()
 

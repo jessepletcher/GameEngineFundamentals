@@ -1,24 +1,26 @@
 extends CanvasLayer
 
-@onready var shop_panel = $Panel
+@onready var shop_panel = $LeftVBox/LeftMenu/UpgradesPanel
+@onready var upgrades_button: Button = $LeftVBox/LeftMenu/TopBar/UpgradesButton
 @onready var rows = {
-	"ball_speed":  $Panel/VBoxContainer/BallSpeedRow,
-	"fire_rate":   $Panel/VBoxContainer/FireRateRow,
-	"money_mult":  $Panel/VBoxContainer/MoneyMultRow,
-	"consistency": $Panel/VBoxContainer/ConsistencyRow,
-	"xp_mult": $Panel/VBoxContainer/XPMultRow,
-	"flat_distance": $Panel/VBoxContainer/FlatDistanceRow,
-	"multi_ball": $Panel/VBoxContainer/MultiBallRow,
+	"ball_speed":  $LeftVBox/LeftMenu/UpgradesPanel/BallSpeedRow,
+	"fire_rate":   $LeftVBox/LeftMenu/UpgradesPanel/FireRateRow,
+	"money_mult":  $LeftVBox/LeftMenu/UpgradesPanel/MoneyMultRow,
+	"consistency": $LeftVBox/LeftMenu/UpgradesPanel/ConsistencyRow,
+	"xp_mult":     $LeftVBox/LeftMenu/UpgradesPanel/XPMultRow,
+	"flat_distance": $LeftVBox/LeftMenu/UpgradesPanel/FlatDistanceRow,
+	"multi_ball":  $LeftVBox/LeftMenu/UpgradesPanel/MultiBallRow,
 }
 
 func _ready() -> void:
 	shop_panel.visible = false
 	GameState.money_changed.connect(_refresh)
-	
+	upgrades_button.pressed.connect(toggle)
+
 	for key in rows:
 		var btn = rows[key].get_node("BuyButton")
 		btn.pressed.connect(_on_buy_pressed.bind(key))
-	
+
 	_refresh(GameState.money)
 
 func toggle() -> void:

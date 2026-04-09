@@ -8,11 +8,19 @@
 [ext_resource type="FontFile" uid="uid://dg4ug6srbh1wt" path="res://balatro.otf" id="4_trceg"]
 [ext_resource type="Script" uid="uid://ct1p3uy4d1sxc" path="res://scenes/ShotControl.gd" id="5_jkv2x"]
 [ext_resource type="AudioStream" uid="uid://pwbje5jq4ie5" path="res://GolfHit.mp3" id="6_choun"]
+[ext_resource type="Texture2D" uid="uid://bq6yuv44f71bj" path="res://MoneyLabel.png" id="6_dp3eg"]
 [ext_resource type="Texture2D" uid="uid://j1a8yd64gan7" path="res://RedFlag.png" id="6_o6xl0"]
+[ext_resource type="Texture2D" uid="uid://hm1uef80hdbi" path="res://MedalsLabel.png" id="7_0ld40"]
 [ext_resource type="Texture2D" uid="uid://1wtx0anscbc8" path="res://BlueFlag.png" id="7_tipki"]
 [ext_resource type="Texture2D" uid="uid://cb0xw8x2ejuin" path="res://BlackFlag.png" id="8_tipki"]
+[ext_resource type="Texture2D" uid="uid://cfcg26n53g543" path="res://XPBackground.png" id="8_yc10j"]
 [ext_resource type="PackedScene" uid="uid://cqochshxmtwgp" path="res://Flag.tscn" id="9_85g3d"]
+[ext_resource type="Texture2D" uid="uid://bymqgk414spcd" path="res://XPBarBackground.png" id="9_jscy8"]
+[ext_resource type="Texture2D" uid="uid://57dsy3ovlimo" path="res://XPBarProgress.png" id="10_pm3ni"]
+[ext_resource type="Texture2D" uid="uid://bh63qn8gcdsjy" path="res://LeftMenuBackground.png" id="11_y6deb"]
 [ext_resource type="AudioStream" uid="uid://mbplthjf2jpc" path="res://FlagHit.mp3" id="11_ya4ey"]
+[ext_resource type="Texture2D" uid="uid://cy6ye2qaaerir" path="res://UpgradesButton.png" id="12_og1vs"]
+[ext_resource type="Texture2D" uid="uid://csxoumf866der" path="res://UpgradesButtonPressed.png" id="13_2wyq8"]
 [ext_resource type="AudioStream" uid="uid://biqrtonns0wht" path="res://u_vr5icvkppa-nature-ambience-323729.mp3" id="13_a8y0u"]
 [ext_resource type="AudioStream" uid="uid://c3prc3scrcaaw" path="res://good golf.wav" id="14_a8y0u"]
 [ext_resource type="Script" uid="uid://dvcvompk6cw5p" path="res://DebugCamera.gd" id="debug_cam"]
@@ -53,13 +61,25 @@ border_color = Color(0.32170263, 0.2242406, 0.15718931, 1)
 expand_margin_top = 4.0
 expand_margin_bottom = 4.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a8y0u"]
-bg_color = Color(0.49019608, 0.3529412, 0.25882354, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0.32156864, 0.22352941, 0.15686275, 1)
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_y6deb"]
+texture = ExtResource("9_jscy8")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_og1vs"]
+texture = ExtResource("10_pm3ni")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vxglm"]
+texture = ExtResource("12_og1vs")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_2f3dj"]
+texture = ExtResource("13_2wyq8")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_tefeu"]
 atlas = ExtResource("4_tbgi4")
@@ -150,28 +170,6 @@ grow_vertical = 2
 texture = ExtResource("3_tbgi4")
 stretch_mode = 6
 
-[node name="MoneyLabel" type="Label" parent="CanvasLayer" unique_id=220844088]
-z_index = 1
-texture_filter = 1
-offset_left = 19.0
-offset_top = 12.0
-offset_right = 403.0
-offset_bottom = 144.0
-theme_override_colors/font_color = Color(0.24158579, 0.5506578, 0, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_font_sizes/font_size = 64
-text = "$0.00"
-
-[node name="ShopButton" type="Button" parent="CanvasLayer" unique_id=1134168048]
-offset_top = 349.915
-offset_right = 384.0
-offset_bottom = 390.915
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_font_sizes/font_size = 32
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
-text = "UPGRADES"
-
 [node name="AimSlider" type="HSlider" parent="CanvasLayer" unique_id=811697383]
 anchors_preset = 7
 anchor_left = 0.5
@@ -187,138 +185,6 @@ min_value = -1.0
 max_value = 1.0
 step = 0.01
 
-[node name="Panel" type="Panel" parent="CanvasLayer" unique_id=1089134530]
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_top = -144.565
-offset_right = 384.0
-offset_bottom = 246.0
-grow_vertical = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_a8y0u")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Panel" unique_id=1733494368]
-layout_mode = 0
-offset_left = 15.0
-offset_top = 17.565002
-offset_right = 99.0
-offset_bottom = 244.565
-theme_override_constants/separation = 18
-
-[node name="BallSpeedRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=98483021]
-layout_mode = 2
-
-[node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/BallSpeedRow" unique_id=406791096]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/BallSpeedRow" unique_id=1684960448]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/BallSpeedRow" unique_id=268026691]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
-
-[node name="FireRateRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=365005602]
-layout_mode = 2
-
-[node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/FireRateRow" unique_id=2007074903]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/FireRateRow" unique_id=1205916336]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/FireRateRow" unique_id=2001506790]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
-
-[node name="MoneyMultRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1306246441]
-layout_mode = 2
-
-[node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/MoneyMultRow" unique_id=77518754]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/MoneyMultRow" unique_id=1783862080]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/MoneyMultRow" unique_id=120206325]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
-
-[node name="XPMultRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1927888584]
-layout_mode = 2
-
-[node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/XPMultRow" unique_id=316341780]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/XPMultRow" unique_id=656682704]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/XPMultRow" unique_id=1818994324]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
-
-[node name="ConsistencyRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1614771815]
-layout_mode = 2
-
-[node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/ConsistencyRow" unique_id=1053258118]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/ConsistencyRow" unique_id=594187679]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/ConsistencyRow" unique_id=1003469390]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
-
-[node name="FlatDistanceRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1886452523]
-layout_mode = 2
-
-[node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/FlatDistanceRow" unique_id=167341021]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/FlatDistanceRow" unique_id=548035724]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/FlatDistanceRow" unique_id=548241790]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
-
-[node name="MultiBallRow" type="HBoxContainer" parent="CanvasLayer/Panel/VBoxContainer" unique_id=1714524131]
-layout_mode = 2
-
-[node name="NameLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/MultiBallRow" unique_id=1028440102]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="LevelLabel" type="Label" parent="CanvasLayer/Panel/VBoxContainer/MultiBallRow" unique_id=236323619]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="BuyButton" type="Button" parent="CanvasLayer/Panel/VBoxContainer/MultiBallRow" unique_id=1373548310]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
-
 [node name="OpenShopButton" type="Button" parent="CanvasLayer" unique_id=28586072]
 offset_left = 1722.0
 offset_top = 394.0
@@ -328,40 +194,6 @@ theme_override_fonts/font = ExtResource("4_trceg")
 theme_override_font_sizes/font_size = 64
 theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
 text = "SHOP"
-
-[node name="XPBar" type="VBoxContainer" parent="CanvasLayer" unique_id=1347500610]
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -27.0
-offset_right = 27.0
-offset_bottom = 54.0
-grow_horizontal = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-
-[node name="LevelLabel" type="Label" parent="CanvasLayer/XPBar" unique_id=2008835539]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_font_sizes/font_size = 32
-text = "Level 1"
-horizontal_alignment = 1
-
-[node name="XPProgress" type="ProgressBar" parent="CanvasLayer/XPBar" unique_id=881976446]
-custom_minimum_size = Vector2(274.04, 0)
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_font_sizes/font_size = 32
-
-[node name="RetireButton" type="Button" parent="CanvasLayer" unique_id=1454019025]
-offset_left = 1686.0
-offset_top = 19.0
-offset_right = 1896.0
-offset_bottom = 84.0
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_font_sizes/font_size = 64
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
-text = "RETIRE"
 
 [node name="RetireDialog" type="PanelContainer" parent="CanvasLayer" unique_id=1455203785]
 anchors_preset = 8
@@ -395,14 +227,6 @@ theme_override_fonts/font = ExtResource("4_trceg")
 theme_override_font_sizes/font_size = 32
 theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
 text = "Cancel"
-
-[node name="MedalsLabel" type="Label" parent="CanvasLayer" unique_id=805189382]
-offset_left = 1538.0
-offset_top = 20.0
-offset_right = 1578.0
-offset_bottom = 53.0
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_font_sizes/font_size = 32
 
 [node name="ShotControl" type="Control" parent="CanvasLayer" unique_id=1544696376]
 custom_minimum_size = Vector2(300, 300)
@@ -488,6 +312,259 @@ text = "Confirm"
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Cancel"
+
+[node name="LeftVBox" type="VBoxContainer" parent="CanvasLayer" unique_id=594785329]
+offset_left = 20.0
+offset_top = -5.0
+offset_right = 325.0
+offset_bottom = 437.0
+
+[node name="Money" type="Control" parent="CanvasLayer/LeftVBox" unique_id=144339451]
+custom_minimum_size = Vector2(305, 69)
+layout_mode = 2
+
+[node name="Background" type="TextureRect" parent="CanvasLayer/LeftVBox/Money" unique_id=1639543379]
+texture_filter = 1
+layout_mode = 0
+offset_top = 5.0
+offset_right = 305.0
+offset_bottom = 70.0
+texture = ExtResource("6_dp3eg")
+stretch_mode = 2
+
+[node name="MoneyLabel" type="Label" parent="CanvasLayer/LeftVBox/Money" unique_id=220844088]
+z_index = 1
+texture_filter = 1
+layout_mode = 0
+offset_left = 48.0
+offset_top = 12.0
+offset_right = 290.0
+offset_bottom = 61.0
+theme_override_colors/font_color = Color(0.08235294, 0.5019608, 0.09803922, 1)
+theme_override_constants/line_spacing = 3
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 0
+theme_override_constants/shadow_outline_size = 0
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_font_sizes/font_size = 48
+text = "0.00"
+
+[node name="Medals" type="Control" parent="CanvasLayer/LeftVBox" unique_id=1251996529]
+custom_minimum_size = Vector2(0, 55.87)
+layout_mode = 2
+
+[node name="MedalsBackground" type="TextureRect" parent="CanvasLayer/LeftVBox/Medals" unique_id=8137912]
+texture_filter = 1
+layout_mode = 0
+offset_top = -4.0
+offset_right = 305.0
+offset_bottom = 61.0
+texture = ExtResource("7_0ld40")
+
+[node name="MedalsLabel" type="Label" parent="CanvasLayer/LeftVBox/Medals" unique_id=805189382]
+layout_mode = 0
+offset_left = 70.0
+offset_top = -3.0
+offset_right = 282.0
+offset_bottom = 46.0
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_font_sizes/font_size = 48
+text = "0"
+
+[node name="XPBar" type="Control" parent="CanvasLayer/LeftVBox" unique_id=658539415]
+custom_minimum_size = Vector2(305, 50)
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/LeftVBox/XPBar" unique_id=517087587]
+texture_filter = 1
+layout_mode = 0
+offset_top = 7.0
+offset_right = 300.0
+offset_bottom = 57.0
+texture = ExtResource("8_yc10j")
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/XPBar" unique_id=2008835539]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 17.0
+offset_right = 92.0
+offset_bottom = 42.0
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_font_sizes/font_size = 24
+text = "Level 1"
+horizontal_alignment = 1
+
+[node name="XPProgress" type="ProgressBar" parent="CanvasLayer/LeftVBox/XPBar" unique_id=881976446]
+texture_filter = 1
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 0
+offset_left = 120.0
+offset_top = 17.0
+offset_right = 245.0
+offset_bottom = 47.0
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_font_sizes/font_size = 8
+theme_override_styles/background = SubResource("StyleBoxTexture_y6deb")
+theme_override_styles/fill = SubResource("StyleBoxTexture_og1vs")
+show_percentage = false
+
+[node name="LeftMenu" type="Control" parent="CanvasLayer/LeftVBox" unique_id=2033481501]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/LeftVBox/LeftMenu" unique_id=1634069558]
+texture_filter = 1
+layout_mode = 0
+offset_top = 8.0
+offset_right = 300.0
+offset_bottom = 58.0
+texture = ExtResource("11_y6deb")
+stretch_mode = 2
+
+[node name="TopBar" type="HBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu" unique_id=1169899390]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 13.0
+offset_right = 310.0
+offset_bottom = 53.0
+
+[node name="UpgradesButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/TopBar" unique_id=1155314175]
+texture_filter = 1
+custom_minimum_size = Vector2(145, 40)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_vxglm")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_2f3dj")
+theme_override_styles/hover = SubResource("StyleBoxTexture_vxglm")
+
+[node name="RetireButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/TopBar" unique_id=1454019025]
+layout_mode = 2
+text = "RETIRE"
+
+[node name="UpgradesPanel" type="VBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu" unique_id=1353442803]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 60.0
+offset_right = 306.0
+offset_bottom = 257.0
+
+[node name="CashLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel" unique_id=1644806234]
+layout_mode = 2
+text = "CASH"
+
+[node name="BallSpeedRow" type="HBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel" unique_id=98483021]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/BallSpeedRow" unique_id=406791096]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/BallSpeedRow" unique_id=1684960448]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/BallSpeedRow" unique_id=268026691]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+
+[node name="FireRateRow" type="HBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel" unique_id=365005602]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/FireRateRow" unique_id=2007074903]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/FireRateRow" unique_id=1205916336]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/FireRateRow" unique_id=2001506790]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+
+[node name="MoneyMultRow" type="HBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel" unique_id=1306246441]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/MoneyMultRow" unique_id=77518754]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/MoneyMultRow" unique_id=1783862080]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/MoneyMultRow" unique_id=120206325]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+
+[node name="XPMultRow" type="HBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel" unique_id=1927888584]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/XPMultRow" unique_id=316341780]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/XPMultRow" unique_id=656682704]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/XPMultRow" unique_id=1818994324]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+
+[node name="ConsistencyRow" type="HBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel" unique_id=1614771815]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/ConsistencyRow" unique_id=1053258118]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/ConsistencyRow" unique_id=594187679]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/ConsistencyRow" unique_id=1003469390]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+
+[node name="MedalsLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel" unique_id=779939300]
+layout_mode = 2
+text = "MEDALS"
+
+[node name="FlatDistanceRow" type="HBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel" unique_id=1886452523]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/FlatDistanceRow" unique_id=167341021]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/FlatDistanceRow" unique_id=548035724]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/FlatDistanceRow" unique_id=548241790]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+
+[node name="MultiBallRow" type="HBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel" unique_id=1714524131]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/MultiBallRow" unique_id=1028440102]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/MultiBallRow" unique_id=236323619]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/UpgradesPanel/MultiBallRow" unique_id=1373548310]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
 
 [node name="Golfer" type="Node3D" parent="." unique_id=264766340]
 script = ExtResource("4_tefeu")
