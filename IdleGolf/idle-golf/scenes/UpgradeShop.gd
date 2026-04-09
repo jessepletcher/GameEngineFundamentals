@@ -2,6 +2,7 @@ extends CanvasLayer
 
 @onready var shop_panel = $LeftVBox/LeftMenu/ScrollContainer
 @onready var menu_background = $LeftVBox/LeftMenu/MenuBackground
+@onready var top_border = $LeftVBox/LeftMenu/TopBorder
 @onready var upgrades_button: Button = $LeftVBox/LeftMenu/TopBar/UpgradesButton
 @onready var rows = {
 	"ball_speed":  $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/BallSpeedRow,
@@ -16,6 +17,7 @@ extends CanvasLayer
 func _ready() -> void:
 	shop_panel.visible = false
 	menu_background.visible = false
+	top_border.visible = false
 	GameState.money_changed.connect(_refresh)
 	upgrades_button.pressed.connect(toggle)
 
@@ -28,6 +30,7 @@ func _ready() -> void:
 func toggle() -> void:
 	shop_panel.visible = !shop_panel.visible
 	menu_background.visible = shop_panel.visible
+	top_border.visible = shop_panel.visible
 	if shop_panel.visible:
 		_refresh(GameState.money)
 

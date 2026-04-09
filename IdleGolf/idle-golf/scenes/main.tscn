@@ -48,6 +48,7 @@
 [ext_resource type="Texture2D" uid="uid://ba3jqr5b4biqn" path="res://ConsistencyButton.png" id="31_ty1g6"]
 [ext_resource type="Texture2D" uid="uid://1j4ad04v05c" path="res://ConsistencyButtonPressed.png" id="32_j2jfr"]
 [ext_resource type="Texture2D" uid="uid://bxslvwk0m8osb" path="res://ConsistencyButtonGrey.png" id="33_bjg73"]
+[ext_resource type="Texture2D" uid="uid://gfks1wap568x" path="res://UpgradeBorderTop.png" id="39_j2jfr"]
 [ext_resource type="Script" uid="uid://dvcvompk6cw5p" path="res://DebugCamera.gd" id="debug_cam"]
 
 [sub_resource type="GDScript" id="GDScript_jyhfs"]
@@ -259,24 +260,12 @@ wait_time = 5.0
 autostart = true
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1979168018]
-layer = -1
 script = ExtResource("2_tbgi4")
 
 [node name="ShopButton" type="Sprite2D" parent="CanvasLayer" unique_id=5767827]
 texture_filter = 1
 position = Vector2(1762, 416)
 texture = ExtResource("3_vc5cj")
-
-[node name="TextureRect" type="TextureRect" parent="CanvasLayer" unique_id=62631654]
-z_index = -10
-texture_filter = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("3_tbgi4")
-stretch_mode = 6
 
 [node name="AimSlider" type="HSlider" parent="CanvasLayer" unique_id=811697383]
 anchors_preset = 7
@@ -423,6 +412,7 @@ theme_override_font_sizes/font_size = 32
 text = "Cancel"
 
 [node name="LeftVBox" type="VBoxContainer" parent="CanvasLayer" unique_id=594785329]
+z_index = 1
 offset_left = 20.0
 offset_top = -5.0
 offset_right = 325.0
@@ -526,9 +516,9 @@ layout_mode = 0
 offset_left = 1.0
 offset_top = 60.0
 offset_right = 296.0
-offset_bottom = 890.0
+offset_bottom = 915.0
 texture = ExtResource("11_yq6so")
-stretch_mode = 1
+expand_mode = 1
 
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer/LeftVBox/LeftMenu" unique_id=1634069558]
 texture_filter = 1
@@ -568,7 +558,7 @@ layout_mode = 1
 offset_left = 19.0
 offset_top = 70.0
 offset_right = 317.0
-offset_bottom = 880.0
+offset_bottom = 899.0
 
 [node name="UpgradesPanel" type="Control" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer" unique_id=1409310776]
 custom_minimum_size = Vector2(290, 935)
@@ -888,6 +878,30 @@ offset_right = 18.0
 offset_bottom = 17.0
 theme_override_fonts/font = ExtResource("4_trceg")
 theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+
+[node name="TopBorder" type="TextureRect" parent="CanvasLayer/LeftVBox/LeftMenu" unique_id=1305365879]
+texture_filter = 1
+layout_mode = 0
+offset_left = 1.0
+offset_top = 60.0
+offset_right = 296.0
+offset_bottom = 115.0
+texture = ExtResource("39_j2jfr")
+
+[node name="Background" type="CanvasLayer" parent="." unique_id=2147018228]
+layer = -1
+
+[node name="TextureRect" type="TextureRect" parent="Background" unique_id=62631654]
+z_index = -10
+z_as_relative = false
+texture_filter = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_tbgi4")
+stretch_mode = 6
 
 [node name="Golfer" type="Node3D" parent="." unique_id=264766340]
 script = ExtResource("4_tefeu")
