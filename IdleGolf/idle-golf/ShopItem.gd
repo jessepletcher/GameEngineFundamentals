@@ -17,6 +17,9 @@ func setup(id: String, item_name: String, desc: String, cost: float, texture: Te
 	desc_label.text = desc
 	if texture:
 		icon.texture = texture
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.custom_minimum_size = texture.get_size() * 5
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	if equipped:
 		buy_button.text = "Equipped"
 		buy_button.disabled = true

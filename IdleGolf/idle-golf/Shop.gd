@@ -50,7 +50,7 @@ func _populate_shop() -> void:
 		var data = GameState.balls[id]
 		var item = ShopItem.instantiate()
 		ball_list.add_child(item)
-		item.setup(id, data["name"], data["desc"], 0.0, null, data["owned"], GameState.equipped_ball == id, data.get("medal_cost", 0))
+		item.setup(id, data["name"], data["desc"], 0.0, data.get("texture", null), data["owned"], GameState.equipped_ball == id, data.get("medal_cost", 0))
 		item.purchase_requested.connect(_on_ball_purchase)
 
 	for id in GameState.clubs:
@@ -85,4 +85,4 @@ func _on_club_purchase(id: String) -> void:
 
 func _on_back_pressed() -> void:
 	GameState.save()
-	get_tree().change_scene_to_file("res://scenes/Main.tscn")
+	get_tree().change_scene_to_file("res://scenes/main.tscn")

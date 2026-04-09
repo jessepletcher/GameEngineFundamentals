@@ -200,14 +200,8 @@ func _on_reset_pressed() -> void:
 	reset_dialog.visible = true
 
 func _on_confirm_reset() -> void:
-	reset_dialog.visible = false
 	GameState.full_reset()
-	money_label.text = "$%.2f" % GameState.money
-	level_label.text = "Level %d" % GameState.level
-	xp_progress.value = 0
-	xp_progress.max_value = GameState.xp_to_next_level
-	medals_label.text = "🏅 %.0f" % GameState.medals
-	shot_timer.wait_time = BASE_INTERVAL / GameState.get_fire_rate()
+	get_tree().reload_current_scene()
 
 func _on_cancel_reset() -> void:
 	reset_dialog.visible = false

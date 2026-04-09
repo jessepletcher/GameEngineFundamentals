@@ -42,17 +42,17 @@ var upgrades = {
 }
 
 var balls = {
-    "standard": {"name": "Standard Ball", "desc": "Your trusty golf ball", "medal_cost": 0.0, "owned": true, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.WHITE, "texture": preload("res://GolfBall2.png"), "flag_mult": 1.0},
-    "homing_ball": {"name": "Homing Ball", "desc": "Homes in on nearest flag", "medal_cost": 5, "owned": false, "speed_mult": 1.0, "money_mult": 1.5, "can_home": true, "trail_color": Color.LIME_GREEN, "texture": preload("res://GolfBall2.png"), "flag_mult": 1.0},
-    "pin_seeker": {"name": "Pin Seeker", "desc": "2x flag bonus money", "medal_cost": 8, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.GOLD, "texture": preload("res://GolfBall2.png"), "flag_mult": 2.0},
-    "firework": {"name": "Firework Ball", "desc": "Explodes into 6 balls at apex", "medal_cost": 12, "owned": false, "speed_mult": 1.0, "money_mult": 0.5, "can_home": false, "trail_color": Color.ORANGE_RED, "texture": preload("res://GolfBall2.png"), "flag_mult": 1.0, "is_firework": true},
+    "standard": {"name": "Standard Ball", "desc": "Your trusty golf ball", "medal_cost": 0.0, "owned": true, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.WHITE, "texture": preload("res://BallIcon.png"), "flag_mult": 1.0},
+    "homing_ball": {"name": "Homing Ball", "desc": "Homes in on nearest flag", "medal_cost": 5, "owned": false, "speed_mult": 1.0, "money_mult": 1.5, "can_home": true, "trail_color": Color.LIME_GREEN, "texture": preload("res://HomingBalllIcon.png"), "flag_mult": 1.0},
+    "pin_seeker": {"name": "Pin Seeker", "desc": "2x flag bonus money", "medal_cost": 8, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.GOLD, "texture": preload("res://PinSeekBalllIcon.png"), "flag_mult": 2.0},
+    "firework": {"name": "Firework Ball", "desc": "Explodes into 6 balls at apex", "medal_cost": 12, "owned": false, "speed_mult": 1.0, "money_mult": 0.5, "can_home": false, "trail_color": Color.ORANGE_RED, "texture": preload("res://FireWorksBalllIcon.png"), "flag_mult": 1.0, "is_firework": true},
 }
 
 var clubs = {
-    "standard":    {"name": "Standard Club",  "desc": "A reliable iron",          "medal_cost": 0,  "owned": true,  "speed_mult": 1.0, "fire_rate_mult": 1.0},
-    "driver":      {"name": "Driver",         "desc": "+30% distance",            "medal_cost": 3,  "owned": false, "speed_mult": 1.3, "fire_rate_mult": 0.9},
-    "rapid_iron":  {"name": "Rapid Iron",     "desc": "+50% fire rate",           "medal_cost": 5,  "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.5},
-    "golden_club": {"name": "Golden Club",    "desc": "+50% money +20% distance", "medal_cost": 10, "owned": false, "speed_mult": 1.2, "fire_rate_mult": 1.0},
+    "standard":    {"name": "Standard Club",  "desc": "A reliable iron",          "medal_cost": 0,  "owned": true,  "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.0},
+    "driver":      {"name": "Driver",         "desc": "+15% distance, -5% fire rate", "medal_cost": 3,  "owned": false, "speed_mult": 1.15, "fire_rate_mult": 0.95, "money_mult": 1.0},
+    "rapid_iron":  {"name": "Rapid Iron",     "desc": "+25% fire rate",           "medal_cost": 5,  "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.25, "money_mult": 1.0},
+    "golden_club": {"name": "Golden Club",    "desc": "+25% money, +10% distance", "medal_cost": 10, "owned": false, "speed_mult": 1.1, "fire_rate_mult": 1.0, "money_mult": 1.25},
 }
 
 var equipped_ball: String = "standard"
@@ -244,14 +244,17 @@ func try_purchase(upgrade: String) -> bool:
         return true
     return false
 
+func get_club_data() -> Dictionary:
+    return clubs[equipped_club]
+
 func get_ball_speed() -> float:
-    return (1.0 + upgrades["ball_speed"]["level"] * 0.2) * get_level_mult("ball_speed")
+    return (1.0 + upgrades["ball_speed"]["level"] * 0.2) * get_level_mult("ball_speed") * get_club_data()["speed_mult"]
 
 func get_fire_rate() -> float:
-    return (1.0 + upgrades["fire_rate"]["level"] * 0.2) * get_level_mult("fire_rate")
+    return (1.0 + upgrades["fire_rate"]["level"] * 0.2) * get_level_mult("fire_rate") * get_club_data()["fire_rate_mult"]
 
 func get_money_mult() -> float:
-    return (10.0 + upgrades["money_mult"]["level"] * 1) * get_level_mult("money_mult")
+    return (10.0 + upgrades["money_mult"]["level"] * 1) * get_level_mult("money_mult") * get_club_data()["money_mult"]
 
 func get_consistency() -> float:
     return (.5 + upgrades["consistency"]["level"] * 0.25) * get_level_mult("consistency")

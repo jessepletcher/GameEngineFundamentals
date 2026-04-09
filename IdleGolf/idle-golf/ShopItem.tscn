@@ -26,7 +26,7 @@ text = "crazy stuff"
 texture_filter = 1
 layout_mode = 2
 texture = ExtResource("1_vfou5")
-expand_mode = 2
+expand_mode = 3
 
 [node name="BuyButton" type="Button" parent="HBoxContainer" unique_id=256065745]
 layout_mode = 2
