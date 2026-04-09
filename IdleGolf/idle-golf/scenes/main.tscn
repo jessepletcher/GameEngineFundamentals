@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://wqdug6vmrqs0" path="res://main.gd" id="1_0wfyh"]
 [ext_resource type="Script" uid="uid://dyg5jvssl6fxu" path="res://scenes/UpgradeShop.gd" id="2_tbgi4"]
 [ext_resource type="Texture2D" uid="uid://b1nwh7mjxcrsc" path="res://IdleGolfBackgroundfairway3.png" id="3_tbgi4"]
+[ext_resource type="Texture2D" uid="uid://bfx5qotmi5mu1" path="res://ShopButton.png" id="3_vc5cj"]
 [ext_resource type="Texture2D" uid="uid://b8l1suyvq4pm6" path="res://GolfSwing-Sheet.png" id="4_tbgi4"]
 [ext_resource type="Script" uid="uid://dvlxily612f3h" path="res://scenes/golfer.gd" id="4_tefeu"]
 [ext_resource type="FontFile" uid="uid://dg4ug6srbh1wt" path="res://balatro.otf" id="4_trceg"]
@@ -12,6 +13,8 @@
 [ext_resource type="Texture2D" uid="uid://j1a8yd64gan7" path="res://RedFlag.png" id="6_o6xl0"]
 [ext_resource type="Texture2D" uid="uid://hm1uef80hdbi" path="res://MedalsLabel.png" id="7_0ld40"]
 [ext_resource type="Texture2D" uid="uid://1wtx0anscbc8" path="res://BlueFlag.png" id="7_tipki"]
+[ext_resource type="Texture2D" uid="uid://b67aq6w1prt86" path="res://TrajectoryBox.png" id="7_ty1g6"]
+[ext_resource type="Texture2D" uid="uid://os4fdv7tyxc2" path="res://TrajectoryMarker.png" id="8_j2jfr"]
 [ext_resource type="Texture2D" uid="uid://cb0xw8x2ejuin" path="res://BlackFlag.png" id="8_tipki"]
 [ext_resource type="Texture2D" uid="uid://cfcg26n53g543" path="res://XPBackground.png" id="8_yc10j"]
 [ext_resource type="PackedScene" uid="uid://cqochshxmtwgp" path="res://Flag.tscn" id="9_85g3d"]
@@ -27,9 +30,24 @@
 [ext_resource type="AudioStream" uid="uid://c3prc3scrcaaw" path="res://good golf.wav" id="14_a8y0u"]
 [ext_resource type="Texture2D" uid="uid://cx354t3ypdfjr" path="res://RetireButtonPressed.png" id="15_vxglm"]
 [ext_resource type="Texture2D" uid="uid://def0fqsl5qg63" path="res://CashLabel.png" id="17_fv21b"]
-[ext_resource type="Texture2D" uid="uid://srw6ecrq6cqn" path="res://CashMenuBackground.png" id="18_qkpxi"]
+[ext_resource type="Texture2D" uid="uid://ca36tbu3tgkf6" path="res://CashMenuBackground.png" id="18_qkpxi"]
 [ext_resource type="Texture2D" uid="uid://bk3spydvahahe" path="res://MedalsTabLabel.png" id="18_tel4y"]
+[ext_resource type="Texture2D" uid="uid://bil05om6bjv77" path="res://BallSpeedButton.png" id="19_5q0nq"]
 [ext_resource type="Texture2D" uid="uid://6gx2e120jo3a" path="res://MedalShopBackground.png" id="20_5q0nq"]
+[ext_resource type="Texture2D" uid="uid://8ol80wv055dk" path="res://BallSpeedButtonPressed.png" id="20_dgi5k"]
+[ext_resource type="Texture2D" uid="uid://sb4pr5uwkk7g" path="res://BallSpeedButtonGrey.png" id="21_dgi5k"]
+[ext_resource type="Texture2D" uid="uid://ekeutnfnka1r" path="res://RateOfFireButton.png" id="22_fuf3a"]
+[ext_resource type="Texture2D" uid="uid://watc2yy8boog" path="res://RateOfFireButtonPressed.png" id="23_pibwh"]
+[ext_resource type="Texture2D" uid="uid://coljwkj0nsqg6" path="res://RateOfFireButtonGrey.png" id="24_c6pm6"]
+[ext_resource type="Texture2D" uid="uid://sglet68pwim0" path="res://MoneyMultButton.png" id="25_5he1u"]
+[ext_resource type="Texture2D" uid="uid://bb1ukd0gecap8" path="res://MoneyMultButtonPressed.png" id="26_5poiv"]
+[ext_resource type="Texture2D" uid="uid://c1xlp8677l57f" path="res://MoneyMultButtonGrey.png" id="27_2cjbq"]
+[ext_resource type="Texture2D" uid="uid://cvxpsll6emdov" path="res://XPMultButton.png" id="28_txyw0"]
+[ext_resource type="Texture2D" uid="uid://jmbkynwsims" path="res://XPMultButtonPressed.png" id="29_vc5cj"]
+[ext_resource type="Texture2D" uid="uid://dqhe0l0ay627f" path="res://XPMultButtonGrey.png" id="30_nvyfr"]
+[ext_resource type="Texture2D" uid="uid://ba3jqr5b4biqn" path="res://ConsistencyButton.png" id="31_ty1g6"]
+[ext_resource type="Texture2D" uid="uid://1j4ad04v05c" path="res://ConsistencyButtonPressed.png" id="32_j2jfr"]
+[ext_resource type="Texture2D" uid="uid://bxslvwk0m8osb" path="res://ConsistencyButtonGrey.png" id="33_bjg73"]
 [ext_resource type="Script" uid="uid://dvcvompk6cw5p" path="res://DebugCamera.gd" id="debug_cam"]
 
 [sub_resource type="GDScript" id="GDScript_jyhfs"]
@@ -97,6 +115,74 @@ axis_stretch_vertical = 1
 texture = ExtResource("15_vxglm")
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_j8jky"]
+texture = ExtResource("19_5q0nq")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_kmb1v"]
+texture = ExtResource("20_dgi5k")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_fuf3a"]
+texture = ExtResource("19_5q0nq")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_pibwh"]
+texture = ExtResource("21_dgi5k")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_dgi5k"]
+texture = ExtResource("22_fuf3a")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_c6pm6"]
+texture = ExtResource("23_pibwh")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_5he1u"]
+texture = ExtResource("24_c6pm6")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_chjal"]
+texture = ExtResource("25_5he1u")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_cjqg0"]
+texture = ExtResource("26_5poiv")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vchkt"]
+texture = ExtResource("27_2cjbq")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bu4jf"]
+texture = ExtResource("28_txyw0")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_o7ddy"]
+texture = ExtResource("29_vc5cj")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_0loja"]
+texture = ExtResource("30_nvyfr")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ids8r"]
+texture = ExtResource("31_ty1g6")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_dnhof"]
+texture = ExtResource("32_j2jfr")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_1v6qk"]
+texture = ExtResource("33_bjg73")
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_tefeu"]
 atlas = ExtResource("4_tbgi4")
@@ -176,6 +262,11 @@ autostart = true
 layer = -1
 script = ExtResource("2_tbgi4")
 
+[node name="ShopButton" type="Sprite2D" parent="CanvasLayer" unique_id=5767827]
+texture_filter = 1
+position = Vector2(1762, 416)
+texture = ExtResource("3_vc5cj")
+
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer" unique_id=62631654]
 z_index = -10
 texture_filter = 1
@@ -203,14 +294,13 @@ max_value = 1.0
 step = 0.01
 
 [node name="OpenShopButton" type="Button" parent="CanvasLayer" unique_id=28586072]
-offset_left = 1722.0
-offset_top = 394.0
-offset_right = 1903.0
-offset_bottom = 490.0
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_font_sizes/font_size = 64
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
-text = "SHOP"
+visibility_layer = 0
+offset_left = 1635.0
+offset_top = 396.0
+offset_right = 1899.0
+offset_bottom = 510.0
+text = "
+"
 
 [node name="RetireDialog" type="PanelContainer" parent="CanvasLayer" unique_id=1455203785]
 anchors_preset = 8
@@ -259,12 +349,12 @@ grow_horizontal = 0
 grow_vertical = 0
 script = ExtResource("5_jkv2x")
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/ShotControl" unique_id=1110494323]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/ShotControl" unique_id=772815278]
+texture_filter = 1
 layout_mode = 0
-offset_right = 300.0
-offset_bottom = 300.0
-mouse_filter = 2
-color = Color(0.12955844, 0.12955847, 0.12955844, 1)
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("7_ty1g6")
 
 [node name="DragPoint" type="Control" parent="CanvasLayer/ShotControl" unique_id=660342021]
 layout_mode = 1
@@ -281,12 +371,14 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/ShotControl/DragPoint" unique_id=1435810513]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/ShotControl/DragPoint" unique_id=1979686888]
+texture_filter = 1
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-mouse_filter = 2
-color = Color(0.5132329, 0.5132329, 0.5132329, 1)
+offset_left = -10.0
+offset_top = -10.0
+offset_right = 45.0
+offset_bottom = 45.0
+texture = ExtResource("8_j2jfr")
 
 [node name="ResetButton" type="Button" parent="CanvasLayer" unique_id=176597736]
 offset_left = 1804.0
@@ -472,7 +564,7 @@ theme_override_styles/hover = SubResource("StyleBoxTexture_yq6so")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/LeftVBox/LeftMenu" unique_id=48628536]
 layout_direction = 3
-layout_mode = 0
+layout_mode = 1
 offset_left = 19.0
 offset_top = 70.0
 offset_right = 317.0
@@ -502,105 +594,215 @@ size_flags_vertical = 0
 texture = ExtResource("18_qkpxi")
 stretch_mode = 1
 
-[node name="BallSpeedRow" type="HBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=98483021]
-layout_mode = 0
+[node name="BallSpeedRow" type="Control" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=242646618]
+anchors_preset = 0
 offset_left = 12.0
 offset_top = 125.0
 offset_right = 287.0
 offset_bottom = 142.0
 
-[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/BallSpeedRow" unique_id=406791096]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/BallSpeedRow" unique_id=1684960448]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
 [node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/BallSpeedRow" unique_id=268026691]
+texture_filter = 1
+layout_mode = 0
+offset_left = -2.0
+offset_top = -25.0
+offset_right = 258.0
+offset_bottom = 65.0
+theme_override_styles/normal = SubResource("StyleBoxTexture_j8jky")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_kmb1v")
+theme_override_styles/hover = SubResource("StyleBoxTexture_fuf3a")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_pibwh")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/BallSpeedRow" unique_id=678561359]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -39.0
+offset_top = -29.5
+offset_right = 39.0
+offset_bottom = 29.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/BallSpeedRow/VBoxContainer" unique_id=406791096]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+text = "Ball Speed"
 
-[node name="FireRateRow" type="HBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=365005602]
-layout_mode = 0
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/BallSpeedRow/VBoxContainer" unique_id=1684960448]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+text = "Lvl. 1"
+
+[node name="CostLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/BallSpeedRow/VBoxContainer" unique_id=1450572563]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="FireRateRow" type="Control" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=1304687719]
+anchors_preset = 0
 offset_left = 25.0
 offset_top = 234.0
 offset_right = 300.0
 offset_bottom = 251.0
 
-[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FireRateRow" unique_id=2007074903]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FireRateRow" unique_id=1205916336]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
 [node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FireRateRow" unique_id=2001506790]
+texture_filter = 1
+layout_mode = 0
+offset_left = -15.0
+offset_top = -34.0
+offset_right = 245.0
+offset_bottom = 56.0
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxTexture_dgi5k")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_c6pm6")
+theme_override_styles/hover = SubResource("StyleBoxTexture_dgi5k")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_5he1u")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FireRateRow" unique_id=1272411209]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.5
+offset_top = -29.5
+offset_right = 20.5
+offset_bottom = 29.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FireRateRow/VBoxContainer" unique_id=2007074903]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+text = "Ball"
 
-[node name="MoneyMultRow" type="HBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=1306246441]
-layout_mode = 0
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FireRateRow/VBoxContainer" unique_id=1205916336]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+text = "Lvl1"
+
+[node name="CostLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FireRateRow/VBoxContainer" unique_id=1307986203]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+text = "Cost"
+
+[node name="MoneyMultRow" type="Control" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=1753469779]
+anchors_preset = 0
 offset_left = 23.0
 offset_top = 325.0
 offset_right = 298.0
 offset_bottom = 342.0
 
-[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MoneyMultRow" unique_id=77518754]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MoneyMultRow" unique_id=1783862080]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MoneyMultRow" unique_id=120206325]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
-
-[node name="XPMultRow" type="HBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=1927888584]
+[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MoneyMultRow" unique_id=1753560898]
+texture_filter = 1
 layout_mode = 0
+offset_left = -13.0
+offset_top = -25.0
+offset_right = 247.0
+offset_bottom = 65.0
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxTexture_chjal")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_cjqg0")
+theme_override_styles/hover = SubResource("StyleBoxTexture_chjal")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_vchkt")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MoneyMultRow" unique_id=181931191]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MoneyMultRow/VBoxContainer" unique_id=77518754]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MoneyMultRow/VBoxContainer" unique_id=1783862080]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="CostLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MoneyMultRow/VBoxContainer" unique_id=1330455256]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+text = "Lvl. 1"
+
+[node name="XPMultRow" type="Control" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=1417205865]
+anchors_preset = 0
 offset_left = 28.0
 offset_top = 438.0
 offset_right = 303.0
 offset_bottom = 455.0
 
-[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/XPMultRow" unique_id=316341780]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/XPMultRow" unique_id=656682704]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-
-[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/XPMultRow" unique_id=1818994324]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
-
-[node name="ConsistencyRow" type="HBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=1614771815]
+[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/XPMultRow" unique_id=257546603]
+texture_filter = 1
 layout_mode = 0
+offset_left = -18.0
+offset_top = -38.0
+offset_right = 242.0
+offset_bottom = 52.0
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxTexture_bu4jf")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_o7ddy")
+theme_override_styles/hover = SubResource("StyleBoxTexture_bu4jf")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_0loja")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/XPMultRow" unique_id=1990744194]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/XPMultRow/VBoxContainer" unique_id=316341780]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/XPMultRow/VBoxContainer" unique_id=656682704]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="CostLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/XPMultRow/VBoxContainer" unique_id=508658337]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+text = "Lvl. 1"
+
+[node name="ConsistencyRow" type="Control" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=320927892]
+anchors_preset = 0
 offset_left = 22.0
 offset_top = 534.0
 offset_right = 297.0
 offset_bottom = 551.0
 
-[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyRow" unique_id=1053258118]
+[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyRow" unique_id=1373329771]
+texture_filter = 1
+layout_mode = 0
+offset_left = -12.0
+offset_top = -34.0
+offset_right = 248.0
+offset_bottom = 56.0
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxTexture_ids8r")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_dnhof")
+theme_override_styles/hover = SubResource("StyleBoxTexture_ids8r")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_1v6qk")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyRow" unique_id=1116455677]
+layout_mode = 1
+offset_right = 41.0
+offset_bottom = 59.0
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyRow/VBoxContainer" unique_id=1053258118]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
 
-[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyRow" unique_id=594187679]
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyRow/VBoxContainer" unique_id=594187679]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
 
-[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyRow" unique_id=1003469390]
+[node name="CostLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyRow/VBoxContainer" unique_id=1268572173]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
+text = "Lvl. 1"
 
 [node name="MedalsTexture" type="TextureRect" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=515430893]
 texture_filter = 1
@@ -623,41 +825,67 @@ size_flags_vertical = 0
 texture = ExtResource("20_5q0nq")
 stretch_mode = 1
 
-[node name="FlatDistanceRow" type="HBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=1886452523]
-layout_mode = 0
+[node name="FlatDistanceRow" type="Control" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=442781239]
+anchors_preset = 0
 offset_top = 842.0
 offset_right = 275.0
 offset_bottom = 859.0
 
-[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FlatDistanceRow" unique_id=167341021]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FlatDistanceRow" unique_id=218644045]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FlatDistanceRow/VBoxContainer" unique_id=167341021]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
 
-[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FlatDistanceRow" unique_id=548035724]
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FlatDistanceRow/VBoxContainer" unique_id=548035724]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="CostLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FlatDistanceRow/VBoxContainer" unique_id=991789271]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+text = "Lvl. 1"
 
 [node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FlatDistanceRow" unique_id=548241790]
-layout_mode = 2
+layout_mode = 0
+offset_left = 10.0
+offset_right = 18.0
+offset_bottom = 17.0
 theme_override_fonts/font = ExtResource("4_trceg")
 theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
 
-[node name="MultiBallRow" type="HBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=1714524131]
-layout_mode = 0
+[node name="MultiBallRow" type="Control" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=2101987342]
+anchors_preset = 0
 offset_top = 863.0
 offset_right = 275.0
 offset_bottom = 880.0
 
-[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow" unique_id=1028440102]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow" unique_id=958181216]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow/VBoxContainer" unique_id=1028440102]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
 
-[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow" unique_id=236323619]
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow/VBoxContainer" unique_id=236323619]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
+
+[node name="CostLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow/VBoxContainer" unique_id=36602594]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+text = "Lvl. 1"
 
 [node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow" unique_id=1373548310]
-layout_mode = 2
+layout_mode = 0
+offset_left = 10.0
+offset_right = 18.0
+offset_bottom = 17.0
 theme_override_fonts/font = ExtResource("4_trceg")
 theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
 

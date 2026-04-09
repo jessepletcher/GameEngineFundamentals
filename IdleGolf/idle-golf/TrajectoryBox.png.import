@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ca36tbu3tgkf6"
-path="res://.godot/imported/CashMenuBackground.png-0fb356fd7778f39ea60c442268ffbbe2.ctex"
+uid="uid://b67aq6w1prt86"
+path="res://.godot/imported/TrajectoryBox.png-18594f0fd6796d1cf00d1f5aea07d481.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CashMenuBackground.png"
-dest_files=["res://.godot/imported/CashMenuBackground.png-0fb356fd7778f39ea60c442268ffbbe2.ctex"]
+source_file="res://TrajectoryBox.png"
+dest_files=["res://.godot/imported/TrajectoryBox.png-18594f0fd6796d1cf00d1f5aea07d481.ctex"]
 
 [params]
 

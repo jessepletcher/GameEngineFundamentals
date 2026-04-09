@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ca36tbu3tgkf6"
-path="res://.godot/imported/CashMenuBackground.png-0fb356fd7778f39ea60c442268ffbbe2.ctex"
+uid="uid://ekeutnfnka1r"
+path="res://.godot/imported/RateOfFireButton.png-4f452ec7b2b25faa2f1a6953beceada6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CashMenuBackground.png"
-dest_files=["res://.godot/imported/CashMenuBackground.png-0fb356fd7778f39ea60c442268ffbbe2.ctex"]
+source_file="res://RateOfFireButton.png"
+dest_files=["res://.godot/imported/RateOfFireButton.png-4f452ec7b2b25faa2f1a6953beceada6.ctex"]
 
 [params]
 

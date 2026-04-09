@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ca36tbu3tgkf6"
-path="res://.godot/imported/CashMenuBackground.png-0fb356fd7778f39ea60c442268ffbbe2.ctex"
+uid="uid://bxslvwk0m8osb"
+path="res://.godot/imported/ConsistencyButtonGrey.png-a7afabc2e29ac471749391cb0026aecc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CashMenuBackground.png"
-dest_files=["res://.godot/imported/CashMenuBackground.png-0fb356fd7778f39ea60c442268ffbbe2.ctex"]
+source_file="res://ConsistencyButtonGrey.png"
+dest_files=["res://.godot/imported/ConsistencyButtonGrey.png-a7afabc2e29ac471749391cb0026aecc.ctex"]
 
 [params]
 

@@ -36,14 +36,16 @@ func _refresh(_money: float) -> void:
 		var upgrade = GameState.upgrades[key]
 		var cost = GameState.get_cost(key)
 		var level = upgrade["level"]
-		rows[key].get_node("NameLabel").text = upgrade["label"]
-		rows[key].get_node("LevelLabel").text = "Lv.%d" % level
+		rows[key].get_node("VBoxContainer/NameLabel").text = upgrade["label"]
+		rows[key].get_node("VBoxContainer/LevelLabel").text = "Lv.%d" % level
+		var cost_label = rows[key].get_node("VBoxContainer/CostLabel")
 		var btn = rows[key].get_node("BuyButton")
+		btn.text = ""
 		if upgrade.get("use_medals", false):
-			btn.text = "🏅 %.0f" % cost
+			cost_label.text = "🏅 %.0f" % cost
 			btn.disabled = GameState.medals < cost
 		else:
-			btn.text = "$%.0f" % cost
+			cost_label.text = "$%.0f" % cost
 			btn.disabled = GameState.money < cost
 
 func _on_buy_pressed(key: String) -> void:

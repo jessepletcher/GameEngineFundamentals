@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ca36tbu3tgkf6"
-path="res://.godot/imported/CashMenuBackground.png-0fb356fd7778f39ea60c442268ffbbe2.ctex"
+uid="uid://sglet68pwim0"
+path="res://.godot/imported/MoneyMultButton.png-8d84eee397a102ea05f092470421daed.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CashMenuBackground.png"
-dest_files=["res://.godot/imported/CashMenuBackground.png-0fb356fd7778f39ea60c442268ffbbe2.ctex"]
+source_file="res://MoneyMultButton.png"
+dest_files=["res://.godot/imported/MoneyMultButton.png-8d84eee397a102ea05f092470421daed.ctex"]
 
 [params]
 
