@@ -76,14 +76,14 @@ func _on_confirm_retire() -> void:
 	retire_dialog.visible = false
 	GameState.retire()
 	# refresh UI
-	money_label.text = "$%.2f" % GameState.money
+	money_label.text = "%.2f" % GameState.money
 	shot_timer.wait_time = BASE_INTERVAL / GameState.get_fire_rate()
 
 func _on_cancel_retire() -> void:
 	retire_dialog.visible = false
 
 func _on_medals_changed(amount: float) -> void:
-	medals_label.text = "🏅 %.0f" % amount
+	medals_label.text = " %.0f" % amount
 
 func _on_retire_pressed() -> void:
 	var medals = GameState.get_medal_reward()
@@ -115,7 +115,7 @@ func _on_golfer_swung() -> void:
 
 
 func _on_money_changed(new_amount: float) -> void:
-	money_label.text = "$%.2f" % new_amount
+	money_label.text = "%.2f" % new_amount
 
 func _on_ShotTimer_timeout() -> void:
 	shot_timer.wait_time = BASE_INTERVAL / GameState.get_fire_rate()

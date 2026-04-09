@@ -1,19 +1,21 @@
 extends CanvasLayer
 
-@onready var shop_panel = $LeftVBox/LeftMenu/UpgradesPanel
+@onready var shop_panel = $LeftVBox/LeftMenu/ScrollContainer
+@onready var menu_background = $LeftVBox/LeftMenu/MenuBackground
 @onready var upgrades_button: Button = $LeftVBox/LeftMenu/TopBar/UpgradesButton
 @onready var rows = {
-	"ball_speed":  $LeftVBox/LeftMenu/UpgradesPanel/BallSpeedRow,
-	"fire_rate":   $LeftVBox/LeftMenu/UpgradesPanel/FireRateRow,
-	"money_mult":  $LeftVBox/LeftMenu/UpgradesPanel/MoneyMultRow,
-	"consistency": $LeftVBox/LeftMenu/UpgradesPanel/ConsistencyRow,
-	"xp_mult":     $LeftVBox/LeftMenu/UpgradesPanel/XPMultRow,
-	"flat_distance": $LeftVBox/LeftMenu/UpgradesPanel/FlatDistanceRow,
-	"multi_ball":  $LeftVBox/LeftMenu/UpgradesPanel/MultiBallRow,
+	"ball_speed":  $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/BallSpeedRow,
+	"fire_rate":   $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FireRateRow,
+	"money_mult":  $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MoneyMultRow,
+	"consistency": $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyRow,
+	"xp_mult":     $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/XPMultRow,
+	"flat_distance": $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FlatDistanceRow,
+	"multi_ball":  $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow,
 }
 
 func _ready() -> void:
 	shop_panel.visible = false
+	menu_background.visible = false
 	GameState.money_changed.connect(_refresh)
 	upgrades_button.pressed.connect(toggle)
 
@@ -25,6 +27,7 @@ func _ready() -> void:
 
 func toggle() -> void:
 	shop_panel.visible = !shop_panel.visible
+	menu_background.visible = shop_panel.visible
 	if shop_panel.visible:
 		_refresh(GameState.money)
 
