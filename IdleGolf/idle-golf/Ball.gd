@@ -81,21 +81,28 @@ func _start_homing() -> void:
 	_is_homing = true
 
 func _home_toward_flag(delta: float) -> void:
+	# give up after 5 seconds to prevent infinite orbiting
+	if _homing_time > 5.0:
+		_is_homing = false
+		return
+
 	var flat_pos = Vector3(global_position.x, 0, global_position.z)
 	var flat_target = Vector3(_target_flag.global_position.x, 0, _target_flag.global_position.z)
 	var flat_dist = flat_pos.distance_to(flat_target)
 
-	if flat_dist < 3.0:
+	if flat_dist < 3.0 and global_position.y < 2.0:
 		_is_homing = false
 		_land()
 		return
 
-	# steer toward flag — starts gentle, gets stronger over time
+	# steer toward flag — scales with ball speed so fast balls still turn
 	var direction = (flat_target - flat_pos).normalized()
 	var current_flat_vel = Vector3(linear_velocity.x, 0, linear_velocity.z)
-	var desired_vel = direction * current_flat_vel.length()
-	var strength = clamp(_homing_time * 0.3, 0.05, 2.0)
-	var steer = (desired_vel - current_flat_vel) * strength
+	var speed = current_flat_vel.length()
+	var desired_vel = direction * speed
+	var time_strength = clamp(_homing_time * 0.3, 0.05, 2.0)
+	var speed_strength = clamp(speed * 0.1, 1.0, 5.0)
+	var steer = (desired_vel - current_flat_vel) * time_strength * speed_strength
 	apply_central_force(steer)
 	
 func _explode() -> void:
@@ -141,7 +148,8 @@ func _ready() -> void:
 	var consistency = GameState.get_consistency()
 	var worst_possible = 1.0 - (1.0 / consistency)
 	var distance_mult = randf_range(worst_possible, 1.0)
-	var whiff_threshold = worst_possible + (1.0 - worst_possible) * 0.2  # bottom 20% of range
+	var whiff_percent = clamp(0.2 / consistency, 0.01, 0.2)  # shrinks as consistency levels up
+	var whiff_threshold = worst_possible + (1.0 - worst_possible) * whiff_percent
 	if distance_mult < whiff_threshold:
 		distance_mult *= 0.3
 		_is_whiff = true

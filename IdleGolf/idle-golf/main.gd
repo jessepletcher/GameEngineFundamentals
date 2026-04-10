@@ -80,9 +80,7 @@ func _on_xp_changed(current_xp: float, required_xp: float) -> void:
 func _on_confirm_retire() -> void:
 	retire_dialog.visible = false
 	GameState.retire()
-	# refresh UI
-	money_label.text = "%.2f" % GameState.money
-	shot_timer.wait_time = BASE_INTERVAL / GameState.get_fire_rate()
+	get_tree().reload_current_scene()
 
 func _on_cancel_retire() -> void:
 	retire_dialog.visible = false

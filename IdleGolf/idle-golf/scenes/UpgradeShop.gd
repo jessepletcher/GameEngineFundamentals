@@ -23,7 +23,7 @@ func _ready() -> void:
 
 	for key in rows:
 		var btn = rows[key].get_node("BuyButton")
-		btn.pressed.connect(_on_buy_pressed.bind(key))
+		btn.gui_input.connect(_on_buy_input.bind(key))
 
 	_refresh(GameState.money)
 
@@ -51,7 +51,17 @@ func _refresh(_money: float) -> void:
 			cost_label.text = "$%.0f" % cost
 			btn.disabled = GameState.money < cost
 
-func _on_buy_pressed(key: String) -> void:
+func _on_buy_input(event: InputEvent, key: String) -> void:
+	if not event is InputEventMouseButton:
+		return
+	if event.button_index != MOUSE_BUTTON_LEFT or not event.pressed:
+		return
+
+	var amount = 5 if event.ctrl_pressed else 1
+	for i in amount:
+		_buy_one(key)
+
+func _buy_one(key: String) -> void:
 	var upgrade = GameState.upgrades[key]
 	if upgrade.get("use_medals", false):
 		var cost = GameState.get_cost(key)
