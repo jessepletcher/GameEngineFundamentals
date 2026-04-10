@@ -1,5 +1,6 @@
 extends Node
 
+var sfx_muted := false
 var money: float = 0.0
 var xp: float = 0.0
 var level: int = 1

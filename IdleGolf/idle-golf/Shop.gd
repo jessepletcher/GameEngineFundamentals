@@ -1,5 +1,7 @@
 extends Control
 
+signal shop_closed
+
 const ShopItem = preload("res://ShopItem.tscn")
 
 @onready var medals_label: Label = $MedalsLabel
@@ -10,9 +12,9 @@ const ShopItem = preload("res://ShopItem.tscn")
 @onready var ball_list = $BallsPanel/BallList
 @onready var club_list = $ClubsPanel/ClubList
 @onready var course_list = $CoursesPanel/CourseList
-@onready var balls_tab: Button = $VBoxContainer/TabBar/BallsTabBtn
-@onready var clubs_tab: Button = $VBoxContainer/TabBar/ClubsTabBtn
-@onready var courses_tab: Button = $VBoxContainer/TabBar/CoursesTabBtn
+@onready var balls_tab: Button = $Panel/VBoxContainer/TabBar/BallsTabBtn
+@onready var clubs_tab: Button = $Panel/VBoxContainer/TabBar/ClubsTabBtn
+@onready var courses_tab: Button = $Panel/VBoxContainer/TabBar/CoursesTabBtn
 
 func _ready() -> void:
 	back_button.pressed.connect(_on_back_pressed)
@@ -85,4 +87,4 @@ func _on_club_purchase(id: String) -> void:
 
 func _on_back_pressed() -> void:
 	GameState.save()
-	get_tree().change_scene_to_file("res://scenes/main.tscn")
+	shop_closed.emit()

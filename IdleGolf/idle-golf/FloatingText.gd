@@ -5,10 +5,12 @@ extends Node3D
 
 var _fade_tween: Tween
 
-func setup(money: float, yards: float, flag_hit: bool = false) -> void:
-	label.text = "$%.2f | %.0f yds" % [money, yards]
-	if flag_hit:
-		label.modulate = Color(0.3, 1.0, 0.3)
+func setup(money: float, yards: float, flag_hit: bool = false, direct_hit: bool = false) -> void:
+	label.text = "$%.0f | %.0f yds" % [money, yards]
+	if direct_hit:
+		label.modulate = Color(1.0, 0.84, 0.0)  # gold
+	elif flag_hit:
+		label.modulate = Color(0.3, 1.0, 0.3)  # green
 	else:
 		label.modulate = Color.WHITE
 

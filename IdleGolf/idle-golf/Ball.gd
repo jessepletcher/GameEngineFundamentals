@@ -155,8 +155,8 @@ func _ready() -> void:
 		_is_whiff = true
 	var horizontal_offset = abs(_launch_modifier.x)
 	var distance_mult_from_curve = lerp(1.0, 0.5, horizontal_offset)
-	var launch_angle = 0.38 + (_launch_modifier.y * -0.15)
-	launch_angle = clamp(launch_angle, 0.1, 0.6)
+	var launch_angle = 0.3 + (_launch_modifier.y * -0.3)
+	launch_angle = clamp(launch_angle, 0.05, 0.6)
 	
 	# convert flat yards to extra speed
 	var flat_bonus = GameState.get_flat_distance()

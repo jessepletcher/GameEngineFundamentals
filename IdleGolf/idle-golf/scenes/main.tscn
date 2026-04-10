@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://wqdug6vmrqs0" path="res://main.gd" id="1_0wfyh"]
 [ext_resource type="Script" uid="uid://dyg5jvssl6fxu" path="res://scenes/UpgradeShop.gd" id="2_tbgi4"]
-[ext_resource type="Texture2D" uid="uid://b1nwh7mjxcrsc" path="res://IdleGolfBackgroundfairway3.png" id="3_tbgi4"]
 [ext_resource type="Texture2D" uid="uid://bfx5qotmi5mu1" path="res://ShopButton.png" id="3_vc5cj"]
 [ext_resource type="Texture2D" uid="uid://b8l1suyvq4pm6" path="res://GolfSwing-Sheet.png" id="4_tbgi4"]
 [ext_resource type="Script" uid="uid://dvlxily612f3h" path="res://scenes/golfer.gd" id="4_tefeu"]
@@ -48,7 +47,29 @@
 [ext_resource type="Texture2D" uid="uid://ba3jqr5b4biqn" path="res://ConsistencyButton.png" id="31_ty1g6"]
 [ext_resource type="Texture2D" uid="uid://1j4ad04v05c" path="res://ConsistencyButtonPressed.png" id="32_j2jfr"]
 [ext_resource type="Texture2D" uid="uid://bxslvwk0m8osb" path="res://ConsistencyButtonGrey.png" id="33_bjg73"]
+[ext_resource type="Texture2D" uid="uid://ccfh75xe3kkwc" path="res://FlatDistanceButton.png" id="38_r4e17"]
 [ext_resource type="Texture2D" uid="uid://gfks1wap568x" path="res://UpgradeBorderTop.png" id="39_j2jfr"]
+[ext_resource type="Texture2D" uid="uid://dy4xxccfvyuyn" path="res://FlatDistanceButtonPressed.png" id="39_y57op"]
+[ext_resource type="Texture2D" uid="uid://u71o7d8dep38" path="res://FlatDistanceButtonGrey.png" id="40_mlv25"]
+[ext_resource type="Texture2D" uid="uid://djheeefjh43sc" path="res://MultBallButton.png" id="41_a82wo"]
+[ext_resource type="Texture2D" uid="uid://dfhmsr6vkfbvn" path="res://MultBallButtonPressed.png" id="42_gdvew"]
+[ext_resource type="Texture2D" uid="uid://dykggam6fytgj" path="res://MultBallButtonGrey.png" id="43_kjtvk"]
+[ext_resource type="PackedScene" path="res://scenes/ScaledSprite.tscn" id="51_bu4jf"]
+[ext_resource type="Texture2D" uid="uid://dx3pt7yd04l3w" path="res://BackgroundSprites/1/3.png" id="52_o7ddy"]
+[ext_resource type="Texture2D" uid="uid://drcxxu0mcwep7" path="res://BackgroundSprites/1/1.png" id="53_ids8r"]
+[ext_resource type="Texture2D" uid="uid://s14i53rtt35q" path="res://BackgroundSprites/1/2.png" id="54_dnhof"]
+[ext_resource type="Texture2D" uid="uid://bnx1w6a0eumod" path="res://BackgroundSprites/1/4.png" id="55_1v6qk"]
+[ext_resource type="Texture2D" uid="uid://b23gpwhaitawc" path="res://BackgroundSprites/1/5.png" id="56_1v6qk"]
+[ext_resource type="Texture2D" uid="uid://81uj0282yd33" path="res://BackgroundSprites/1/6.png" id="57_augu2"]
+[ext_resource type="Texture2D" uid="uid://bq5554xa007rh" path="res://BackgroundSprites/1/Newfairway.png" id="57_xhfw6"]
+[ext_resource type="Texture2D" uid="uid://c3njyd2aciqeq" path="res://BackgroundSprites/1/8.png" id="59_152kg"]
+[ext_resource type="Texture2D" uid="uid://5rff84ur0wcx" path="res://BackgroundSprites/1/9.png" id="60_r4e17"]
+[ext_resource type="Texture2D" uid="uid://dllf5pwkvk4qm" path="res://BackgroundSprites/1/10.png" id="61_y57op"]
+[ext_resource type="Texture2D" uid="uid://capxctkkp1t1j" path="res://BackgroundSprites/1/11.png" id="62_mlv25"]
+[ext_resource type="Texture2D" uid="uid://bokrqsqig3fhw" path="res://BackgroundSprites/1/12.png" id="63_a82wo"]
+[ext_resource type="Texture2D" uid="uid://buic4roldmo7b" path="res://BackgroundSprites/1/13.png" id="64_gdvew"]
+[ext_resource type="Texture2D" uid="uid://do1dkghir7keg" path="res://BackgroundSprites/1/14.png" id="65_kjtvk"]
+[ext_resource type="Texture2D" uid="uid://552ia2xw715m" path="res://BackgroundSprites/1/15.png" id="66_xrs0c"]
 [ext_resource type="Script" uid="uid://dvcvompk6cw5p" path="res://DebugCamera.gd" id="debug_cam"]
 
 [sub_resource type="GDScript" id="GDScript_jyhfs"]
@@ -76,6 +97,11 @@ sky = SubResource("Sky_h2yge")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_jyhfs"]
 size = Vector3(225.4649, 1, 484.55878)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ksmap"]
+texture = ExtResource("3_vc5cj")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_trceg"]
 bg_color = Color(0.49, 0.35182002, 0.2597, 1)
@@ -185,6 +211,36 @@ texture = ExtResource("32_j2jfr")
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_1v6qk"]
 texture = ExtResource("33_bjg73")
 
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_a82wo"]
+texture = ExtResource("38_r4e17")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_gdvew"]
+texture = ExtResource("39_y57op")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_kjtvk"]
+texture = ExtResource("40_mlv25")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_xrs0c"]
+texture = ExtResource("41_a82wo")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_xljpf"]
+texture = ExtResource("42_gdvew")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_j4bwh"]
+texture = ExtResource("43_kjtvk")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_tefeu"]
 atlas = ExtResource("4_tbgi4")
 region = Rect2(0, 0, 96, 96)
@@ -263,6 +319,7 @@ autostart = true
 script = ExtResource("2_tbgi4")
 
 [node name="ShopButton" type="Sprite2D" parent="CanvasLayer" unique_id=5767827]
+visible = false
 texture_filter = 1
 position = Vector2(1763, 416)
 texture = ExtResource("3_vc5cj")
@@ -283,11 +340,22 @@ max_value = 1.0
 step = 0.01
 
 [node name="OpenShopButton" type="Button" parent="CanvasLayer" unique_id=28586072]
-visibility_layer = 0
-offset_left = 1635.0
-offset_top = 396.0
-offset_right = 1899.0
-offset_bottom = 510.0
+texture_filter = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -315.0
+offset_top = -135.0
+offset_bottom = 55.0
+grow_horizontal = 0
+grow_vertical = 2
+pivot_offset_ratio = Vector2(1, 0)
+theme_override_styles/normal = SubResource("StyleBoxTexture_ksmap")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_ksmap")
+theme_override_styles/hover = SubResource("StyleBoxTexture_ksmap")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_ksmap")
 text = "
 "
 
@@ -822,10 +890,25 @@ offset_top = 842.0
 offset_right = 275.0
 offset_bottom = 859.0
 
+[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FlatDistanceRow" unique_id=548241790]
+texture_filter = 1
+layout_mode = 0
+offset_left = 10.0
+offset_top = -117.0
+offset_right = 270.0
+offset_bottom = -27.0
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxTexture_a82wo")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_gdvew")
+theme_override_styles/hover = SubResource("StyleBoxTexture_a82wo")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_kjtvk")
+
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FlatDistanceRow" unique_id=218644045]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 137.0
+offset_top = -104.0
+offset_right = 178.0
+offset_bottom = -45.0
 
 [node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FlatDistanceRow/VBoxContainer" unique_id=167341021]
 layout_mode = 2
@@ -840,24 +923,31 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
 text = "Lvl. 1"
 
-[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FlatDistanceRow" unique_id=548241790]
-layout_mode = 0
-offset_left = 10.0
-offset_right = 18.0
-offset_bottom = 17.0
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
-
 [node name="MultiBallRow" type="Control" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=2101987342]
 anchors_preset = 0
 offset_top = 863.0
 offset_right = 275.0
 offset_bottom = 880.0
 
+[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow" unique_id=1373548310]
+texture_filter = 1
+layout_mode = 0
+offset_left = 10.0
+offset_top = -38.0
+offset_right = 270.0
+offset_bottom = 52.0
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxTexture_xrs0c")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_xljpf")
+theme_override_styles/hover = SubResource("StyleBoxTexture_xrs0c")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_j4bwh")
+
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow" unique_id=958181216]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 146.0
+offset_top = -21.0
+offset_right = 187.0
+offset_bottom = 38.0
 
 [node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow/VBoxContainer" unique_id=1028440102]
 layout_mode = 2
@@ -872,14 +962,6 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
 text = "Lvl. 1"
 
-[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow" unique_id=1373548310]
-layout_mode = 0
-offset_left = 10.0
-offset_right = 18.0
-offset_bottom = 17.0
-theme_override_fonts/font = ExtResource("4_trceg")
-theme_override_styles/normal = SubResource("StyleBoxFlat_trceg")
-
 [node name="TopBorder" type="TextureRect" parent="CanvasLayer/LeftVBox/LeftMenu" unique_id=1305365879]
 texture_filter = 1
 layout_mode = 0
@@ -888,21 +970,6 @@ offset_top = 60.0
 offset_right = 296.0
 offset_bottom = 115.0
 texture = ExtResource("39_j2jfr")
-
-[node name="Background" type="CanvasLayer" parent="." unique_id=2147018228]
-layer = -1
-
-[node name="TextureRect" type="TextureRect" parent="Background" unique_id=62631654]
-z_index = -10
-z_as_relative = false
-texture_filter = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("3_tbgi4")
-stretch_mode = 6
 
 [node name="Golfer" type="Node3D" parent="." unique_id=264766340]
 script = ExtResource("4_tefeu")
@@ -921,19 +988,22 @@ volume_db = -12.868
 
 [node name="BlackFlag" parent="Flags" unique_id=196980026 groups=["flags"] instance=ExtResource("9_85g3d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 200)
-radius = 20.0
+radius_x = 20.0
+radius_z = 20.0
 distance_mult = 3.0
 flag_texture = ExtResource("8_tipki")
 
 [node name="BlueFlag" parent="Flags" unique_id=1818691062 groups=["flags"] instance=ExtResource("9_85g3d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.305, 0, 150)
-radius = 20.0
+radius_x = 25.0
+radius_z = 20.0
 distance_mult = 2.0
 flag_texture = ExtResource("7_tipki")
 
 [node name="RedFlag" parent="Flags" unique_id=126990683 groups=["flags"] instance=ExtResource("9_85g3d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.8, 0, 100)
-radius = 15.0
+radius_x = 11.0
+radius_z = 15.0
 distance_mult = 1.5
 flag_texture = ExtResource("6_o6xl0")
 
@@ -941,19 +1011,109 @@ flag_texture = ExtResource("6_o6xl0")
 stream = ExtResource("11_ya4ey")
 volume_db = -10.62
 
-[node name="AudioStreamPlayer3D2" type="AudioStreamPlayer3D" parent="." unique_id=998623756]
+[node name="NatureAmbience" type="AudioStreamPlayer3D" parent="." unique_id=998623756]
 stream = ExtResource("13_a8y0u")
 volume_db = -12.036
-autoplay = true
 
-[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=912753352]
+[node name="Music" type="AudioStreamPlayer3D" parent="." unique_id=912753352]
 stream = ExtResource("14_a8y0u")
 volume_db = -31.964
-autoplay = true
 
 [node name="DebugCamera" type="Camera3D" parent="." unique_id=2072627228]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -10)
 script = ExtResource("debug_cam")
+
+[node name="Sprites" type="Node3D" parent="." unique_id=193502691]
+
+[node name="ScaledSprite" parent="Sprites" unique_id=1933655206 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 58.110775)
+texture = ExtResource("52_o7ddy")
+flip_h = true
+pixel_offset = Vector2(0, 8)
+
+[node name="ScaledSprite2" parent="Sprites" unique_id=755339387 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 38.99835)
+texture = ExtResource("53_ids8r")
+flip_h = true
+pixel_offset = Vector2(0, 12)
+
+[node name="ScaledSprite3" parent="Sprites" unique_id=2135529231 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 43.527878)
+texture = ExtResource("54_dnhof")
+flip_h = true
+pixel_offset = Vector2(0, 12)
+
+[node name="ScaledSprite4" parent="Sprites" unique_id=224060410 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 62.855373)
+texture = ExtResource("55_1v6qk")
+flip_h = true
+pixel_offset = Vector2(0, 12)
+
+[node name="ScaledSprite5" parent="Sprites" unique_id=95887043 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 66.1322)
+texture = ExtResource("56_1v6qk")
+flip_h = true
+pixel_offset = Vector2(0, 6)
+
+[node name="ScaledSprite6" parent="Sprites" unique_id=1681188448 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 110.88641)
+texture = ExtResource("57_augu2")
+flip_h = true
+pixel_offset = Vector2(0, 2)
+
+[node name="ScaledSprite7" parent="Sprites" unique_id=2054601720 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 307.9582)
+texture = ExtResource("57_xhfw6")
+flip_h = true
+pixel_offset = Vector2(0, 2)
+
+[node name="ScaledSprite8" parent="Sprites" unique_id=1808550588 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 307.9582)
+texture = ExtResource("59_152kg")
+flip_h = true
+pixel_offset = Vector2(0, 1)
+
+[node name="ScaledSprite9" parent="Sprites" unique_id=1907371905 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 401.4999)
+texture = ExtResource("60_r4e17")
+flip_h = true
+pixel_offset = Vector2(0, 2)
+
+[node name="ScaledSprite10" parent="Sprites" unique_id=1534239914 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 450)
+texture = ExtResource("61_y57op")
+flip_h = true
+pixel_offset = Vector2(0, 2)
+
+[node name="ScaledSprite11" parent="Sprites" unique_id=679198459 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 600)
+texture = ExtResource("62_mlv25")
+flip_h = true
+pixel_offset = Vector2(0, 2)
+
+[node name="ScaledSprite12" parent="Sprites" unique_id=1193985418 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 650)
+texture = ExtResource("63_a82wo")
+flip_h = true
+pixel_offset = Vector2(0, 2)
+
+[node name="ScaledSprite13" parent="Sprites" unique_id=368656122 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1500)
+texture = ExtResource("64_gdvew")
+flip_h = true
+pixel_offset = Vector2(0, 2)
+
+[node name="ScaledSprite14" parent="Sprites" unique_id=1075094190 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1500)
+texture = ExtResource("65_kjtvk")
+flip_h = true
+pixel_offset = Vector2(0, 2)
+
+[node name="ScaledSprite15" parent="Sprites" unique_id=278902616 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3000)
+texture = ExtResource("66_xrs0c")
+flip_h = true
+pixel_offset = Vector2(0, 2)
 
 [connection signal="timeout" from="ShotTimer" to="." method="_on_shot_timer_timeout"]
 [connection signal="frame_changed" from="Golfer/GolferSprite" to="." method="_on_golfer_sprite_frame_changed"]

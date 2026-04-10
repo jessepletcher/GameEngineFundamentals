@@ -38,9 +38,13 @@ var _floating_texts: Array = []
 var _text_queue: Array = []
 var _queue_processing: bool = false
 const TEXT_QUEUE_INTERVAL := 0.15
+var _ambience_player: AudioStreamPlayer
+var _music_player: AudioStreamPlayer3D
+var _settings_panel: PanelContainer
+var _music_muted := false
 
 func _ready() -> void:
-	money_label.text = "%.2f" % GameState.money
+	money_label.text = "%.0f" % GameState.money
 	level_label.text = "Level %d" % GameState.level
 	xp_progress.max_value = GameState.xp_to_next_level
 	xp_progress.value = GameState.xp
@@ -68,9 +72,32 @@ func _ready() -> void:
 
 	# reset button
 	reset_button.pressed.connect(_on_reset_pressed)
+
+	# music
+	_music_player = $Music
+	if not _music_player.playing:
+		_music_player.play()
+
+	# nature ambience loop
+	_ambience_player = AudioStreamPlayer.new()
+	var stream = load("res://u_vr5icvkppa-nature-ambience-323729.mp3")
+	stream.loop = true
+	_ambience_player.stream = stream
+	add_child(_ambience_player)
+	_ambience_player.play()
+	# cut off last 20 seconds by restarting when it reaches that point
+	var ambience_length = stream.get_length()
+	var loop_timer = Timer.new()
+	loop_timer.wait_time = ambience_length - 20.0
+	loop_timer.autostart = true
+	loop_timer.timeout.connect(func(): _ambience_player.play())
+	add_child(loop_timer)
 	confirm_reset.pressed.connect(_on_confirm_reset)
 	cancel_reset.pressed.connect(_on_cancel_reset)
 	reset_dialog.visible = false
+
+	# settings menu
+	_setup_settings_menu()
 
 
 func _on_xp_changed(current_xp: float, required_xp: float) -> void:
@@ -109,16 +136,44 @@ func _show_level_up_popup(new_level: int, stat: String) -> void:
 	tween.parallel().tween_property(label, "modulate:a", 0.0, 1.5)
 	tween.tween_callback(label.queue_free)
 
+var _shop_instance: Control = null
+var _shop_layer: CanvasLayer = null
+
 func _on_open_shop_pressed() -> void:
 	GameState.save()
-	get_tree().change_scene_to_file("res://Shop.tscn")
+	if _shop_instance:
+		return
+	_music_player.stream_paused = true
+	_ambience_player.stream_paused = true
+	AudioServer.set_bus_volume_db(0, -20.0)
+	$CanvasLayer.visible = false
+
+	_shop_layer = CanvasLayer.new()
+	_shop_layer.layer = 10
+	add_child(_shop_layer)
+
+	var shop_scene = load("res://Shop.tscn")
+	_shop_instance = shop_scene.instantiate()
+	_shop_layer.add_child(_shop_instance)
+	_shop_instance.shop_closed.connect(_on_shop_closed)
+
+func _on_shop_closed() -> void:
+	if _shop_layer:
+		_shop_layer.queue_free()
+		_shop_layer = null
+		_shop_instance = null
+	$CanvasLayer.visible = true
+	AudioServer.set_bus_volume_db(0, 0.0)
+	if not _music_muted:
+		_music_player.stream_paused = false
+		_ambience_player.stream_paused = false
 
 func _on_golfer_swung() -> void:
 	_hit_ball()
 
 
 func _on_money_changed(new_amount: float) -> void:
-	money_label.text = "%.2f" % new_amount
+	money_label.text = "%.0f" % new_amount
 
 func _on_ShotTimer_timeout() -> void:
 	shot_timer.wait_time = BASE_INTERVAL / GameState.get_fire_rate()
@@ -126,7 +181,8 @@ func _on_ShotTimer_timeout() -> void:
 
 
 func _hit_ball() -> void:
-	hit_sound.play()
+	if not GameState.sfx_muted:
+		hit_sound.play()
 	var modifier = shot_control.get_launch_modifier()
 	var ball_count = GameState.get_ball_count()
 	for i in ball_count:
@@ -146,23 +202,30 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 	var base_money = pow(yards, 2) * 0.0002 + 5
 	
 	var best_bonus = 0.0
+	var direct_hit = false
 	for flag in flags.get_children():
-		var bonus = flag.check_hit(ball.global_position)
-		if bonus > best_bonus:
-			best_bonus = bonus
-	
+		var result = flag.check_hit(ball.global_position)
+		if result[0] > best_bonus:
+			best_bonus = result[0]
+		if result[1]:
+			direct_hit = true
+
 	if best_bonus > 0.0:
-		flag_sound.play(1.0)
+		if not GameState.sfx_muted:
+			flag_sound.play(1.0)
 		var flag_mult = GameState.balls[GameState.equipped_ball].get("flag_mult", 1.0)
 		base_money += best_bonus * flag_mult
-	
+
+	if direct_hit:
+		base_money *= 5.0
+
 	var final_money = base_money * GameState.get_money_mult()
 	GameState.money += final_money
 	GameState.money_changed.emit(GameState.money)
 	GameState.add_xp(final_money * 0.1)  # just call add_xp directly here
 
 	# queue the floating text so multiple landings in the same frame don't stack
-	_text_queue.append({"money": final_money, "yards": yards, "flag_hit": best_bonus > 0.0})
+	_text_queue.append({"money": final_money, "yards": yards, "flag_hit": best_bonus > 0.0, "direct_hit": direct_hit})
 	if not _queue_processing:
 		_process_text_queue()
 
@@ -175,12 +238,12 @@ func _process_text_queue() -> void:
 	_queue_processing = true
 	while _text_queue.size() > 0:
 		var data = _text_queue.pop_front()
-		_spawn_floating_text(data["money"], data["yards"], data.get("flag_hit", false))
+		_spawn_floating_text(data["money"], data["yards"], data.get("flag_hit", false), data.get("direct_hit", false))
 		await get_tree().create_timer(TEXT_QUEUE_INTERVAL).timeout
 	_queue_processing = false
 
 
-func _spawn_floating_text(money: float, yards: float, flag_hit: bool = false) -> void:
+func _spawn_floating_text(money: float, yards: float, flag_hit: bool = false, direct_hit: bool = false) -> void:
 	if _floating_texts.size() >= 10:
 		var oldest = _floating_texts[0]
 		if is_instance_valid(oldest):
@@ -195,7 +258,7 @@ func _spawn_floating_text(money: float, yards: float, flag_hit: bool = false) ->
 	var text = FloatingText.instantiate()
 	add_child(text)
 	text.global_position = golfer.global_position + Vector3(0, 1.5, 0)
-	text.setup(money, yards, flag_hit)
+	text.setup(money, yards, flag_hit, direct_hit)
 	_floating_texts.append(text)
 	text.tree_exited.connect(func(): _floating_texts.erase(text))
 
@@ -232,3 +295,75 @@ func _on_confirm_reset() -> void:
 
 func _on_cancel_reset() -> void:
 	reset_dialog.visible = false
+
+func _setup_settings_menu() -> void:
+	var font = load("res://balatro.otf")
+
+	# settings button - top right
+	var settings_btn = Button.new()
+	settings_btn.text = "⚙"
+	settings_btn.add_theme_font_override("font", font)
+	settings_btn.add_theme_font_size_override("font_size", 24)
+	settings_btn.anchor_left = 1.0
+	settings_btn.anchor_right = 1.0
+	settings_btn.anchor_top = 0.0
+	settings_btn.anchor_bottom = 0.0
+	settings_btn.offset_left = -50
+	settings_btn.offset_right = -10
+	settings_btn.offset_top = 10
+	settings_btn.offset_bottom = 50
+	$CanvasLayer.add_child(settings_btn)
+
+	# settings panel
+	_settings_panel = PanelContainer.new()
+	_settings_panel.anchor_left = 1.0
+	_settings_panel.anchor_right = 1.0
+	_settings_panel.anchor_top = 0.0
+	_settings_panel.anchor_bottom = 0.0
+	_settings_panel.offset_left = -200
+	_settings_panel.offset_right = -10
+	_settings_panel.offset_top = 55
+	_settings_panel.offset_bottom = 200
+	_settings_panel.visible = false
+	$CanvasLayer.add_child(_settings_panel)
+
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 8)
+	_settings_panel.add_child(vbox)
+
+	var sfx_btn = Button.new()
+	sfx_btn.text = "Disable SFX"
+	sfx_btn.add_theme_font_override("font", font)
+	sfx_btn.add_theme_font_size_override("font_size", 16)
+	vbox.add_child(sfx_btn)
+
+	var music_btn = Button.new()
+	music_btn.text = "Disable Music"
+	music_btn.add_theme_font_override("font", font)
+	music_btn.add_theme_font_size_override("font_size", 16)
+	vbox.add_child(music_btn)
+
+	var exit_btn = Button.new()
+	exit_btn.text = "Exit Game"
+	exit_btn.add_theme_font_override("font", font)
+	exit_btn.add_theme_font_size_override("font_size", 16)
+	vbox.add_child(exit_btn)
+
+	settings_btn.pressed.connect(func(): _settings_panel.visible = !_settings_panel.visible)
+
+	sfx_btn.pressed.connect(func():
+		GameState.sfx_muted = !GameState.sfx_muted
+		sfx_btn.text = "Enable SFX" if GameState.sfx_muted else "Disable SFX"
+	)
+
+	music_btn.pressed.connect(func():
+		_music_muted = !_music_muted
+		_ambience_player.stream_paused = _music_muted
+		_music_player.stream_paused = _music_muted
+		music_btn.text = "Enable Music" if _music_muted else "Disable Music"
+	)
+
+	exit_btn.pressed.connect(func():
+		GameState.save()
+		get_tree().quit()
+	)
