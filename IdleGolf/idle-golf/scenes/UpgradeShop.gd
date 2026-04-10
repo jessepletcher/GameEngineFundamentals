@@ -15,9 +15,9 @@ extends CanvasLayer
 }
 
 func _ready() -> void:
-	shop_panel.visible = false
-	menu_background.visible = false
-	top_border.visible = false
+	shop_panel.visible = true
+	menu_background.visible = true
+	top_border.visible = true
 	GameState.money_changed.connect(_refresh)
 	upgrades_button.pressed.connect(toggle)
 

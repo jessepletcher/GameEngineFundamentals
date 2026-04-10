@@ -34,6 +34,11 @@ const BASE_INTERVAL := 5.0
 const BASE_SPREAD := 8.0
 const FloatingText = preload("res://scenes/FloatingText.tscn")
 
+var _floating_texts: Array = []
+var _text_queue: Array = []
+var _queue_processing: bool = false
+const TEXT_QUEUE_INTERVAL := 0.15
+
 func _ready() -> void:
 	money_label.text = "%.2f" % GameState.money
 	level_label.text = "Level %d" % GameState.level
@@ -157,15 +162,44 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 	GameState.money += final_money
 	GameState.money_changed.emit(GameState.money)
 	GameState.add_xp(final_money * 0.1)  # just call add_xp directly here
-	
-	var text = FloatingText.instantiate()
-	add_child(text)
-	text.global_position = ball.global_position + Vector3(0, 1, 0)
-	text.setup(final_money, yards)
-	
+
+	# queue the floating text so multiple landings in the same frame don't stack
+	_text_queue.append({"money": final_money, "yards": yards, "flag_hit": best_bonus > 0.0})
+	if not _queue_processing:
+		_process_text_queue()
+
 	await get_tree().create_timer(3.0).timeout
 	if is_instance_valid(ball):
 		ball.queue_free()
+
+
+func _process_text_queue() -> void:
+	_queue_processing = true
+	while _text_queue.size() > 0:
+		var data = _text_queue.pop_front()
+		_spawn_floating_text(data["money"], data["yards"], data.get("flag_hit", false))
+		await get_tree().create_timer(TEXT_QUEUE_INTERVAL).timeout
+	_queue_processing = false
+
+
+func _spawn_floating_text(money: float, yards: float, flag_hit: bool = false) -> void:
+	if _floating_texts.size() >= 10:
+		var oldest = _floating_texts[0]
+		if is_instance_valid(oldest):
+			oldest.force_fade()
+
+	# push all existing texts up to make room for the new one
+	for existing in _floating_texts:
+		if is_instance_valid(existing):
+			var shift_tween = create_tween()
+			shift_tween.tween_property(existing, "global_position:y", existing.global_position.y + .1, 0.15)
+
+	var text = FloatingText.instantiate()
+	add_child(text)
+	text.global_position = golfer.global_position + Vector3(0, 1.5, 0)
+	text.setup(money, yards, flag_hit)
+	_floating_texts.append(text)
+	text.tree_exited.connect(func(): _floating_texts.erase(text))
 
 
 func _on_ball_exploded(fragments: Array) -> void:

@@ -264,7 +264,7 @@ script = ExtResource("2_tbgi4")
 
 [node name="ShopButton" type="Sprite2D" parent="CanvasLayer" unique_id=5767827]
 texture_filter = 1
-position = Vector2(1762, 416)
+position = Vector2(1763, 416)
 texture = ExtResource("3_vc5cj")
 
 [node name="AimSlider" type="HSlider" parent="CanvasLayer" unique_id=811697383]
@@ -466,6 +466,7 @@ offset_left = 70.0
 offset_top = -3.0
 offset_right = 282.0
 offset_bottom = 46.0
+theme_override_colors/font_color = Color(0.40784314, 0.40784314, 0.40784314, 1)
 theme_override_fonts/font = ExtResource("4_trceg")
 theme_override_font_sizes/font_size = 48
 text = "0"

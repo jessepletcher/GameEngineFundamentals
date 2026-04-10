@@ -3,12 +3,25 @@ extends Node3D
 @onready var label: Label3D = $Label3D
 @onready var camera: Camera3D = get_viewport().get_camera_3d()
 
-func setup(money: float, yards: float) -> void:
+var _fade_tween: Tween
+
+func setup(money: float, yards: float, flag_hit: bool = false) -> void:
 	label.text = "$%.2f | %.0f yds" % [money, yards]
-	
+	if flag_hit:
+		label.modulate = Color(0.3, 1.0, 0.3)
+	else:
+		label.modulate = Color.WHITE
+
+	_fade_tween = create_tween()
+	_fade_tween.tween_interval(1.0)
+	_fade_tween.tween_property(label, "modulate:a", 0.0, 0.3)
+	_fade_tween.tween_callback(queue_free)
+
+func force_fade() -> void:
+	if _fade_tween and _fade_tween.is_valid():
+		_fade_tween.kill()
 	var tween = create_tween()
-	tween.tween_property(self, "position:y", position.y + 3.0, 1.5)
-	tween.parallel().tween_property(label, "modulate:a", 0.0, 1.5)
+	tween.tween_property(label, "modulate:a", 0.0, 0.3)
 	tween.tween_callback(queue_free)
 
 func _process(_delta: float) -> void:
