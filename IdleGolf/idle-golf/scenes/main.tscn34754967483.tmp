@@ -58,17 +58,13 @@
 [ext_resource type="Texture2D" uid="uid://s14i53rtt35q" path="res://BackgroundSprites/1/2.png" id="54_dnhof"]
 [ext_resource type="Texture2D" uid="uid://bnx1w6a0eumod" path="res://BackgroundSprites/1/4.png" id="55_1v6qk"]
 [ext_resource type="Texture2D" uid="uid://b23gpwhaitawc" path="res://BackgroundSprites/1/5.png" id="56_1v6qk"]
-[ext_resource type="Texture2D" uid="uid://cp4wcdmx3t3ip" path="res://3TreeAnim.png" id="56_mlv25"]
 [ext_resource type="Texture2D" uid="uid://81uj0282yd33" path="res://BackgroundSprites/1/6.png" id="57_augu2"]
 [ext_resource type="Texture2D" uid="uid://bq5554xa007rh" path="res://BackgroundSprites/1/Newfairway.png" id="57_xhfw6"]
-[ext_resource type="Texture2D" uid="uid://bp74sxkfmor4l" path="res://1GrassAnim.png" id="58_kjtvk"]
 [ext_resource type="Texture2D" uid="uid://c3njyd2aciqeq" path="res://BackgroundSprites/1/8.png" id="59_152kg"]
 [ext_resource type="Texture2D" uid="uid://5rff84ur0wcx" path="res://BackgroundSprites/1/9.png" id="60_r4e17"]
-[ext_resource type="Texture2D" uid="uid://vx7uxk1sqmud" path="res://4TreeAnim.png" id="61_xrs0c"]
 [ext_resource type="Texture2D" uid="uid://dllf5pwkvk4qm" path="res://BackgroundSprites/1/10.png" id="61_y57op"]
 [ext_resource type="Texture2D" uid="uid://capxctkkp1t1j" path="res://BackgroundSprites/1/11.png" id="62_mlv25"]
 [ext_resource type="Texture2D" uid="uid://bokrqsqig3fhw" path="res://BackgroundSprites/1/12.png" id="63_a82wo"]
-[ext_resource type="Texture2D" uid="uid://cl5mflol6sb24" path="res://5TreeAnim.png" id="63_xljpf"]
 [ext_resource type="Texture2D" uid="uid://buic4roldmo7b" path="res://BackgroundSprites/1/13.png" id="64_gdvew"]
 [ext_resource type="Texture2D" uid="uid://do1dkghir7keg" path="res://BackgroundSprites/1/14.png" id="65_kjtvk"]
 [ext_resource type="Texture2D" uid="uid://552ia2xw715m" path="res://BackgroundSprites/1/15.png" id="66_xrs0c"]
@@ -600,7 +596,6 @@ theme_override_styles/pressed = SubResource("StyleBoxTexture_fv21b")
 theme_override_styles/hover = SubResource("StyleBoxTexture_yq6so")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/LeftVBox/LeftMenu" unique_id=48628536]
-clip_contents = false
 layout_direction = 3
 layout_mode = 1
 offset_left = 15.0
@@ -658,7 +653,6 @@ offset_left = 75.0
 offset_top = 15.0
 offset_right = 112.0
 offset_bottom = 74.0
-mouse_filter = 2
 
 [node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/BallSpeedRow/VBoxContainer" unique_id=852836166]
 layout_mode = 2
@@ -702,7 +696,6 @@ offset_left = 74.0
 offset_top = 15.0
 offset_right = 111.0
 offset_bottom = 74.0
-mouse_filter = 2
 
 [node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FireRateRow/VBoxContainer" unique_id=2007074903]
 layout_mode = 2
@@ -746,7 +739,6 @@ offset_left = 39.0
 offset_top = 15.0
 offset_right = 80.0
 offset_bottom = 74.0
-mouse_filter = 2
 
 [node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MoneyMultRow/VBoxContainer" unique_id=77518754]
 layout_mode = 2
@@ -790,7 +782,6 @@ offset_left = 38.0
 offset_top = 15.0
 offset_right = 79.0
 offset_bottom = 74.0
-mouse_filter = 2
 
 [node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/XPMultRow/VBoxContainer" unique_id=316341780]
 layout_mode = 2
@@ -834,7 +825,6 @@ offset_left = 62.0
 offset_top = 15.0
 offset_right = 103.0
 offset_bottom = 74.0
-mouse_filter = 2
 
 [node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyRow/VBoxContainer" unique_id=1053258118]
 layout_mode = 2
@@ -903,7 +893,6 @@ offset_left = 66.0
 offset_top = -102.0
 offset_right = 107.0
 offset_bottom = -43.0
-mouse_filter = 2
 
 [node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FlatDistanceRow/VBoxContainer" unique_id=167341021]
 layout_mode = 2
@@ -946,7 +935,6 @@ offset_left = 65.0
 offset_top = -23.0
 offset_right = 106.0
 offset_bottom = 36.0
-mouse_filter = 2
 
 [node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow/VBoxContainer" unique_id=1028440102]
 layout_mode = 2
@@ -965,7 +953,7 @@ text = "Lvl. 1"
 horizontal_alignment = 2
 
 [node name="MenuBackground" type="TextureRect" parent="CanvasLayer" unique_id=1125651043]
-show_behind_parent = true
+z_index = -1
 texture_filter = 1
 offset_left = 5.0
 offset_right = 340.0
@@ -1033,20 +1021,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 58.110775)
 texture = ExtResource("52_o7ddy")
 flip_h = true
 pixel_offset = Vector2(0, 8)
-animated = true
-spritesheet = ExtResource("56_mlv25")
-h_frames = 9
-fps = 2.0
 
 [node name="ScaledSprite2" parent="Sprites" unique_id=755339387 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 38.99835)
 texture = ExtResource("53_ids8r")
 flip_h = true
 pixel_offset = Vector2(0, 12)
-animated = true
-spritesheet = ExtResource("58_kjtvk")
-h_frames = 9
-fps = 2.0
 
 [node name="ScaledSprite3" parent="Sprites" unique_id=2135529231 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 43.527878)
@@ -1059,20 +1039,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 62.855373)
 texture = ExtResource("55_1v6qk")
 flip_h = true
 pixel_offset = Vector2(0, 12)
-animated = true
-spritesheet = ExtResource("61_xrs0c")
-h_frames = 9
-fps = 2.0
 
 [node name="ScaledSprite5" parent="Sprites" unique_id=95887043 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 66.1322)
 texture = ExtResource("56_1v6qk")
 flip_h = true
 pixel_offset = Vector2(0, 6)
-animated = true
-spritesheet = ExtResource("63_xljpf")
-h_frames = 9
-fps = 2.0
 
 [node name="ScaledSprite6" parent="Sprites" unique_id=1681188448 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 110.88641)

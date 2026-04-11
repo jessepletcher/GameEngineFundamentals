@@ -83,6 +83,7 @@ func _ready() -> void:
 	var stream = load("res://u_vr5icvkppa-nature-ambience-323729.mp3")
 	stream.loop = true
 	_ambience_player.stream = stream
+	_ambience_player.volume_db = -15.0
 	add_child(_ambience_player)
 	_ambience_player.play()
 	# cut off last 20 seconds by restarting when it reaches that point
