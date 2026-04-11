@@ -8,7 +8,10 @@ const Ball = preload("res://scenes/Ball.tscn")
 @onready var golfer = $Golfer
 @onready var shop = $CanvasLayer
 @onready var aim_slider: HSlider = $CanvasLayer/AimSlider
-@onready var flags = $Flags
+@onready var level1_sprites = $Level1
+@onready var level1_flags = $Level1Flags
+@onready var level2_sprites = $Level2
+@onready var level2_flags = $Level2Flags
 @onready var hit_sound: AudioStreamPlayer3D = $Golfer/GolfHit
 @onready var flag_sound: AudioStreamPlayer3D = $FlagSound
 @onready var open_shop_button: Button = $CanvasLayer/OpenShopButton
@@ -43,7 +46,27 @@ var _music_player: AudioStreamPlayer3D
 var _settings_panel: PanelContainer
 var _music_muted := false
 
+var _course_data := {
+	"course1": {"sprites": null, "flags": null},
+	"course2": {"sprites": null, "flags": null},
+}
+
+func _get_active_flags() -> Node3D:
+	return _course_data[GameState.equipped_course]["flags"]
+
+func _switch_course() -> void:
+	for key in _course_data:
+		var show = key == GameState.equipped_course
+		_course_data[key]["sprites"].visible = show
+		_course_data[key]["flags"].visible = show
+
 func _ready() -> void:
+	_course_data["course1"]["sprites"] = level1_sprites
+	_course_data["course1"]["flags"] = level1_flags
+	_course_data["course2"]["sprites"] = level2_sprites
+	_course_data["course2"]["flags"] = level2_flags
+	_switch_course()
+	GameState.course_changed.connect(_switch_course)
 	money_label.text = "%.0f" % GameState.money
 	level_label.text = "Level %d" % GameState.level
 	xp_progress.max_value = GameState.xp_to_next_level
@@ -83,7 +106,7 @@ func _ready() -> void:
 	var stream = load("res://u_vr5icvkppa-nature-ambience-323729.mp3")
 	stream.loop = true
 	_ambience_player.stream = stream
-	_ambience_player.volume_db = -15.0
+	_ambience_player.volume_db = -10.0
 	add_child(_ambience_player)
 	_ambience_player.play()
 	# cut off last 20 seconds by restarting when it reaches that point
@@ -139,15 +162,19 @@ func _show_level_up_popup(new_level: int, stat: String) -> void:
 
 var _shop_instance: Control = null
 var _shop_layer: CanvasLayer = null
+var _transitioning := false
+const TRANSITION_DURATION := 0.4
 
 func _on_open_shop_pressed() -> void:
 	GameState.save()
-	if _shop_instance:
+	if _shop_instance or _transitioning:
 		return
+	_transitioning = true
 	_music_player.stream_paused = true
 	_ambience_player.stream_paused = true
 	AudioServer.set_bus_volume_db(0, -20.0)
-	$CanvasLayer.visible = false
+
+	var screen_w = get_viewport().get_visible_rect().size.x
 
 	_shop_layer = CanvasLayer.new()
 	_shop_layer.layer = 10
@@ -156,18 +183,45 @@ func _on_open_shop_pressed() -> void:
 	var shop_scene = load("res://Shop.tscn")
 	_shop_instance = shop_scene.instantiate()
 	_shop_layer.add_child(_shop_instance)
-	_shop_instance.shop_closed.connect(_on_shop_closed)
+	_shop_instance.shop_closed.connect(_on_shop_close_requested)
+
+	# shop starts offscreen right
+	_shop_layer.offset = Vector2(screen_w, 0)
+
+	var tween = create_tween().set_parallel(true)
+	# slide main UI left
+	tween.tween_property($CanvasLayer, "offset", Vector2(-screen_w, 0), TRANSITION_DURATION).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_CUBIC)
+	# slide shop in from right
+	tween.tween_property(_shop_layer, "offset", Vector2.ZERO, TRANSITION_DURATION).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_CUBIC)
+	tween.chain().tween_callback(func():
+		_transitioning = false
+	)
+
+func _on_shop_close_requested() -> void:
+	if _transitioning:
+		return
+	_transitioning = true
+	var screen_w = get_viewport().get_visible_rect().size.x
+
+	var tween = create_tween().set_parallel(true)
+	# slide shop out to the right
+	tween.tween_property(_shop_layer, "offset", Vector2(screen_w, 0), TRANSITION_DURATION).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_CUBIC)
+	# slide main UI back from left
+	tween.tween_property($CanvasLayer, "offset", Vector2.ZERO, TRANSITION_DURATION).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_CUBIC)
+	tween.chain().tween_callback(_on_shop_closed)
 
 func _on_shop_closed() -> void:
 	if _shop_layer:
 		_shop_layer.queue_free()
 		_shop_layer = null
 		_shop_instance = null
-	$CanvasLayer.visible = true
+	_transitioning = false
 	AudioServer.set_bus_volume_db(0, 0.0)
 	if not _music_muted:
 		_music_player.stream_paused = false
 		_ambience_player.stream_paused = false
+	# reload golfer sprite in case player switched golfer
+	golfer._load_golfer_sprite()
 
 func _on_golfer_swung() -> void:
 	_hit_ball()
@@ -204,7 +258,7 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 	
 	var best_bonus = 0.0
 	var direct_hit = false
-	for flag in flags.get_children():
+	for flag in _get_active_flags().get_children():
 		var result = flag.check_hit(ball.global_position)
 		if result[0] > best_bonus:
 			best_bonus = result[0]
@@ -350,6 +404,12 @@ func _setup_settings_menu() -> void:
 	exit_btn.add_theme_font_size_override("font_size", 16)
 	vbox.add_child(exit_btn)
 
+	var medals_btn = Button.new()
+	medals_btn.text = "+100 Medals"
+	medals_btn.add_theme_font_override("font", font)
+	medals_btn.add_theme_font_size_override("font_size", 16)
+	vbox.add_child(medals_btn)
+
 	settings_btn.pressed.connect(func(): _settings_panel.visible = !_settings_panel.visible)
 
 	sfx_btn.pressed.connect(func():
@@ -367,4 +427,9 @@ func _setup_settings_menu() -> void:
 	exit_btn.pressed.connect(func():
 		GameState.save()
 		get_tree().quit()
+	)
+
+	medals_btn.pressed.connect(func():
+		GameState.medals += 100
+		GameState.medals_changed.emit(GameState.medals)
 	)

@@ -15,6 +15,8 @@ signal medals_changed(new_amount: float)
 signal money_changed(new_amount: float)
 signal leveled_up(new_level: int, stat_boosted: String)
 signal xp_changed(current_xp: float, required_xp: float)
+signal golfer_changed
+signal course_changed
 
 const SAVE_PATH = "user://save.cfg"
 
@@ -38,26 +40,32 @@ var upgrades = {
 	"money_mult":   {"level": 0, "base_cost": 20.0,  "label": "Money Multiplier"},
 	"consistency":  {"level": 0, "base_cost": 12.0,  "label": "Consistency"},
 	"xp_mult":      {"level": 0, "base_cost": 20.0,  "label": "XP Multiplier"},
-	"flat_distance": {"level": 0, "base_cost": 3.0, "label": "Flat Distance", "use_medals": true},
-	"multi_ball": {"level": 0, "base_cost": 50.0, "label": "Multi Ball", "use_medals": true},
+	"flat_distance": {"level": 0, "base_cost": 8.0, "label": "Flat Distance", "use_medals": true},
+	"multi_ball": {"level": 0, "base_cost": 15.0, "label": "Multi Ball", "use_medals": true, "max_level": 3},
 }
 
 var balls = {
 	"standard": {"name": "Standard Ball", "desc": "Your trusty golf ball", "medal_cost": 0.0, "owned": true, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.WHITE, "texture": preload("res://BallIcon.png"), "flag_mult": 1.0},
 	"homing_ball": {"name": "Homing Ball", "desc": "Homes in on nearest flag", "medal_cost": 5, "owned": false, "speed_mult": 1.0, "money_mult": 1.5, "can_home": true, "trail_color": Color.LIME_GREEN, "texture": preload("res://HomingBalllIcon.png"), "flag_mult": 1.0},
-	"pin_seeker": {"name": "Pin Seeker", "desc": "2x flag bonus money", "medal_cost": 8, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.GOLD, "texture": preload("res://PinSeekBalllIcon.png"), "flag_mult": 2.0},
-	"firework": {"name": "Firework Ball", "desc": "Explodes into 6 balls at apex", "medal_cost": 12, "owned": false, "speed_mult": 1.0, "money_mult": 0.5, "can_home": false, "trail_color": Color.ORANGE_RED, "texture": preload("res://FireWorksBalllIcon.png"), "flag_mult": 1.0, "is_firework": true},
+	"pin_seeker": {"name": "Pin Seeker", "desc": "2x flag bonus money", "medal_cost": 25, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.GOLD, "texture": preload("res://PinSeekBalllIcon.png"), "flag_mult": 2.0},
+	"firework": {"name": "Firework Ball", "desc": "Explodes into 6 balls at apex", "medal_cost": 60, "owned": false, "speed_mult": 1.0, "money_mult": 0.5, "can_home": false, "trail_color": Color.ORANGE_RED, "texture": preload("res://FireWorksBalllIcon.png"), "flag_mult": 1.0, "is_firework": true},
 }
 
-var clubs = {
-	"standard":    {"name": "Standard Club",  "desc": "A reliable iron",          "medal_cost": 0,  "owned": true,  "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.0},
-	"driver":      {"name": "Driver",         "desc": "+15% distance, -5% fire rate", "medal_cost": 3,  "owned": false, "speed_mult": 1.15, "fire_rate_mult": 0.95, "money_mult": 1.0},
-	"rapid_iron":  {"name": "Rapid Iron",     "desc": "+25% fire rate",           "medal_cost": 5,  "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.25, "money_mult": 1.0},
-	"golden_club": {"name": "Golden Club",    "desc": "+25% money, +10% distance", "medal_cost": 10, "owned": false, "speed_mult": 1.1, "fire_rate_mult": 1.0, "money_mult": 1.25},
+var golfers = {
+	"standard":    {"name": "Standard Golfer", "desc": "A reliable swing",             "medal_cost": 0,  "owned": true,  "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96},
+	"power":       {"name": "Power Golfer",    "desc": "+15% distance, -5% fire rate", "medal_cost": 5,  "owned": false, "speed_mult": 1.15, "fire_rate_mult": 0.95, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96},
+	"speedy":      {"name": "Speedy Golfer",   "desc": "+25% fire rate",               "medal_cost": 20, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.25, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96},
+	"Lion Trees":      {"name": "Lion Trees",   "desc": "+25% money, +20% distance",   "medal_cost": 50, "owned": false, "speed_mult": 1.2, "fire_rate_mult": 1.0, "money_mult": 1.25, "spritesheet": "res://LionTreesSwing.png", "h_frames": 5, "frame_size": 96},
+}
+
+var courses = {
+	"course1": {"name": "Driving Range", "desc": "The classic range", "medal_cost": 0, "owned": true},
+	"course2": {"name": "Course 2", "desc": "A new challenge", "medal_cost": 10, "owned": false},
 }
 
 var equipped_ball: String = "standard"
-var equipped_club: String = "standard"
+var equipped_golfer: String = "standard"
+var equipped_course: String = "course1"
 
 var level_bonuses = {
 	"ball_speed": 0.0,
@@ -77,7 +85,7 @@ func get_flat_distance() -> float:
 func get_medal_reward() -> float:
 	var xp_improvement = max(lifetime_xp - best_run_xp, 0.0)
 	var money_improvement = max(lifetime_money - best_run_money, 0.0)
-	return floor((xp_improvement * 0.01) + (money_improvement * 0.001))
+	return floor((xp_improvement * 0.001) + (money_improvement * 0.0001))
 
 func retire() -> void:
 	var earned_medals = get_medal_reward()
@@ -111,7 +119,8 @@ func full_reset() -> void:
 	best_run_xp = 0.0
 	best_run_money = 0.0
 	equipped_ball = "standard"
-	equipped_club = "standard"
+	equipped_golfer = "standard"
+	equipped_course = "course1"
 
 	for key in upgrades:
 		upgrades[key]["level"] = 0
@@ -122,8 +131,11 @@ func full_reset() -> void:
 	for key in balls:
 		balls[key]["owned"] = (key == "standard")
 
-	for key in clubs:
-		clubs[key]["owned"] = (key == "standard")
+	for key in golfers:
+		golfers[key]["owned"] = (key == "standard")
+
+	for key in courses:
+		courses[key]["owned"] = (key == "course1")
 
 	money_changed.emit(money)
 	medals_changed.emit(medals)
@@ -143,7 +155,8 @@ func save() -> void:
 	config.set_value("player", "level", level)
 	config.set_value("player", "xp_to_next_level", xp_to_next_level)
 	config.set_value("player", "equipped_ball", equipped_ball)
-	config.set_value("player", "equipped_club", equipped_club)
+	config.set_value("player", "equipped_golfer", equipped_golfer)
+	config.set_value("player", "equipped_course", equipped_course)
 	config.set_value("player", "medals", medals)
 	config.set_value("player", "lifetime_xp", lifetime_xp)
 	config.set_value("player", "lifetime_money", lifetime_money)
@@ -159,9 +172,12 @@ func save() -> void:
 	for key in balls:
 		config.set_value("balls", key, balls[key]["owned"])
 	
-	for key in clubs:
-		config.set_value("clubs", key, clubs[key]["owned"])
-	
+	for key in golfers:
+		config.set_value("golfers", key, golfers[key]["owned"])
+
+	for key in courses:
+		config.set_value("courses", key, courses[key]["owned"])
+
 	config.save(SAVE_PATH)
 
 func load_game() -> void:
@@ -175,7 +191,8 @@ func load_game() -> void:
 	level = config.get_value("player", "level", 1)
 	xp_to_next_level = config.get_value("player", "xp_to_next_level", 100.0)
 	equipped_ball = config.get_value("player", "equipped_ball", "standard")
-	equipped_club = config.get_value("player", "equipped_club", "standard")
+	equipped_golfer = config.get_value("player", "equipped_golfer", "standard")
+	equipped_course = config.get_value("player", "equipped_course", "course1")
 	medals = config.get_value("player", "medals", 0.0)
 	lifetime_xp = config.get_value("player", "lifetime_xp", 0.0)
 	lifetime_money = config.get_value("player", "lifetime_money", 0.0)
@@ -191,8 +208,11 @@ func load_game() -> void:
 	for key in balls:
 		balls[key]["owned"] = config.get_value("balls", key, false)
 	
-	for key in clubs:
-		clubs[key]["owned"] = config.get_value("clubs", key, false)
+	for key in golfers:
+		golfers[key]["owned"] = config.get_value("golfers", key, false)
+
+	for key in courses:
+		courses[key]["owned"] = config.get_value("courses", key, false)
 
 func add_xp(amount: float) -> void:
 	var gained = amount * get_xp_mult()
@@ -234,7 +254,9 @@ func get_ball_count() -> int:
 func get_cost(upgrade: String) -> float:
 	var level = upgrades[upgrade]["level"]
 	if upgrade == "multi_ball":
-		return floor(upgrades[upgrade]["base_cost"] * pow(2.0, level))
+		return floor(upgrades[upgrade]["base_cost"] * pow(5.0, level))  # 15 → 75 → 375
+	if upgrade == "flat_distance":
+		return floor(upgrades[upgrade]["base_cost"] * pow(3.0, level))  # 8 → 24 → 72 → 216
 	return floor(upgrades[upgrade]["base_cost"] * pow(1.12, level))
 
 func try_purchase(upgrade: String) -> bool:
@@ -246,17 +268,17 @@ func try_purchase(upgrade: String) -> bool:
 		return true
 	return false
 
-func get_club_data() -> Dictionary:
-	return clubs[equipped_club]
+func get_golfer_data() -> Dictionary:
+	return golfers[equipped_golfer]
 
 func get_ball_speed() -> float:
-	return (1.0 + upgrades["ball_speed"]["level"] * 0.08) * get_level_mult("ball_speed") * get_club_data()["speed_mult"]  # → 5x at lv50
+	return (1.0 + upgrades["ball_speed"]["level"] * 0.08) * get_level_mult("ball_speed") * get_golfer_data()["speed_mult"]  # → 5x at lv50
 
 func get_fire_rate() -> float:
-	return (1.0 + upgrades["fire_rate"]["level"] * 0.06) * get_level_mult("fire_rate") * get_club_data()["fire_rate_mult"]  # → 4x at lv50
+	return (1.0 + upgrades["fire_rate"]["level"] * 0.06) * get_level_mult("fire_rate") * get_golfer_data()["fire_rate_mult"]  # → 4x at lv50
 
 func get_money_mult() -> float:
-	return (1.0 + upgrades["money_mult"]["level"] * 0.18) * get_level_mult("money_mult") * get_club_data()["money_mult"]  # → ~10x at lv50
+	return (1.0 + upgrades["money_mult"]["level"] * 0.18) * get_level_mult("money_mult") * get_golfer_data()["money_mult"]  # → ~10x at lv50
 
 func get_consistency() -> float:
 	return (0.5 + upgrades["consistency"]["level"] * 0.11) * get_level_mult("consistency")  # → ~6x at lv50

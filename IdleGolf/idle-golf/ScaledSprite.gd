@@ -3,6 +3,7 @@ extends Node3D
 @export var texture: Texture2D
 @export var flip_h: bool = false
 @export var pixel_offset: Vector2 = Vector2(0, -12)
+@export var sprite_scale: float = 1.0
 
 ## Animation settings
 @export var animated: bool = false
@@ -34,13 +35,15 @@ func _ready() -> void:
 		sprite.texture = texture
 
 func _process(delta: float) -> void:
-	# scaling
-	var distance = global_position.distance_to(camera.global_position)
+	# scaling — use camera-space Z depth for correct perspective
+	var cam_space = camera.global_transform.affine_inverse() * global_position
+	var depth = max(-cam_space.z, 0.01)
 	var fov_rad = deg_to_rad(camera.fov)
-	var visible_height = 2.0 * distance * tan(fov_rad / 2.0)
+	var visible_height = 2.0 * depth * tan(fov_rad / 2.0)
 	var sprite_height = 216.0 * sprite.pixel_size
 	var scale_factor = visible_height / sprite_height
-	sprite.scale = Vector3(scale_factor, scale_factor, scale_factor)
+	var final_scale = scale_factor * sprite_scale
+	sprite.scale = Vector3(final_scale, final_scale, final_scale)
 
 	# animation
 	if animated and _frame_count > 0:

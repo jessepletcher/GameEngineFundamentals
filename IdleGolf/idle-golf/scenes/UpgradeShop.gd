@@ -42,8 +42,13 @@ func _refresh(_money: float) -> void:
 		var btn = rows[key].get_node("BuyButton")
 		btn.text = ""
 		if upgrade.get("use_medals", false):
-			cost_label.text = "🏅 %.0f" % cost
-			btn.disabled = GameState.medals < cost
+			var max_lvl = upgrade.get("max_level", -1)
+			if max_lvl >= 0 and level >= max_lvl:
+				cost_label.text = "MAX"
+				btn.disabled = true
+			else:
+				cost_label.text = "🏅 %.0f" % cost
+				btn.disabled = GameState.medals < cost
 		else:
 			cost_label.text = "$%.0f" % cost
 			btn.disabled = GameState.money < cost
@@ -60,6 +65,9 @@ func _on_buy_input(event: InputEvent, key: String) -> void:
 
 func _buy_one(key: String) -> void:
 	var upgrade = GameState.upgrades[key]
+	var max_lvl = upgrade.get("max_level", -1)
+	if max_lvl >= 0 and upgrade["level"] >= max_lvl:
+		return
 	if upgrade.get("use_medals", false):
 		var cost = GameState.get_cost(key)
 		if GameState.medals >= cost:
