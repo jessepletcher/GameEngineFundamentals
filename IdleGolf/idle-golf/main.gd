@@ -41,6 +41,7 @@ var _floating_texts: Array = []
 var _text_queue: Array = []
 var _queue_processing: bool = false
 const TEXT_QUEUE_INTERVAL := 0.15
+const MAX_INDIVIDUAL_TEXTS := 4  # show this many individually, then batch the rest
 var _ambience_player: AudioStreamPlayer
 var _music_player: AudioStreamPlayer3D
 var _settings_panel: PanelContainer
@@ -289,31 +290,75 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 		ball.queue_free()
 
 
+func _get_dynamic_lifetime() -> float:
+	# base 1.0s, shrinks as queue + active texts grow, minimum 0.3s
+	var pressure = _text_queue.size() + _floating_texts.size()
+	return clampf(1.0 - pressure * 0.1, 0.3, 1.0)
+
 func _process_text_queue() -> void:
 	_queue_processing = true
 	while _text_queue.size() > 0:
-		var data = _text_queue.pop_front()
-		_spawn_floating_text(data["money"], data["yards"], data.get("flag_hit", false), data.get("direct_hit", false))
-		await get_tree().create_timer(TEXT_QUEUE_INTERVAL).timeout
+		# if queue is overflowing, batch the extras into a summary
+		if _text_queue.size() > MAX_INDIVIDUAL_TEXTS:
+			# show first few individually
+			for i in MAX_INDIVIDUAL_TEXTS:
+				if _text_queue.size() == 0:
+					break
+				var data = _text_queue.pop_front()
+				_spawn_floating_text(data["money"], data["yards"], data.get("flag_hit", false), data.get("direct_hit", false))
+				await get_tree().create_timer(TEXT_QUEUE_INTERVAL).timeout
+
+			# collapse everything remaining into one summary
+			if _text_queue.size() > 0:
+				var total_money := 0.0
+				var hit_count := _text_queue.size()
+				var any_flag := false
+				var any_direct := false
+				for data in _text_queue:
+					total_money += data["money"]
+					if data.get("direct_hit", false):
+						any_direct = true
+					elif data.get("flag_hit", false):
+						any_flag = true
+				_text_queue.clear()
+				_spawn_summary_text(total_money, hit_count, any_flag, any_direct)
+				await get_tree().create_timer(TEXT_QUEUE_INTERVAL).timeout
+		else:
+			var data = _text_queue.pop_front()
+			_spawn_floating_text(data["money"], data["yards"], data.get("flag_hit", false), data.get("direct_hit", false))
+			await get_tree().create_timer(TEXT_QUEUE_INTERVAL).timeout
 	_queue_processing = false
 
 
-func _spawn_floating_text(money: float, yards: float, flag_hit: bool = false, direct_hit: bool = false) -> void:
+func _push_existing_texts_up() -> void:
 	if _floating_texts.size() >= 10:
 		var oldest = _floating_texts[0]
 		if is_instance_valid(oldest):
 			oldest.force_fade()
 
-	# push all existing texts up to make room for the new one
 	for existing in _floating_texts:
 		if is_instance_valid(existing):
 			var shift_tween = create_tween()
 			shift_tween.tween_property(existing, "global_position:y", existing.global_position.y + .1, 0.15)
 
+func _spawn_floating_text(money: float, yards: float, flag_hit: bool = false, direct_hit: bool = false) -> void:
+	_push_existing_texts_up()
+
 	var text = FloatingText.instantiate()
 	add_child(text)
 	text.global_position = golfer.global_position + Vector3(0, 1.5, 0)
-	text.setup(money, yards, flag_hit, direct_hit)
+	text.setup(money, yards, flag_hit, direct_hit, _get_dynamic_lifetime())
+	_floating_texts.append(text)
+	text.tree_exited.connect(func(): _floating_texts.erase(text))
+
+func _spawn_summary_text(total_money: float, hit_count: int, any_flag: bool, any_direct: bool) -> void:
+	_push_existing_texts_up()
+
+	var text = FloatingText.instantiate()
+	add_child(text)
+	text.global_position = golfer.global_position + Vector3(0, 1.5, 0)
+	var summary = "+$%.0f (%d more hits)" % [total_money, hit_count]
+	text.setup_summary(summary, _get_dynamic_lifetime())
 	_floating_texts.append(text)
 	text.tree_exited.connect(func(): _floating_texts.erase(text))
 

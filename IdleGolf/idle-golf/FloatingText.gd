@@ -5,7 +5,7 @@ extends Node3D
 
 var _fade_tween: Tween
 
-func setup(money: float, yards: float, flag_hit: bool = false, direct_hit: bool = false) -> void:
+func setup(money: float, yards: float, flag_hit: bool = false, direct_hit: bool = false, lifetime: float = 1.0) -> void:
 	label.text = "$%.0f | %.0f yds" % [money, yards]
 	if direct_hit:
 		label.modulate = Color(1.0, 0.84, 0.0)  # gold
@@ -15,7 +15,16 @@ func setup(money: float, yards: float, flag_hit: bool = false, direct_hit: bool 
 		label.modulate = Color.WHITE
 
 	_fade_tween = create_tween()
-	_fade_tween.tween_interval(1.0)
+	_fade_tween.tween_interval(lifetime)
+	_fade_tween.tween_property(label, "modulate:a", 0.0, 0.3)
+	_fade_tween.tween_callback(queue_free)
+
+func setup_summary(text: String, lifetime: float = 1.0) -> void:
+	label.text = text
+	label.modulate = Color(0.8, 0.9, 1.0)  # light blue for summary
+
+	_fade_tween = create_tween()
+	_fade_tween.tween_interval(lifetime)
 	_fade_tween.tween_property(label, "modulate:a", 0.0, 0.3)
 	_fade_tween.tween_callback(queue_free)
 
