@@ -59,6 +59,7 @@ func _on_buy_input(event: InputEvent, key: String) -> void:
 	if event.button_index != MOUSE_BUTTON_LEFT or not event.pressed:
 		return
 
+	GameState._play_button_sound()
 	var amount = 5 if event.ctrl_pressed else 1
 	for i in amount:
 		_buy_one(key)

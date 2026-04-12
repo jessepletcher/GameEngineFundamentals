@@ -52,25 +52,27 @@ func _populate_shop() -> void:
 		var data = GameState.balls[id]
 		var item = ShopItem.instantiate()
 		ball_list.add_child(item)
-		item.setup(id, data["name"], data["desc"], 0.0, data.get("texture", null), data["owned"], GameState.equipped_ball == id, data.get("medal_cost", 0))
+		item.setup(id, data["name"], data["desc"], 0.0, data.get("texture", null), data["owned"], GameState.equipped_ball == id, data.get("medal_cost", 0), data.get("unlock_level", 1))
 		item.purchase_requested.connect(_on_ball_purchase)
 
 	for id in GameState.golfers:
 		var data = GameState.golfers[id]
 		var item = ShopItem.instantiate()
 		golfer_list.add_child(item)
-		item.setup(id, data["name"], data["desc"], 0.0, null, data["owned"], GameState.equipped_golfer == id, data.get("medal_cost", 0))
+		item.setup(id, data["name"], data["desc"], 0.0, null, data["owned"], GameState.equipped_golfer == id, data.get("medal_cost", 0), data.get("unlock_level", 1))
 		item.purchase_requested.connect(_on_golfer_purchase)
 
 	for id in GameState.courses:
 		var data = GameState.courses[id]
 		var item = ShopItem.instantiate()
 		course_list.add_child(item)
-		item.setup(id, data["name"], data["desc"], 0.0, null, data["owned"], GameState.equipped_course == id, data.get("medal_cost", 0))
+		item.setup(id, data["name"], data["desc"], 0.0, null, data["owned"], GameState.equipped_course == id, data.get("medal_cost", 0), data.get("unlock_level", 1))
 		item.purchase_requested.connect(_on_course_purchase)
 
 func _on_ball_purchase(id: String) -> void:
 	var data = GameState.balls[id]
+	if not data["owned"] and GameState.level < data.get("unlock_level", 1):
+		return
 	if data["owned"]:
 		GameState.equipped_ball = id
 	elif GameState.medals >= data["medal_cost"]:
@@ -82,6 +84,8 @@ func _on_ball_purchase(id: String) -> void:
 
 func _on_golfer_purchase(id: String) -> void:
 	var data = GameState.golfers[id]
+	if not data["owned"] and GameState.level < data.get("unlock_level", 1):
+		return
 	if data["owned"]:
 		GameState.equipped_golfer = id
 	elif GameState.medals >= data["medal_cost"]:
@@ -95,6 +99,8 @@ func _on_golfer_purchase(id: String) -> void:
 
 func _on_course_purchase(id: String) -> void:
 	var data = GameState.courses[id]
+	if not data["owned"] and GameState.level < data.get("unlock_level", 1):
+		return
 	if data["owned"]:
 		GameState.equipped_course = id
 	elif GameState.medals >= data["medal_cost"]:

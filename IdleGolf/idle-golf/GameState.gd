@@ -1,6 +1,9 @@
 extends Node
 
 var sfx_muted := false
+var _button_press_sound: AudioStreamPlayer
+var _cursor_normal: Texture2D
+var _cursor_pressed: Texture2D
 var money: float = 0.0
 var xp: float = 0.0
 var level: int = 1
@@ -45,22 +48,22 @@ var upgrades = {
 }
 
 var balls = {
-	"standard": {"name": "Standard Ball", "desc": "Your trusty golf ball", "medal_cost": 0.0, "owned": true, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.WHITE, "texture": preload("res://BallIcon.png"), "flag_mult": 1.0},
-	"homing_ball": {"name": "Homing Ball", "desc": "Homes in on nearest flag", "medal_cost": 5, "owned": false, "speed_mult": 1.0, "money_mult": 1.5, "can_home": true, "trail_color": Color.LIME_GREEN, "texture": preload("res://HomingBalllIcon.png"), "flag_mult": 1.0},
-	"pin_seeker": {"name": "Pin Seeker", "desc": "2x flag bonus money", "medal_cost": 25, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.GOLD, "texture": preload("res://PinSeekBalllIcon.png"), "flag_mult": 2.0},
-	"firework": {"name": "Firework Ball", "desc": "Explodes into 6 balls at apex", "medal_cost": 60, "owned": false, "speed_mult": 1.0, "money_mult": 0.5, "can_home": false, "trail_color": Color.ORANGE_RED, "texture": preload("res://FireWorksBalllIcon.png"), "flag_mult": 1.0, "is_firework": true},
+	"standard": {"name": "Standard Ball", "desc": "Your trusty golf ball", "medal_cost": 0.0, "owned": true, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.WHITE, "texture": preload("res://BallIcon.png"), "flag_mult": 1.0, "unlock_level": 1},
+	"homing_ball": {"name": "Homing Ball", "desc": "Homes in on nearest flag", "medal_cost": 5, "owned": false, "speed_mult": 1.0, "money_mult": 1.5, "can_home": true, "trail_color": Color.LIME_GREEN, "texture": preload("res://HomingBalllIcon.png"), "flag_mult": 1.0, "unlock_level": 5},
+	"pin_seeker": {"name": "Pin Seeker", "desc": "2x flag bonus money", "medal_cost": 25, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.GOLD, "texture": preload("res://PinSeekBalllIcon.png"), "flag_mult": 2.0, "unlock_level": 15},
+	"firework": {"name": "Firework Ball", "desc": "Explodes into 6 balls at apex", "medal_cost": 60, "owned": false, "speed_mult": 1.0, "money_mult": 0.5, "can_home": false, "trail_color": Color.ORANGE_RED, "texture": preload("res://FireWorksBalllIcon.png"), "flag_mult": 1.0, "is_firework": true, "unlock_level": 30},
 }
 
 var golfers = {
-	"standard":    {"name": "Standard Golfer", "desc": "A reliable swing",             "medal_cost": 0,  "owned": true,  "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96},
-	"power":       {"name": "Power Golfer",    "desc": "+15% distance, -5% fire rate", "medal_cost": 5,  "owned": false, "speed_mult": 1.15, "fire_rate_mult": 0.95, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96},
-	"speedy":      {"name": "Speedy Golfer",   "desc": "+25% fire rate",               "medal_cost": 20, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.25, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96},
-	"Lion Trees":      {"name": "Lion Trees",   "desc": "+25% money, +20% distance",   "medal_cost": 50, "owned": false, "speed_mult": 1.2, "fire_rate_mult": 1.0, "money_mult": 1.25, "spritesheet": "res://LionTreesSwing.png", "h_frames": 5, "frame_size": 96},
+	"standard":    {"name": "Standard Golfer", "desc": "A reliable swing",             "medal_cost": 0,  "owned": true,  "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 1},
+	"power":       {"name": "Power Golfer",    "desc": "+15% distance, -5% fire rate", "medal_cost": 5,  "owned": false, "speed_mult": 1.15, "fire_rate_mult": 0.95, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 3},
+	"speedy":      {"name": "Speedy Golfer",   "desc": "+25% fire rate",               "medal_cost": 20, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.25, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 10},
+	"Lion Trees":      {"name": "Lion Trees",   "desc": "+25% money, +20% distance",   "medal_cost": 50, "owned": false, "speed_mult": 1.2, "fire_rate_mult": 1.0, "money_mult": 1.25, "spritesheet": "res://LionTreesSwing.png", "h_frames": 5, "frame_size": 96, "unlock_level": 25},
 }
 
 var courses = {
-	"course1": {"name": "Driving Range", "desc": "The classic range", "medal_cost": 0, "owned": true},
-	"course2": {"name": "Course 2", "desc": "A new challenge", "medal_cost": 10, "owned": false},
+	"course1": {"name": "Driving Range", "desc": "The classic range", "medal_cost": 0, "owned": true, "unlock_level": 1},
+	"course2": {"name": "Course 2", "desc": "A new challenge", "medal_cost": 10, "owned": false, "unlock_level": 8},
 }
 
 var equipped_ball: String = "standard"
@@ -78,6 +81,46 @@ var level_bonuses = {
 func _ready() -> void:
 	get_tree().set_auto_accept_quit(false)
 	load_game()
+
+	# custom mouse cursor
+	_cursor_normal = load("res://Mouse.png")
+	_cursor_pressed = load("res://MousePressed.png")
+	Input.set_custom_mouse_cursor(_cursor_normal)
+
+	# global button press sound
+	_button_press_sound = AudioStreamPlayer.new()
+	_button_press_sound.stream = load("res://ButtonPress.mp3")
+	_button_press_sound.volume_db = 0.0
+	add_child(_button_press_sound)
+	get_tree().node_added.connect(_on_node_added)
+	# catch buttons already in the tree on first frame
+	_connect_existing_buttons.call_deferred()
+
+func _connect_existing_buttons() -> void:
+	_connect_buttons_recursive(get_tree().root)
+
+func _connect_buttons_recursive(node: Node) -> void:
+	if node is BaseButton:
+		if not node.pressed.is_connected(_play_button_sound):
+			node.pressed.connect(_play_button_sound)
+	for child in node.get_children():
+		_connect_buttons_recursive(child)
+
+func _on_node_added(node: Node) -> void:
+	if node is BaseButton:
+		if not node.pressed.is_connected(_play_button_sound):
+			node.pressed.connect(_play_button_sound)
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			Input.set_custom_mouse_cursor(_cursor_pressed)
+		else:
+			Input.set_custom_mouse_cursor(_cursor_normal)
+
+func _play_button_sound() -> void:
+	if not sfx_muted:
+		_button_press_sound.play()
 	
 func get_flat_distance() -> float:
 	return upgrades["flat_distance"]["level"] * 2.0  # +2 yards per level → 100 yds at lv50
