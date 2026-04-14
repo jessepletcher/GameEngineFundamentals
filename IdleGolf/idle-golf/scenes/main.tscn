@@ -72,20 +72,10 @@
 [ext_resource type="Texture2D" uid="uid://buic4roldmo7b" path="res://BackgroundSprites/1/13.png" id="64_gdvew"]
 [ext_resource type="Texture2D" uid="uid://do1dkghir7keg" path="res://BackgroundSprites/1/14.png" id="65_kjtvk"]
 [ext_resource type="Texture2D" uid="uid://552ia2xw715m" path="res://BackgroundSprites/1/15.png" id="66_xrs0c"]
-[ext_resource type="Texture2D" uid="uid://ctlvvnl1lbmf3" path="res://BackgroundSprites/2/FairWay4.png" id="75_fjhjs"]
-[ext_resource type="Texture2D" uid="uid://dujcdw8q13e07" path="res://BackgroundSprites/2/Fairway3.png" id="76_bfu41"]
-[ext_resource type="Texture2D" uid="uid://p5fbjb8j4gqq" path="res://BackgroundSprites/2/Fairway2.png" id="77_r4ag1"]
-[ext_resource type="Texture2D" uid="uid://b1epmqqbwjmkp" path="res://BackgroundSprites/2/LeftIsland.png" id="78_v0wtd"]
-[ext_resource type="Texture2D" uid="uid://sc7oaxgh25kf" path="res://BackgroundSprites/2/Rocks.png" id="79_sgvw8"]
-[ext_resource type="Texture2D" uid="uid://uaol2ysjwsbe" path="res://BackgroundSprites/2/Water5.png" id="80_6nfnn"]
-[ext_resource type="Texture2D" uid="uid://1jh6h2j8itwx" path="res://BackgroundSprites/2/Fairway.png" id="81_4ue30"]
-[ext_resource type="Texture2D" uid="uid://b6fi2teaapoyt" path="res://BackgroundSprites/2/Water4.png" id="82_k42av"]
-[ext_resource type="Texture2D" uid="uid://dlthwhxf4dd4j" path="res://BackgroundSprites/2/Water3.png" id="83_gr8w0"]
-[ext_resource type="Texture2D" uid="uid://catjk5lptfai6" path="res://BackgroundSprites/2/Water2.png" id="84_673bd"]
-[ext_resource type="Texture2D" uid="uid://dxf6r4osff0ao" path="res://BackgroundSprites/2/RightIsland.png" id="85_akjxb"]
-[ext_resource type="Texture2D" uid="uid://bbva08vhuga2p" path="res://BackgroundSprites/2/Water1.png" id="86_vrx01"]
-[ext_resource type="Texture2D" uid="uid://6xtdw2gu7wa4" path="res://BackgroundSprites/2/Clouds.png" id="87_1uevf"]
-[ext_resource type="Texture2D" uid="uid://frnv8evvkwff" path="res://BackgroundSprites/2/Sky.png" id="88_tc087"]
+[ext_resource type="Texture2D" uid="uid://by67sqjxsqlcb" path="res://FairwayStrip.png" id="71_bfu41"]
+[ext_resource type="PackedScene" uid="uid://dhilwbnw4hr2e" path="res://scenes/Destructible.tscn" id="72_j4bwh"]
+[ext_resource type="Texture2D" uid="uid://cusn0rqe2euuk" path="res://FireWatchTower.png" id="73_ksmap"]
+[ext_resource type="Texture2D" uid="uid://di2f6fqtsvpdm" path="res://WaterTower.png" id="74_ygd8o"]
 [ext_resource type="Script" uid="uid://dvcvompk6cw5p" path="res://DebugCamera.gd" id="debug_cam"]
 [ext_resource type="Script" uid="uid://4viempthtba8" path="res://ShopSignAnimation.gd" id="shopsign_script"]
 
@@ -109,7 +99,7 @@ func _process(delta: float) -> void:
 sky_material = SubResource("ProceduralSkyMaterial_0xm2m")
 
 [sub_resource type="Environment" id="Environment_1bvp3"]
-background_mode = 3
+background_mode = 2
 sky = SubResource("Sky_h2yge")
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xrs0c"]
@@ -303,6 +293,12 @@ animations = [{
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_jyhfs"]
 size = Vector3(225.4649, 1, 484.55878)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ksmap"]
+size = Vector3(79.60449, 219.8356, 185.9718)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2s0kr"]
+size = Vector3(60.363106, 143.28357, 181.09766)
 
 [node name="Main" type="Node3D" unique_id=1063394605]
 script = ExtResource("1_0wfyh")
@@ -1044,14 +1040,21 @@ volume_db = -31.964
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -10)
 script = ExtResource("debug_cam")
 
+[node name="Floor" type="StaticBody3D" parent="." unique_id=175669179]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, -5.012023, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=1876965504]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.623993, 0, 241.7794)
+shape = SubResource("BoxShape3D_jyhfs")
+
 [node name="Level1" type="Node3D" parent="." unique_id=193502691]
-visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 0)
 
 [node name="ScaledSprite" parent="Level1" unique_id=1933655206 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 58.110775)
 texture = ExtResource("52_o7ddy")
 flip_h = true
-pixel_offset = Vector2(0, 8)
+pixel_offset = Vector2(0, 0)
 animated = true
 spritesheet = ExtResource("56_mlv25")
 h_frames = 9
@@ -1061,7 +1064,7 @@ fps = 2.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 38.99835)
 texture = ExtResource("53_ids8r")
 flip_h = true
-pixel_offset = Vector2(0, 12)
+pixel_offset = Vector2(0, 0)
 animated = true
 spritesheet = ExtResource("58_kjtvk")
 h_frames = 9
@@ -1071,13 +1074,13 @@ fps = 2.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 43.527878)
 texture = ExtResource("54_dnhof")
 flip_h = true
-pixel_offset = Vector2(0, 12)
+pixel_offset = Vector2(0, 0)
 
 [node name="ScaledSprite4" parent="Level1" unique_id=224060410 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 62.855373)
 texture = ExtResource("55_1v6qk")
 flip_h = true
-pixel_offset = Vector2(0, 12)
+pixel_offset = Vector2(0, 0)
 animated = true
 spritesheet = ExtResource("61_xrs0c")
 h_frames = 9
@@ -1087,7 +1090,7 @@ fps = 2.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 66.1322)
 texture = ExtResource("56_1v6qk")
 flip_h = true
-pixel_offset = Vector2(0, 6)
+pixel_offset = Vector2(0, 0)
 animated = true
 spritesheet = ExtResource("63_xljpf")
 h_frames = 9
@@ -1097,68 +1100,101 @@ fps = 2.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 110.88641)
 texture = ExtResource("57_augu2")
 flip_h = true
-pixel_offset = Vector2(0, 2)
+pixel_offset = Vector2(0, 0)
 
 [node name="ScaledSprite7" parent="Level1" unique_id=2054601720 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 307.9582)
 texture = ExtResource("57_xhfw6")
 flip_h = true
-pixel_offset = Vector2(0, 2)
+pixel_offset = Vector2(0, 0)
 
 [node name="ScaledSprite8" parent="Level1" unique_id=1808550588 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 307.9582)
 texture = ExtResource("59_152kg")
 flip_h = true
-pixel_offset = Vector2(0, 1)
+pixel_offset = Vector2(0, 0)
 
 [node name="ScaledSprite9" parent="Level1" unique_id=1907371905 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 401.4999)
 texture = ExtResource("60_r4e17")
 flip_h = true
-pixel_offset = Vector2(0, 2)
+pixel_offset = Vector2(0, 0)
 
 [node name="ScaledSprite10" parent="Level1" unique_id=1534239914 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 450)
 texture = ExtResource("61_y57op")
 flip_h = true
-pixel_offset = Vector2(0, 2)
+pixel_offset = Vector2(0, 0)
 
 [node name="ScaledSprite11" parent="Level1" unique_id=679198459 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 600)
 texture = ExtResource("62_mlv25")
 flip_h = true
-pixel_offset = Vector2(0, 2)
+pixel_offset = Vector2(0, 0)
 
 [node name="ScaledSprite12" parent="Level1" unique_id=1193985418 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 650)
 texture = ExtResource("63_a82wo")
 flip_h = true
-pixel_offset = Vector2(0, 2)
+pixel_offset = Vector2(0, 0)
 
 [node name="ScaledSprite13" parent="Level1" unique_id=368656122 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1500)
 texture = ExtResource("64_gdvew")
 flip_h = true
-pixel_offset = Vector2(0, 2)
+pixel_offset = Vector2(0, 0)
 
 [node name="ScaledSprite14" parent="Level1" unique_id=1075094190 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1500)
 texture = ExtResource("65_kjtvk")
 flip_h = true
-pixel_offset = Vector2(0, 2)
+pixel_offset = Vector2(0, 0)
 
 [node name="ScaledSprite15" parent="Level1" unique_id=278902616 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3000)
 texture = ExtResource("66_xrs0c")
 flip_h = true
-pixel_offset = Vector2(0, 2)
+pixel_offset = Vector2(0, 0)
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Level1" unique_id=175669179]
-transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, -5.012023, 0)
+[node name="ScaledSprite16" parent="Level1" unique_id=390482108 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.9030187)
+texture = ExtResource("71_bfu41")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+spritesheet = ExtResource("56_mlv25")
+h_frames = 9
+fps = 2.0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Level1/StaticBody3D" unique_id=1876965504]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.623993, 0, 241.7794)
-shape = SubResource("BoxShape3D_jyhfs")
+[node name="Destructible" parent="Level1" unique_id=1756764275 instance=ExtResource("72_j4bwh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 700)
+hits_required = 100
+shake_factor = 0.1
+
+[node name="ScaledSprite" parent="Level1/Destructible" index="0"]
+texture = ExtResource("73_ksmap")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+
+[node name="CollisionShape3D" parent="Level1/Destructible/StaticBody3D" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84.139, 100.92479, 0)
+shape = SubResource("BoxShape3D_ksmap")
+
+[node name="Destructible2" parent="Level1" unique_id=1152535827 instance=ExtResource("72_j4bwh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 425)
+hits_required = 100
+shake_factor = 0.1
+
+[node name="ScaledSprite" parent="Level1/Destructible2" index="0"]
+texture = ExtResource("74_ygd8o")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+
+[node name="CollisionShape3D" parent="Level1/Destructible2/StaticBody3D" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -73.304504, 66.59099, 52.936523)
+shape = SubResource("BoxShape3D_2s0kr")
 
 [node name="Level1Flags" type="Node3D" parent="." unique_id=1592995379]
 
@@ -1185,104 +1221,6 @@ flag_texture = ExtResource("6_o6xl0")
 
 [node name="Level2" type="Node3D" parent="." unique_id=653858414]
 
-[node name="ScaledSprite" parent="Level2" unique_id=258062472 instance=ExtResource("51_bu4jf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 5.091516)
-texture = ExtResource("75_fjhjs")
-flip_h = true
-pixel_offset = Vector2(0, 0)
-sprite_scale = 0.2
-
-[node name="ScaledSprite2" parent="Level2" unique_id=84250972 instance=ExtResource("51_bu4jf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 20.464596)
-texture = ExtResource("76_bfu41")
-flip_h = true
-pixel_offset = Vector2(0, 0)
-sprite_scale = 0.2
-
-[node name="ScaledSprite3" parent="Level2" unique_id=355653384 instance=ExtResource("51_bu4jf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 64.44295)
-texture = ExtResource("77_r4ag1")
-flip_h = true
-pixel_offset = Vector2(0, 0)
-sprite_scale = 0.2
-
-[node name="ScaledSprite4" parent="Level2" unique_id=1074067654 instance=ExtResource("51_bu4jf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 58.0979)
-texture = ExtResource("78_v0wtd")
-flip_h = true
-pixel_offset = Vector2(0, 0)
-sprite_scale = 0.2
-
-[node name="ScaledSprite5" parent="Level2" unique_id=1122102041 instance=ExtResource("51_bu4jf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 73.324356)
-texture = ExtResource("79_sgvw8")
-flip_h = true
-pixel_offset = Vector2(0, 0)
-sprite_scale = 0.2
-
-[node name="ScaledSprite6" parent="Level2" unique_id=1999981059 instance=ExtResource("51_bu4jf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 114.5549)
-texture = ExtResource("80_6nfnn")
-flip_h = true
-pixel_offset = Vector2(0, 0)
-sprite_scale = 0.2
-
-[node name="ScaledSprite7" parent="Level2" unique_id=1282158214 instance=ExtResource("51_bu4jf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 205.7909)
-texture = ExtResource("81_4ue30")
-flip_h = true
-pixel_offset = Vector2(0, 0)
-sprite_scale = 0.2
-
-[node name="ScaledSprite8" parent="Level2" unique_id=972371565 instance=ExtResource("51_bu4jf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 251.72523)
-texture = ExtResource("82_k42av")
-flip_h = true
-pixel_offset = Vector2(0, 0)
-sprite_scale = 0.2
-
-[node name="ScaledSprite9" parent="Level2" unique_id=1327867952 instance=ExtResource("51_bu4jf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 277.91223)
-texture = ExtResource("83_gr8w0")
-flip_h = true
-pixel_offset = Vector2(0, 0)
-sprite_scale = 0.2
-
-[node name="ScaledSprite10" parent="Level2" unique_id=1905390955 instance=ExtResource("51_bu4jf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 317.28976)
-texture = ExtResource("84_673bd")
-flip_h = true
-pixel_offset = Vector2(0, 0)
-sprite_scale = 0.2
-
-[node name="ScaledSprite11" parent="Level2" unique_id=963255301 instance=ExtResource("51_bu4jf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 352.97656)
-texture = ExtResource("85_akjxb")
-flip_h = true
-pixel_offset = Vector2(0, 0)
-sprite_scale = 0.2
-
-[node name="ScaledSprite12" parent="Level2" unique_id=334343694 instance=ExtResource("51_bu4jf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 3181.4927)
-texture = ExtResource("86_vrx01")
-flip_h = true
-pixel_offset = Vector2(0, 0)
-sprite_scale = 0.2
-
-[node name="ScaledSprite13" parent="Level2" unique_id=744367667 instance=ExtResource("51_bu4jf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 3997.6213)
-texture = ExtResource("87_1uevf")
-flip_h = true
-pixel_offset = Vector2(0, 0)
-sprite_scale = 0.2
-
-[node name="ScaledSprite14" parent="Level2" unique_id=41880001 instance=ExtResource("51_bu4jf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 4812.173)
-texture = ExtResource("88_tc087")
-flip_h = true
-pixel_offset = Vector2(0, 0)
-sprite_scale = 0.2
-
 [node name="Level2Flags" type="Node3D" parent="." unique_id=1087643447]
 
 [node name="Flag" parent="Level2Flags" unique_id=1248909520 instance=ExtResource("9_85g3d")]
@@ -1295,3 +1233,6 @@ flag_texture = ExtResource("6_o6xl0")
 [connection signal="timeout" from="ShotTimer" to="." method="_on_shot_timer_timeout"]
 [connection signal="frame_changed" from="Golfer/GolferSprite" to="." method="_on_golfer_sprite_frame_changed"]
 [connection signal="frame_changed" from="Golfer/GolferSprite" to="Golfer" method="_on_golfer_sprite_frame_changed"]
+
+[editable path="Level1/Destructible"]
+[editable path="Level1/Destructible2"]

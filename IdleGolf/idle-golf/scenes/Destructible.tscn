@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://dhilwbnw4hr2e"]
+
+[ext_resource type="Script" uid="uid://c1u8cys3l23i" path="res://Destructible.gd" id="1"]
+[ext_resource type="Script" uid="uid://bra02vde23rnc" path="res://ScaledSprite.gd" id="2"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_default"]
+size = Vector3(2, 2, 1)
+
+[node name="Destructible" type="Node3D" unique_id=1099243967]
+script = ExtResource("1")
+
+[node name="ScaledSprite" type="Node3D" parent="." unique_id=1915457829]
+script = ExtResource("2")
+
+[node name="Sprite3D" type="Sprite3D" parent="ScaledSprite" unique_id=2044288839]
+texture_filter = 0
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1076818500]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1328262986]
+shape = SubResource("BoxShape3D_default")

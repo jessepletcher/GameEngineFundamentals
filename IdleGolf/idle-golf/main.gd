@@ -124,6 +124,17 @@ func _ready() -> void:
 	# settings menu
 	_setup_settings_menu()
 
+	# connect destructibles
+	for obj in get_tree().get_nodes_in_group("destructibles"):
+		obj.destroyed.connect(_on_destructible_destroyed)
+
+func _on_destructible_destroyed(reward: float) -> void:
+	GameState.money += reward
+	GameState.money_changed.emit(GameState.money)
+	GameState.add_xp(reward * 0.1)
+	_text_queue.append({"money": reward, "yards": 0.0, "flag_hit": false, "direct_hit": true})
+	if not _queue_processing:
+		_process_text_queue()
 
 func _on_xp_changed(current_xp: float, required_xp: float) -> void:
 	xp_progress.max_value = required_xp
@@ -284,6 +295,11 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 	_text_queue.append({"money": final_money, "yards": yards, "flag_hit": best_bonus > 0.0, "direct_hit": direct_hit})
 	if not _queue_processing:
 		_process_text_queue()
+	else:
+		# safety: if queue is stuck, force restart
+		if _floating_texts.size() == 0 and _text_queue.size() > 3:
+			_queue_processing = false
+			_process_text_queue()
 
 	await get_tree().create_timer(3.0).timeout
 	if is_instance_valid(ball):

@@ -12,6 +12,7 @@ var _aim: float = 0.0  # -1.0 to 1.0
 var _is_whiff := false
 var _is_firework := false
 var _is_fragment := false
+var _is_fake := false
 var _is_homing := false
 var _target_flag: Node3D = null
 var _has_peaked := false
@@ -47,7 +48,7 @@ func _physics_process(delta: float) -> void:
 		_homing_time += delta
 		_home_toward_flag(delta)
 	
-	if not _has_landed and global_position.y < 0.5 and abs(linear_velocity.y) < 2.0:
+	if not _has_landed and global_position.y < 1.0 and _prev_velocity_y < 0.0:
 		_land()
 		
 func _start_homing() -> void:
@@ -108,36 +109,65 @@ func _home_toward_flag(delta: float) -> void:
 func _explode() -> void:
 	var BallScene = preload("res://scenes/Ball.tscn")
 	var fragments: Array = []
-	for i in 6:
-		var frag = BallScene.instantiate()
-		frag._is_fragment = true
-		frag._speed = 0
-		frag._spread = 0
-		frag._start_z = _start_z
-		get_parent().add_child(frag)
-		frag.global_position = global_position
-		var angle = (TAU / 6.0) * i
-		frag.linear_velocity = Vector3(
-			sin(angle) * randf_range(5.0, 15.0),
-			randf_range(2.0, 6.0),
-			cos(angle) * randf_range(5.0, 15.0)
-		)
-		fragments.append(frag)
+	var total_count := 6
+	var real_count := 3
+
+	for i in total_count:
+		var angle = (TAU / float(total_count)) * i
+
+		if i < real_count:
+			# real fragment — earns money on landing
+			var frag = BallScene.instantiate()
+			frag._is_fragment = true
+			frag._speed = 0
+			frag._spread = 0
+			frag._start_z = _start_z
+			get_parent().add_child(frag)
+			frag.global_position = global_position
+			frag.linear_velocity = Vector3(
+				sin(angle) * randf_range(5.0, 15.0),
+				randf_range(2.0, 6.0),
+				cos(angle) * randf_range(5.0, 15.0)
+			)
+			fragments.append(frag)
+		else:
+			# fake particle — just visuals, no landing signal
+			var fake = BallScene.instantiate()
+			fake._is_fragment = true
+			fake._is_fake = true
+			fake._speed = 0
+			fake._spread = 0
+			fake._start_z = _start_z
+			get_parent().add_child(fake)
+			fake.global_position = global_position
+			fake.linear_velocity = Vector3(
+				sin(angle) * randf_range(5.0, 15.0),
+				randf_range(2.0, 6.0),
+				cos(angle) * randf_range(5.0, 15.0)
+			)
+
 	exploded.emit(fragments)
 	queue_free()
 
 func _ready() -> void:
+	add_to_group("balls")
 	if _is_fragment:
 		_start_z = _start_z  # already set by parent
-		var ball_data = GameState.balls[GameState.equipped_ball]
+		trail.draw_pass_1 = trail.draw_pass_1.duplicate()
 		var mat = trail.draw_pass_1.material.duplicate()
-		mat.albedo_color = ball_data["trail_color"]
+		if _is_fake:
+			mat.albedo_color = Color.ORANGE
+			sprite.visible = false
+		else:
+			var ball_data = GameState.balls[GameState.equipped_ball]
+			mat.albedo_color = ball_data["trail_color"]
 		trail.draw_pass_1.material = mat
 		return
 
 	_start_z = global_position.z
 
 	var ball_data = GameState.balls[GameState.equipped_ball]
+	trail.draw_pass_1 = trail.draw_pass_1.duplicate()
 	var mat = trail.draw_pass_1.material.duplicate()
 	mat.albedo_color = ball_data["trail_color"]
 	trail.draw_pass_1.material = mat
@@ -190,5 +220,11 @@ func _land() -> void:
 	if _has_landed:
 		return
 	_has_landed = true
+	if _is_fake:
+		# fake particle — just disappear after a moment
+		var tween = create_tween()
+		tween.tween_interval(0.5)
+		tween.tween_callback(queue_free)
+		return
 	var yards = (global_position.z - _start_z) * 1.094
 	landed.emit(abs(yards))
