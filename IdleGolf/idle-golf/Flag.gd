@@ -11,7 +11,6 @@ extends Node3D
 @onready var sprite: Sprite3D = $Sprite3D
 
 var _wiggle_tween: Tween
-var _hit_sound: AudioStreamPlayer3D
 
 func _process(_delta: float) -> void:
 	var distance = global_position.distance_to(camera.global_position)
@@ -28,10 +27,6 @@ func _ready() -> void:
 	distance_label.text = "%.0f yds" % yards
 	distance_label.font = load("res://balatro.otf")
 
-	_hit_sound = AudioStreamPlayer3D.new()
-	_hit_sound.stream = load("res://FlagStickHit.mp3")
-	add_child(_hit_sound)
-
 ## Returns [bonus, is_direct_hit]
 func check_hit(ball_position: Vector3) -> Array:
 	var dx = abs(ball_position.x - global_position.x)
@@ -46,8 +41,7 @@ func check_hit(ball_position: Vector3) -> Array:
 
 	var direct = dx <= direct_radius_x and dz <= direct_radius_z
 	if direct:
-		if not GameState.sfx_muted:
-			_hit_sound.play()
+		AudioManager.play_sfx("flag_stick")
 		_wiggle()
 
 	return [bonus, direct]

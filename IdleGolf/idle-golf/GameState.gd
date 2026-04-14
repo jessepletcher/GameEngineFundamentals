@@ -1,7 +1,5 @@
 extends Node
 
-var sfx_muted := false
-var _button_press_sound: AudioStreamPlayer
 var _cursor_normal: Texture2D
 var _cursor_pressed: Texture2D
 var money: float = 0.0
@@ -87,13 +85,8 @@ func _ready() -> void:
 	_cursor_pressed = load("res://MousePressed.png")
 	Input.set_custom_mouse_cursor(_cursor_normal)
 
-	# global button press sound
-	_button_press_sound = AudioStreamPlayer.new()
-	_button_press_sound.stream = load("res://ButtonPress.mp3")
-	_button_press_sound.volume_db = 0.0
-	add_child(_button_press_sound)
+	# global button press sound hookup
 	get_tree().node_added.connect(_on_node_added)
-	# catch buttons already in the tree on first frame
 	_connect_existing_buttons.call_deferred()
 
 func _connect_existing_buttons() -> void:
@@ -119,8 +112,7 @@ func _input(event: InputEvent) -> void:
 			Input.set_custom_mouse_cursor(_cursor_normal)
 
 func _play_button_sound() -> void:
-	if not sfx_muted:
-		_button_press_sound.play()
+	AudioManager.play_sfx("button")
 	
 func get_flat_distance() -> float:
 	return upgrades["flat_distance"]["level"] * 2.0  # +2 yards per level → 100 yds at lv50

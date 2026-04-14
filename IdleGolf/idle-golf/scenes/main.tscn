@@ -295,10 +295,13 @@ animations = [{
 size = Vector3(225.4649, 1, 484.55878)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ksmap"]
-size = Vector3(79.60449, 219.8356, 185.9718)
+size = Vector3(79.60449, 219.8356, 69.37262)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_2s0kr"]
-size = Vector3(60.363106, 143.28357, 181.09766)
+size = Vector3(60.363106, 143.28357, 57.510742)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ygd8o"]
+size = Vector3(947.1648, 317.04272, 1551.3917)
 
 [node name="Main" type="Node3D" unique_id=1063394605]
 script = ExtResource("1_0wfyh")
@@ -1138,12 +1141,6 @@ texture = ExtResource("63_a82wo")
 flip_h = true
 pixel_offset = Vector2(0, 0)
 
-[node name="ScaledSprite13" parent="Level1" unique_id=368656122 instance=ExtResource("51_bu4jf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1500)
-texture = ExtResource("64_gdvew")
-flip_h = true
-pixel_offset = Vector2(0, 0)
-
 [node name="ScaledSprite14" parent="Level1" unique_id=1075094190 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1500)
 texture = ExtResource("65_kjtvk")
@@ -1171,30 +1168,44 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 700)
 hits_required = 100
 shake_factor = 0.1
 
-[node name="ScaledSprite" parent="Level1/Destructible" index="0"]
+[node name="ScaledSprite" parent="Level1/Destructible" index="0" unique_id=1915457829]
 texture = ExtResource("73_ksmap")
 flip_h = true
 pixel_offset = Vector2(0, 0)
 sprite_scale = 0.2
 
-[node name="CollisionShape3D" parent="Level1/Destructible/StaticBody3D" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84.139, 100.92479, 0)
+[node name="CollisionShape3D" parent="Level1/Destructible/StaticBody3D" parent_id_path=PackedInt32Array(1756764275, 1076818500) index="0" unique_id=1328262986]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84.139, 100.92479, -58.29956)
 shape = SubResource("BoxShape3D_ksmap")
 
 [node name="Destructible2" parent="Level1" unique_id=1152535827 instance=ExtResource("72_j4bwh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 425)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 459.67224)
 hits_required = 100
 shake_factor = 0.1
 
-[node name="ScaledSprite" parent="Level1/Destructible2" index="0"]
+[node name="ScaledSprite" parent="Level1/Destructible2" index="0" unique_id=1915457829]
 texture = ExtResource("74_ygd8o")
 flip_h = true
 pixel_offset = Vector2(0, 0)
 sprite_scale = 0.2
 
-[node name="CollisionShape3D" parent="Level1/Destructible2/StaticBody3D" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -73.304504, 66.59099, 52.936523)
+[node name="CollisionShape3D" parent="Level1/Destructible2/StaticBody3D" parent_id_path=PackedInt32Array(1152535827, 1076818500) index="0" unique_id=1328262986]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -73.304504, 66.59099, -8.856934)
 shape = SubResource("BoxShape3D_2s0kr")
+
+[node name="Destructible3" parent="Level1" unique_id=1099243967 instance=ExtResource("72_j4bwh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1500)
+hits_required = 100
+shake_factor = 0.1
+
+[node name="ScaledSprite" parent="Level1/Destructible3" index="0" unique_id=1915457829]
+texture = ExtResource("64_gdvew")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+
+[node name="CollisionShape3D" parent="Level1/Destructible3/StaticBody3D" parent_id_path=PackedInt32Array(1099243967, 1076818500) index="0" unique_id=1328262986]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -173.95674, 158.02136, 768.21606)
+shape = SubResource("BoxShape3D_ygd8o")
 
 [node name="Level1Flags" type="Node3D" parent="." unique_id=1592995379]
 
@@ -1236,3 +1247,4 @@ flag_texture = ExtResource("6_o6xl0")
 
 [editable path="Level1/Destructible"]
 [editable path="Level1/Destructible2"]
+[editable path="Level1/Destructible3"]

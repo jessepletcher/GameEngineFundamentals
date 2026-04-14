@@ -83,19 +83,21 @@ func _crumble() -> void:
 	var reward = money_per_hit * _hits_taken * distance * GameState.get_money_mult()
 	destroyed.emit(reward)
 
+	AudioManager.play_sfx("destroy")
+
 	var ds = _get_distance_scale()
 	var fall_distance = 3.0 * ds
 
 	# violent shake while falling
-	var shake_tween = create_tween().set_loops(20)
+	var shake_tween = create_tween().set_loops(50)
 	var shake_intensity = 0.12 * ds * shake_factor
 	shake_tween.tween_property(scaled_sprite, "position:x", shake_intensity, 0.02)
 	shake_tween.tween_property(scaled_sprite, "position:x", -shake_intensity, 0.02)
 
 	# fall straight down and fade
 	var fall_tween = create_tween().set_parallel(true)
-	fall_tween.tween_property(scaled_sprite, "position:y", scaled_sprite.position.y - fall_distance, 0.8).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
-	fall_tween.tween_callback(_fade_sprite).set_delay(0.5)
+	fall_tween.tween_property(scaled_sprite, "position:y", scaled_sprite.position.y - fall_distance, 2.0).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+	fall_tween.tween_callback(_fade_sprite).set_delay(1.2)
 
 	# after fall completes, stop shaking and respawn later
 	fall_tween.set_parallel(false)

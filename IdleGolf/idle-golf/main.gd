@@ -12,8 +12,6 @@ const Ball = preload("res://scenes/Ball.tscn")
 @onready var level1_flags = $Level1Flags
 @onready var level2_sprites = $Level2
 @onready var level2_flags = $Level2Flags
-@onready var hit_sound: AudioStreamPlayer3D = $Golfer/GolfHit
-@onready var flag_sound: AudioStreamPlayer3D = $FlagSound
 @onready var open_shop_button: Button = $CanvasLayer/OpenShopButton
 @onready var xp_progress: ProgressBar = $CanvasLayer/LeftVBox/XPBar/XPProgress
 @onready var level_label: Label = $CanvasLayer/LeftVBox/XPBar/LevelLabel
@@ -42,10 +40,7 @@ var _text_queue: Array = []
 var _queue_processing: bool = false
 const TEXT_QUEUE_INTERVAL := 0.15
 const MAX_INDIVIDUAL_TEXTS := 4  # show this many individually, then batch the rest
-var _ambience_player: AudioStreamPlayer
-var _music_player: AudioStreamPlayer3D
 var _settings_panel: PanelContainer
-var _music_muted := false
 
 var _course_data := {
 	"course1": {"sprites": null, "flags": null},
@@ -98,24 +93,19 @@ func _ready() -> void:
 	reset_button.pressed.connect(_on_reset_pressed)
 
 	# music
-	_music_player = $Music
-	if not _music_player.playing:
-		_music_player.play()
+	AudioManager.play_music($Music.stream)
 
 	# nature ambience loop
-	_ambience_player = AudioStreamPlayer.new()
-	var stream = load("res://u_vr5icvkppa-nature-ambience-323729.mp3")
-	stream.loop = true
-	_ambience_player.stream = stream
-	_ambience_player.volume_db = -10.0
-	add_child(_ambience_player)
-	_ambience_player.play()
+	var ambience_stream = load("res://u_vr5icvkppa-nature-ambience-323729.mp3")
+	ambience_stream.loop = true
+	AudioManager.play_ambience(ambience_stream)
+	AudioManager.ambience_volume = 0.3
 	# cut off last 20 seconds by restarting when it reaches that point
-	var ambience_length = stream.get_length()
+	var ambience_length = ambience_stream.get_length()
 	var loop_timer = Timer.new()
 	loop_timer.wait_time = ambience_length - 20.0
 	loop_timer.autostart = true
-	loop_timer.timeout.connect(func(): _ambience_player.play())
+	loop_timer.timeout.connect(func(): AudioManager.ambience_player.play())
 	add_child(loop_timer)
 	confirm_reset.pressed.connect(_on_confirm_reset)
 	cancel_reset.pressed.connect(_on_cancel_reset)
@@ -182,9 +172,9 @@ func _on_open_shop_pressed() -> void:
 	if _shop_instance or _transitioning:
 		return
 	_transitioning = true
-	_music_player.stream_paused = true
-	_ambience_player.stream_paused = true
-	AudioServer.set_bus_volume_db(0, -20.0)
+	AudioManager.music_player.stream_paused = true
+	AudioManager.ambience_player.stream_paused = true
+	AudioManager.set_sfx_ducked(true)
 
 	var screen_w = get_viewport().get_visible_rect().size.x
 
@@ -228,10 +218,10 @@ func _on_shop_closed() -> void:
 		_shop_layer = null
 		_shop_instance = null
 	_transitioning = false
-	AudioServer.set_bus_volume_db(0, 0.0)
-	if not _music_muted:
-		_music_player.stream_paused = false
-		_ambience_player.stream_paused = false
+	AudioManager.set_sfx_ducked(false)
+	if not AudioManager.music_muted:
+		AudioManager.music_player.stream_paused = false
+		AudioManager.ambience_player.stream_paused = false
 	# reload golfer sprite in case player switched golfer
 	golfer._load_golfer_sprite()
 
@@ -248,8 +238,7 @@ func _on_ShotTimer_timeout() -> void:
 
 
 func _hit_ball() -> void:
-	if not GameState.sfx_muted:
-		hit_sound.play()
+	AudioManager.play_sfx("hit")
 	var modifier = shot_control.get_launch_modifier()
 	var ball_count = GameState.get_ball_count()
 	for i in ball_count:
@@ -278,8 +267,7 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 			direct_hit = true
 
 	if best_bonus > 0.0:
-		if not GameState.sfx_muted:
-			flag_sound.play(1.0)
+		AudioManager.play_sfx("flag")
 		var flag_mult = GameState.balls[GameState.equipped_ball].get("flag_mult", 1.0)
 		base_money += best_bonus * flag_mult
 
@@ -474,15 +462,13 @@ func _setup_settings_menu() -> void:
 	settings_btn.pressed.connect(func(): _settings_panel.visible = !_settings_panel.visible)
 
 	sfx_btn.pressed.connect(func():
-		GameState.sfx_muted = !GameState.sfx_muted
-		sfx_btn.text = "Enable SFX" if GameState.sfx_muted else "Disable SFX"
+		AudioManager.toggle_sfx_mute()
+		sfx_btn.text = "Enable SFX" if AudioManager.sfx_muted else "Disable SFX"
 	)
 
 	music_btn.pressed.connect(func():
-		_music_muted = !_music_muted
-		_ambience_player.stream_paused = _music_muted
-		_music_player.stream_paused = _music_muted
-		music_btn.text = "Enable Music" if _music_muted else "Disable Music"
+		AudioManager.toggle_music_mute()
+		music_btn.text = "Enable Music" if AudioManager.music_muted else "Disable Music"
 	)
 
 	exit_btn.pressed.connect(func():

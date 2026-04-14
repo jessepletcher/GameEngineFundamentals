@@ -35,6 +35,13 @@ func _physics_process(delta: float) -> void:
 	var distance = abs(global_position.z - _start_z)
 	var scale_factor = pow(distance * 0.05, 1.0)
 	sprite.scale = Vector3(scale_factor, scale_factor, scale_factor)
+
+	# disable trail particles far from origin for performance
+	var dist_from_origin = global_position.length()
+	if trail.emitting and dist_from_origin > 800.0:
+		trail.emitting = false
+	elif not trail.emitting and dist_from_origin < 800.0:
+		trail.emitting = true
 	
 	# firework explosion at apex — detect when velocity flips from up to down
 	if _is_firework and not _has_peaked and _prev_velocity_y > 0 and linear_velocity.y <= 0:
