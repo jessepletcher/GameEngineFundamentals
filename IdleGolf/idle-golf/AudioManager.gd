@@ -7,6 +7,7 @@ var _sounds := {
 	"flag_stick": preload("res://FlagStickHit.mp3"),
 	"destroy": preload("res://destruction.mp3"),
 	"button": preload("res://ButtonPress.mp3"),
+	"blink": preload("res://blink.mp3"),
 }
 
 # Volume controls (0.0 to 1.0) — edit in Project > AutoLoad > AudioManager node inspector
@@ -15,6 +16,7 @@ var _sounds := {
 @export_range(0.0, 1.0) var flag_stick_volume := 0.05
 @export_range(0.0, 1.0) var destroy_volume := .005
 @export_range(0.0, 1.0) var button_volume := .5
+@export_range(0.0, 1.0) var blink_volume := 0.05
 @export_range(0.0, 1.0) var music_volume := 0.05
 @export_range(0.0, 1.0) var ambience_volume := 0.3
 
@@ -36,6 +38,7 @@ func _ready() -> void:
 		"flag_stick": func(): return flag_stick_volume,
 		"destroy": func(): return destroy_volume,
 		"button": func(): return button_volume,
+		"blink": func(): return blink_volume,
 	}
 
 	# build player pool

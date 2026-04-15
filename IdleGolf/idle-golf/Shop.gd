@@ -16,14 +16,32 @@ const ShopItem = preload("res://ShopItem.tscn")
 @onready var golfers_tab: Button = $Panel/VBoxContainer/TabBar/ClubsTabBtn
 @onready var courses_tab: Button = $Panel/VBoxContainer/TabBar/CoursesTabBtn
 
+var _medal_icon: TextureRect
+
 func _ready() -> void:
 	back_button.pressed.connect(_on_back_pressed)
 	balls_tab.pressed.connect(_show_balls)
 	golfers_tab.pressed.connect(_show_golfers)
 	courses_tab.pressed.connect(_show_courses)
-	medals_label.text = "🏅 %.0f" % GameState.medals
+	_setup_medal_icon()
+	_update_medals_label()
 	_populate_shop()
 	_show_balls()  # default tab
+
+func _setup_medal_icon() -> void:
+	_medal_icon = TextureRect.new()
+	_medal_icon.texture = preload("res://medalicon.png")
+	_medal_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_medal_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_medal_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_medal_icon.custom_minimum_size = Vector2(48, 48)
+	medals_label.clip_contents = false
+	medals_label.add_child(_medal_icon)
+	await get_tree().process_frame
+	_medal_icon.position = Vector2(0, (medals_label.size.y - 48) / 2)
+
+func _update_medals_label() -> void:
+	medals_label.text = "       %.0f" % GameState.medals
 
 func _show_balls() -> void:
 	balls_panel.visible = true
@@ -80,6 +98,7 @@ func _on_ball_purchase(id: String) -> void:
 		GameState.medals_changed.emit(GameState.medals)
 		GameState.balls[id]["owned"] = true
 		GameState.equipped_ball = id
+	_update_medals_label()
 	_populate_shop()
 
 func _on_golfer_purchase(id: String) -> void:
@@ -94,6 +113,7 @@ func _on_golfer_purchase(id: String) -> void:
 		GameState.golfers[id]["owned"] = true
 		GameState.equipped_golfer = id
 	GameState.golfer_changed.emit()
+	_update_medals_label()
 	_populate_shop()
 
 
@@ -109,6 +129,7 @@ func _on_course_purchase(id: String) -> void:
 		GameState.courses[id]["owned"] = true
 		GameState.equipped_course = id
 	GameState.course_changed.emit()
+	_update_medals_label()
 	_populate_shop()
 
 func _on_back_pressed() -> void:

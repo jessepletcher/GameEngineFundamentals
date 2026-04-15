@@ -55,6 +55,7 @@ func _switch_course() -> void:
 		var show = key == GameState.equipped_course
 		_course_data[key]["sprites"].visible = show
 		_course_data[key]["flags"].visible = show
+	_show_all_yardage()
 
 func _ready() -> void:
 	_course_data["course1"]["sprites"] = level1_sprites
@@ -90,7 +91,7 @@ func _ready() -> void:
 	add_child(save_timer)
 
 	# reset button
-	reset_button.pressed.connect(_on_reset_pressed)
+	reset_button.visible = false  # hidden, moved to settings menu
 
 	# music
 	AudioManager.play_music($Music.stream)
@@ -117,6 +118,13 @@ func _ready() -> void:
 	# connect destructibles
 	for obj in get_tree().get_nodes_in_group("destructibles"):
 		obj.destroyed.connect(_on_destructible_destroyed)
+
+	_show_all_yardage()
+
+func _show_all_yardage() -> void:
+	for obj in get_tree().get_nodes_in_group("destructibles"):
+		if is_instance_valid(obj):
+			obj.show_yardage()
 
 func _on_destructible_destroyed(reward: float) -> void:
 	GameState.money += reward
@@ -224,6 +232,7 @@ func _on_shop_closed() -> void:
 		AudioManager.ambience_player.stream_paused = false
 	# reload golfer sprite in case player switched golfer
 	golfer._load_golfer_sprite()
+	_show_all_yardage()
 
 func _on_golfer_swung() -> void:
 	_hit_ball()
@@ -404,18 +413,20 @@ func _setup_settings_menu() -> void:
 	var font = load("res://balatro.otf")
 
 	# settings button - top right
-	var settings_btn = Button.new()
-	settings_btn.text = "⚙"
-	settings_btn.add_theme_font_override("font", font)
-	settings_btn.add_theme_font_size_override("font_size", 24)
+	var settings_btn = TextureButton.new()
+	settings_btn.texture_normal = load("res://SettingsButton.png")
+	settings_btn.stretch_mode = TextureButton.STRETCH_KEEP
+	settings_btn.ignore_texture_size = false
+	settings_btn.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	settings_btn.anchor_left = 1.0
 	settings_btn.anchor_right = 1.0
 	settings_btn.anchor_top = 0.0
 	settings_btn.anchor_bottom = 0.0
-	settings_btn.offset_left = -50
+	var tex_size = settings_btn.texture_normal.get_size()
 	settings_btn.offset_right = -10
+	settings_btn.offset_left = -10 - tex_size.x
 	settings_btn.offset_top = 10
-	settings_btn.offset_bottom = 50
+	settings_btn.offset_bottom = 10 + tex_size.y
 	$CanvasLayer.add_child(settings_btn)
 
 	# settings panel
@@ -453,6 +464,12 @@ func _setup_settings_menu() -> void:
 	exit_btn.add_theme_font_size_override("font_size", 16)
 	vbox.add_child(exit_btn)
 
+	var reset_btn = Button.new()
+	reset_btn.text = "Reset Game"
+	reset_btn.add_theme_font_override("font", font)
+	reset_btn.add_theme_font_size_override("font_size", 16)
+	vbox.add_child(reset_btn)
+
 	var medals_btn = Button.new()
 	medals_btn.text = "+100 Medals"
 	medals_btn.add_theme_font_override("font", font)
@@ -474,6 +491,11 @@ func _setup_settings_menu() -> void:
 	exit_btn.pressed.connect(func():
 		GameState.save()
 		get_tree().quit()
+	)
+
+	reset_btn.pressed.connect(func():
+		_settings_panel.visible = false
+		_on_reset_pressed()
 	)
 
 	medals_btn.pressed.connect(func():

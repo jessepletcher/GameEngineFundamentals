@@ -296,14 +296,23 @@ animations = [{
 [sub_resource type="BoxShape3D" id="BoxShape3D_jyhfs"]
 size = Vector3(225.4649, 1, 484.55878)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ksmap"]
-size = Vector3(79.60449, 219.8356, 69.37262)
+[sub_resource type="BoxShape3D" id="BoxShape3D_11yus"]
+size = Vector3(56.57, 141.795, 30)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_2s0kr"]
-size = Vector3(60.363106, 143.28357, 57.510742)
+[sub_resource type="BoxMesh" id="BoxMesh_11yus"]
+size = Vector3(56.57, 141.795, 30)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ygd8o"]
-size = Vector3(947.1648, 317.04272, 1551.3917)
+[sub_resource type="BoxShape3D" id="BoxShape3D_ih3m7"]
+size = Vector3(27.87, 72.5, 20)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ih3m7"]
+size = Vector3(27.87, 72.5, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_b6ruc"]
+size = Vector3(1200, 500, 100)
+
+[sub_resource type="BoxMesh" id="BoxMesh_b6ruc"]
+size = Vector3(1200, 500, 100)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_xaipn"]
 
@@ -1189,8 +1198,13 @@ pixel_offset = Vector2(0, 0)
 sprite_scale = 0.2
 
 [node name="CollisionShape3D" parent="Level1/Destructible/StaticBody3D" parent_id_path=PackedInt32Array(1756764275, 1076818500) index="0" unique_id=1328262986]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84.139, 100.92479, -58.29956)
-shape = SubResource("BoxShape3D_ksmap")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 73.45, 143.67, 0)
+shape = SubResource("BoxShape3D_11yus")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Level1/Destructible" unique_id=1323967490]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 73.45, 143.67, 0)
+visible = false
+mesh = SubResource("BoxMesh_11yus")
 
 [node name="Destructible2" parent="Level1" unique_id=1152535827 instance=ExtResource("72_j4bwh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 459.67224)
@@ -1205,8 +1219,13 @@ pixel_offset = Vector2(0, 0)
 sprite_scale = 0.2
 
 [node name="CollisionShape3D" parent="Level1/Destructible2/StaticBody3D" parent_id_path=PackedInt32Array(1152535827, 1076818500) index="0" unique_id=1328262986]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -73.304504, 66.59099, -8.856934)
-shape = SubResource("BoxShape3D_2s0kr")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -85.435, 55.38, 0)
+shape = SubResource("BoxShape3D_ih3m7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Level1/Destructible2" unique_id=1705145228]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -85.435, 55.38, 0)
+visible = false
+mesh = SubResource("BoxMesh_ih3m7")
 
 [node name="Destructible3" parent="Level1" unique_id=1099243967 instance=ExtResource("72_j4bwh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1500)
@@ -1220,8 +1239,13 @@ flip_h = true
 pixel_offset = Vector2(0, 0)
 
 [node name="CollisionShape3D" parent="Level1/Destructible3/StaticBody3D" parent_id_path=PackedInt32Array(1099243967, 1076818500) index="0" unique_id=1328262986]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -173.95674, 158.02136, 768.21606)
-shape = SubResource("BoxShape3D_ygd8o")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -259.865, 329.175, 0)
+shape = SubResource("BoxShape3D_b6ruc")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Level1/Destructible3" unique_id=1641016923]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -259.865, 329.175, 0)
+visible = false
+mesh = SubResource("BoxMesh_b6ruc")
 
 [node name="Destructible4" parent="Level1" unique_id=1109325919 instance=ExtResource("72_j4bwh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 25)

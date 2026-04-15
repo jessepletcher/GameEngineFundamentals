@@ -14,9 +14,57 @@ signal destroyed(reward: float)
 var _hits_taken := 0
 var _is_alive := true
 var _hit_balls: Array = []  # track which balls already counted a hit
+var _yardage_label: Label3D
+var _yardage_tween: Tween
 
 func _ready() -> void:
 	add_to_group("destructibles")
+	_create_yardage_label()
+
+func _create_yardage_label() -> void:
+	_yardage_label = Label3D.new()
+	var yards = global_position.length() * 1.094
+	_yardage_label.text = "%.0f yds" % yards
+	_yardage_label.font = load("res://balatro.otf")
+	_yardage_label.font_size = 40
+	_yardage_label.modulate = Color.WHITE
+	_yardage_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	_yardage_label.outline_size = 0
+	_yardage_label.no_depth_test = true
+	_yardage_label.visible = false
+
+	var ds = _get_distance_scale()
+	_yardage_label.scale = Vector3(ds, ds, ds)
+
+	# position above collision shape
+	var shape_top_y = collision_shape.global_position.y
+	var shape = collision_shape.shape
+	if shape is BoxShape3D:
+		shape_top_y += shape.size.y * 0.5
+	elif shape is SphereShape3D:
+		shape_top_y += shape.radius
+	add_child(_yardage_label)
+	_yardage_label.global_position = Vector3(collision_shape.global_position.x, shape_top_y + 0.5 * ds, collision_shape.global_position.z)
+
+func show_yardage() -> void:
+	if not _yardage_label or not is_instance_valid(_yardage_label):
+		return
+	# kill previous blink if still running
+	if _yardage_tween and _yardage_tween.is_valid():
+		_yardage_tween.kill()
+
+	_yardage_label.modulate.a = 1.0
+
+	# blink 5 times then hide
+	_yardage_tween = create_tween()
+	for i in 3:
+		_yardage_tween.tween_callback(func():
+			_yardage_label.visible = true
+			AudioManager.play_sfx("blink")
+		)
+		_yardage_tween.tween_interval(0.6)
+		_yardage_tween.tween_callback(func(): _yardage_label.visible = false)
+		_yardage_tween.tween_interval(0.6)
 
 func _physics_process(_delta: float) -> void:
 	if not _is_alive:
@@ -82,6 +130,7 @@ func _crumble() -> void:
 	var distance = global_position.distance_to(Vector3.ZERO) * 1.094  # convert to yards
 	var reward = money_per_hit * _hits_taken * distance * GameState.get_money_mult()
 	destroyed.emit(reward)
+	_spawn_reward_text(reward)
 
 	AudioManager.play_sfx("destroy")
 
@@ -107,6 +156,39 @@ func _crumble() -> void:
 	)
 	fall_tween.tween_interval(respawn_time)
 	fall_tween.tween_callback(_respawn)
+
+var _reward_label: Label3D
+
+func _spawn_reward_text(reward: float) -> void:
+	# remove previous label if one exists
+	if _reward_label and is_instance_valid(_reward_label):
+		_reward_label.queue_free()
+
+	_reward_label = Label3D.new()
+	_reward_label.text = "+$%.0f" % reward
+	_reward_label.font = load("res://balatro.otf")
+	_reward_label.font_size = 32
+	_reward_label.modulate = Color(1.0, 0.84, 0.0)  # gold
+	_reward_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	_reward_label.outline_size = 0
+
+	var ds = _get_distance_scale()
+	_reward_label.scale = Vector3(ds, ds, ds)
+
+	add_child(_reward_label)
+	# position above the collision shape
+	var shape = collision_shape.shape
+	var shape_top_y = collision_shape.global_position.y
+	if shape is BoxShape3D:
+		shape_top_y += shape.size.y * 0.5
+	elif shape is SphereShape3D:
+		shape_top_y += shape.radius
+	_reward_label.global_position = Vector3(collision_shape.global_position.x, shape_top_y + 0.5 * ds, collision_shape.global_position.z)
+
+	var tween = create_tween()
+	tween.tween_interval(2.0)
+	tween.tween_property(_reward_label, "modulate:a", 0.0, 1.0)
+	tween.tween_callback(_reward_label.queue_free)
 
 func _fade_sprite() -> void:
 	var sprite_3d = scaled_sprite.get_node("Sprite3D")

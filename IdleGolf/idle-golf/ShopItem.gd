@@ -40,7 +40,17 @@ func setup(id: String, item_name: String, desc: String, cost: float, texture: Te
 		buy_button.disabled = GameState.money < cost
 
 		if medal_cost > 0:
-			buy_button.text = "🏅 %d" % medal_cost
+			buy_button.text = "   %d" % medal_cost
 			buy_button.disabled = GameState.medals < medal_cost
+			var medal_icon = TextureRect.new()
+			medal_icon.texture = preload("res://medalicon.png")
+			medal_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			medal_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			medal_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			medal_icon.custom_minimum_size = Vector2(16, 16)
+			medal_icon.set_anchors_preset(Control.PRESET_CENTER_LEFT)
+			medal_icon.position.x = 4
+			medal_icon.position.y = -8
+			buy_button.add_child(medal_icon)
 
 	buy_button.pressed.connect(func(): purchase_requested.emit(item_id))

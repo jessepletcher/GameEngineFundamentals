@@ -47,11 +47,26 @@ func _refresh(_money: float) -> void:
 				cost_label.text = "MAX"
 				btn.disabled = true
 			else:
-				cost_label.text = "🏅 %.0f" % cost
+				cost_label.text = "  %.0f" % cost
 				btn.disabled = GameState.medals < cost
+				_add_medal_icon(cost_label)
 		else:
 			cost_label.text = "$%.0f" % cost
 			btn.disabled = GameState.money < cost
+
+func _add_medal_icon(label: Label) -> void:
+	# remove existing medal icons to avoid duplicates on refresh
+	for child in label.get_children():
+		if child is TextureRect:
+			child.queue_free()
+	var medal_icon = TextureRect.new()
+	medal_icon.texture = preload("res://medalicon.png")
+	medal_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	medal_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	medal_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	medal_icon.custom_minimum_size = Vector2(16, 16)
+	label.add_child(medal_icon)
+	medal_icon.position = Vector2(0, (label.size.y - 16) / 2)
 
 func _on_buy_input(event: InputEvent, key: String) -> void:
 	if not event is InputEventMouseButton:
