@@ -401,6 +401,7 @@ func _on_ball_whiffed() -> void:
 
 func _on_reset_pressed() -> void:
 	reset_dialog.visible = true
+	reset_dialog.move_to_front()
 
 func _on_confirm_reset() -> void:
 	GameState.full_reset()
