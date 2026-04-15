@@ -14,14 +14,21 @@ extends Node3D
 @export var fps: float = 8.0  # animation speed
 @export var loop: bool = true
 
+## Bob settings
+@export var bob_enabled: bool = false
+@export var bob_height: float = 0.3
+@export var bob_speed: float = 2.0
+
 @onready var sprite: Sprite3D = $Sprite3D
 @onready var camera: Camera3D = get_viewport().get_camera_3d()
 
 var _anim_time := 0.0
 var _current_frame := 0
 var _frame_count := 0
+var _bob_base_y := 0.0
 
 func _ready() -> void:
+	_bob_base_y = position.y
 	sprite.flip_h = flip_h
 	sprite.offset = pixel_offset
 
@@ -44,6 +51,10 @@ func _process(delta: float) -> void:
 	var scale_factor = visible_height / sprite_height
 	var final_scale = scale_factor * sprite_scale
 	sprite.scale = Vector3(final_scale, final_scale, final_scale)
+
+	# bob
+	if bob_enabled:
+		position.y = _bob_base_y + sin(Time.get_ticks_msec() * 0.001 * bob_speed) * bob_height
 
 	# animation
 	if animated and _frame_count > 0:

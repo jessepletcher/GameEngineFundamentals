@@ -76,6 +76,8 @@
 [ext_resource type="PackedScene" uid="uid://dhilwbnw4hr2e" path="res://scenes/Destructible.tscn" id="72_j4bwh"]
 [ext_resource type="Texture2D" uid="uid://cusn0rqe2euuk" path="res://FireWatchTower.png" id="73_ksmap"]
 [ext_resource type="Texture2D" uid="uid://di2f6fqtsvpdm" path="res://WaterTower.png" id="74_ygd8o"]
+[ext_resource type="Texture2D" uid="uid://bnc70jy861j2h" path="res://Target.png" id="75_2s0kr"]
+[ext_resource type="Texture2D" uid="uid://c2mmos8ylkods" path="res://HotAirBalloon.png" id="76_xaipn"]
 [ext_resource type="Script" uid="uid://dvcvompk6cw5p" path="res://DebugCamera.gd" id="debug_cam"]
 [ext_resource type="Script" uid="uid://4viempthtba8" path="res://ShopSignAnimation.gd" id="shopsign_script"]
 
@@ -302,6 +304,15 @@ size = Vector3(60.363106, 143.28357, 57.510742)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ygd8o"]
 size = Vector3(947.1648, 317.04272, 1551.3917)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_xaipn"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ndrjj"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ndrjj"]
+size = Vector3(41.695, 71.045, 12.43)
+
+[sub_resource type="BoxMesh" id="BoxMesh_xaipn"]
 
 [node name="Main" type="Node3D" unique_id=1063394605]
 script = ExtResource("1_0wfyh")
@@ -1146,6 +1157,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1500)
 texture = ExtResource("65_kjtvk")
 flip_h = true
 pixel_offset = Vector2(0, 0)
+bob_enabled = true
+bob_height = 10.0
+bob_speed = 1.0
 
 [node name="ScaledSprite15" parent="Level1" unique_id=278902616 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3000)
@@ -1180,8 +1194,9 @@ shape = SubResource("BoxShape3D_ksmap")
 
 [node name="Destructible2" parent="Level1" unique_id=1152535827 instance=ExtResource("72_j4bwh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 459.67224)
-hits_required = 100
+hits_required = 50
 shake_factor = 0.1
+money_per_hit = 4.0
 
 [node name="ScaledSprite" parent="Level1/Destructible2" index="0" unique_id=1915457829]
 texture = ExtResource("74_ygd8o")
@@ -1195,8 +1210,9 @@ shape = SubResource("BoxShape3D_2s0kr")
 
 [node name="Destructible3" parent="Level1" unique_id=1099243967 instance=ExtResource("72_j4bwh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1500)
-hits_required = 100
+hits_required = 500
 shake_factor = 0.1
+money_per_hit = 15.0
 
 [node name="ScaledSprite" parent="Level1/Destructible3" index="0" unique_id=1915457829]
 texture = ExtResource("64_gdvew")
@@ -1206,6 +1222,50 @@ pixel_offset = Vector2(0, 0)
 [node name="CollisionShape3D" parent="Level1/Destructible3/StaticBody3D" parent_id_path=PackedInt32Array(1099243967, 1076818500) index="0" unique_id=1328262986]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -173.95674, 158.02136, 768.21606)
 shape = SubResource("BoxShape3D_ygd8o")
+
+[node name="Destructible4" parent="Level1" unique_id=1109325919 instance=ExtResource("72_j4bwh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 25)
+hits_required = 5
+shake_factor = 0.1
+money_per_hit = 2.0
+
+[node name="ScaledSprite" parent="Level1/Destructible4" index="0" unique_id=1915457829]
+texture = ExtResource("75_2s0kr")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+
+[node name="CollisionShape3D" parent="Level1/Destructible4/StaticBody3D" parent_id_path=PackedInt32Array(1109325919, 1076818500) index="0" unique_id=1328262986]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.615, -2.13, 0)
+shape = SubResource("BoxShape3D_xaipn")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Level1/Destructible4" unique_id=336131796]
+transform = Transform3D(2.665, 0, 0, 0, 2.8, 0, 0, 0, 1, -4.615, -2.13, 0)
+visible = false
+mesh = SubResource("BoxMesh_ndrjj")
+
+[node name="Destructible5" parent="Level1" unique_id=1155254419 instance=ExtResource("72_j4bwh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 300)
+hits_required = 25
+shake_factor = 0.1
+money_per_hit = 3.0
+
+[node name="ScaledSprite" parent="Level1/Destructible5" index="0" unique_id=1915457829]
+texture = ExtResource("76_xaipn")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+bob_enabled = true
+bob_height = 3.0
+
+[node name="CollisionShape3D" parent="Level1/Destructible5/StaticBody3D" parent_id_path=PackedInt32Array(1155254419, 1076818500) index="0" unique_id=1328262986]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -254.31, 115.345, 0)
+shape = SubResource("BoxShape3D_ndrjj")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Level1/Destructible5" unique_id=452497032]
+transform = Transform3D(41.695, 0, 0, 0, 71.045, 0, 0, 0, 12.43, -254.31, 115.345, 0)
+visible = false
+mesh = SubResource("BoxMesh_xaipn")
 
 [node name="Level1Flags" type="Node3D" parent="." unique_id=1592995379]
 
@@ -1248,3 +1308,5 @@ flag_texture = ExtResource("6_o6xl0")
 [editable path="Level1/Destructible"]
 [editable path="Level1/Destructible2"]
 [editable path="Level1/Destructible3"]
+[editable path="Level1/Destructible4"]
+[editable path="Level1/Destructible5"]

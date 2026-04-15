@@ -181,7 +181,7 @@ func _ready() -> void:
 	var ball_speed_mult = ball_data["speed_mult"]
 	
 	var spread_rad = deg_to_rad(randf_range(-_spread, _spread))
-	var aim_angle = _aim * deg_to_rad(45.0)
+	var aim_angle = _aim * deg_to_rad(75.0)
 	var consistency = GameState.get_consistency()
 	var worst_possible = 1.0 - (1.0 / consistency)
 	var distance_mult = randf_range(worst_possible, 1.0)
