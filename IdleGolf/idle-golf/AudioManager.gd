@@ -5,9 +5,9 @@ var _sounds := {
 	"hit": preload("res://GolfHit.mp3"),
 	"flag": preload("res://FlagHit.mp3"),
 	"flag_stick": preload("res://FlagStickHit.mp3"),
-	"destroy": preload("res://destruction.mp3"),
+	"destroy": preload("res://Destruction.mp3"),
 	"button": preload("res://ButtonPress.mp3"),
-	"blink": preload("res://blink.mp3"),
+	"blink": preload("res://Blink.mp3"),
 }
 
 # Volume controls (0.0 to 1.0) — edit in Project > AutoLoad > AudioManager node inspector

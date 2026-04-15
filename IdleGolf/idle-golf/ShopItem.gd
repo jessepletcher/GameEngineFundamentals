@@ -43,7 +43,7 @@ func setup(id: String, item_name: String, desc: String, cost: float, texture: Te
 			buy_button.text = "   %d" % medal_cost
 			buy_button.disabled = GameState.medals < medal_cost
 			var medal_icon = TextureRect.new()
-			medal_icon.texture = preload("res://medalicon.png")
+			medal_icon.texture = preload("res://MedalIcon.png")
 			medal_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 			medal_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			medal_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE

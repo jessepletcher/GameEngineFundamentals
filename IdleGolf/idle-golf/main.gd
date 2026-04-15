@@ -400,8 +400,8 @@ func _on_ball_whiffed() -> void:
 	tween.tween_callback(label.queue_free)
 
 func _on_reset_pressed() -> void:
-	reset_dialog.visible = true
 	reset_dialog.move_to_front()
+	reset_dialog.visible = true
 
 func _on_confirm_reset() -> void:
 	GameState.full_reset()
@@ -423,7 +423,7 @@ func _setup_settings_menu() -> void:
 	settings_btn.anchor_right = 1.0
 	settings_btn.anchor_top = 0.0
 	settings_btn.anchor_bottom = 0.0
-	var tex_size = settings_btn.texture_normal.get_size()
+	var tex_size = settings_btn.texture_normal.get_size() if settings_btn.texture_normal else Vector2(32, 32)
 	settings_btn.offset_right = -10
 	settings_btn.offset_left = -10 - tex_size.x
 	settings_btn.offset_top = 10

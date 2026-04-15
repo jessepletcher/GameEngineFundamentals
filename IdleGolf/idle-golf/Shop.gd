@@ -30,15 +30,14 @@ func _ready() -> void:
 
 func _setup_medal_icon() -> void:
 	_medal_icon = TextureRect.new()
-	_medal_icon.texture = preload("res://medalicon.png")
+	_medal_icon.texture = preload("res://MedalIcon.png")
 	_medal_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_medal_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_medal_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_medal_icon.custom_minimum_size = Vector2(48, 48)
 	medals_label.clip_contents = false
 	medals_label.add_child(_medal_icon)
-	await get_tree().process_frame
-	_medal_icon.position = Vector2(0, (medals_label.size.y - 48) / 2)
+	_medal_icon.set_deferred("position", Vector2(0, (medals_label.size.y - 48) / 2))
 
 func _update_medals_label() -> void:
 	medals_label.text = "       %.0f" % GameState.medals

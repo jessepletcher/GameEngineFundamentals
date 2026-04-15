@@ -408,6 +408,7 @@ h_frames = 13
 fps = 3.0
 
 [node name="RetireDialog" type="PanelContainer" parent="CanvasLayer" unique_id=1455203785]
+visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -494,6 +495,7 @@ theme_override_font_sizes/font_size = 32
 text = "RESET"
 
 [node name="ResetDialog" type="Panel" parent="CanvasLayer" unique_id=117300160]
+visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
