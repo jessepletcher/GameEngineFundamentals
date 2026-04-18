@@ -19,9 +19,9 @@ func setup(money: float, yards: float, flag_hit: bool = false, direct_hit: bool 
 	_fade_tween.tween_property(label, "modulate:a", 0.0, 0.3)
 	_fade_tween.tween_callback(queue_free)
 
-func setup_summary(text: String, lifetime: float = 1.0) -> void:
+func setup_summary(text: String, lifetime: float = 1.0, color: Color = Color(0.8, 0.9, 1.0)) -> void:
 	label.text = text
-	label.modulate = Color(0.8, 0.9, 1.0)  # light blue for summary
+	label.modulate = color
 
 	_fade_tween = create_tween()
 	_fade_tween.tween_interval(lifetime)

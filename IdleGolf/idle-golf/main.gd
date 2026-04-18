@@ -42,6 +42,17 @@ const TEXT_QUEUE_INTERVAL := 0.15
 const MAX_INDIVIDUAL_TEXTS := 4  # show this many individually, then batch the rest
 var _settings_panel: PanelContainer
 
+# Market Ball — invested money per flag
+var _market_investments := {}  # flag node -> invested money
+var _market_labels := {}  # flag node -> Label3D showing invested amount
+const MARKET_GROWTH_RATE := 0.10  # 10% per second
+
+# Golden Flag
+var _golden_flag: Node3D = null
+var _golden_timer: Timer
+const GOLDEN_FLAG_INTERVAL_MIN := 20.0
+const GOLDEN_FLAG_INTERVAL_MAX := 40.0
+
 var _course_data := {
 	"course1": {"sprites": null, "flags": null},
 	"course2": {"sprites": null, "flags": null},
@@ -50,7 +61,26 @@ var _course_data := {
 func _get_active_flags() -> Node3D:
 	return _course_data[GameState.equipped_course]["flags"]
 
+func _process(delta: float) -> void:
+	# grow market ball investments
+	for flag in _market_investments:
+		if not is_instance_valid(flag):
+			continue
+		_market_investments[flag] *= (1.0 + MARKET_GROWTH_RATE * delta)
+		_update_market_label(flag)
+
 func _switch_course() -> void:
+	# cash out any market investments before switching
+	var cashout = _cashout_all_investments()
+	if cashout > 0.0:
+		GameState.money += cashout
+		GameState.money_changed.emit(GameState.money)
+	# deactivate golden flag on course switch
+	if _golden_flag and is_instance_valid(_golden_flag):
+		_golden_flag.deactivate_golden()
+		_golden_flag = null
+	if _golden_timer:
+		_start_golden_timer()
 	for key in _course_data:
 		var show = key == GameState.equipped_course
 		_course_data[key]["sprites"].visible = show
@@ -118,6 +148,18 @@ func _ready() -> void:
 	# connect destructibles
 	for obj in get_tree().get_nodes_in_group("destructibles"):
 		obj.destroyed.connect(_on_destructible_destroyed)
+
+	# connect golden flag signals on all courses' flags
+	for key in _course_data:
+		for flag in _course_data[key]["flags"].get_children():
+			flag.golden_hit.connect(_on_golden_flag_hit)
+
+	# golden flag timer
+	_golden_timer = Timer.new()
+	_golden_timer.one_shot = true
+	_golden_timer.timeout.connect(_spawn_golden_flag)
+	add_child(_golden_timer)
+	_start_golden_timer()
 
 	_show_all_yardage()
 
@@ -265,15 +307,17 @@ func _hit_ball() -> void:
 
 func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 	var base_money = pow(yards, 2) * 0.0002 + 5
-	
+
 	var best_bonus = 0.0
 	var direct_hit = false
+	var hit_flag: Node3D = null
 	for flag in _get_active_flags().get_children():
 		var result = flag.check_hit(ball.global_position)
 		if result[0] > best_bonus:
 			best_bonus = result[0]
 		if result[1]:
 			direct_hit = true
+			hit_flag = flag
 
 	if best_bonus > 0.0:
 		AudioManager.play_sfx("flag")
@@ -281,15 +325,26 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 		base_money += best_bonus * flag_mult
 
 	if direct_hit:
-		base_money *= 5.0
+		base_money *= 2.5
 
 	var final_money = base_money * GameState.get_money_mult()
-	GameState.money += final_money
-	GameState.money_changed.emit(GameState.money)
-	GameState.add_xp(final_money * 0.1)  # just call add_xp directly here
+	var is_market = GameState.balls[GameState.equipped_ball].get("is_market", false)
 
-	# queue the floating text so multiple landings in the same frame don't stack
-	_text_queue.append({"money": final_money, "yards": yards, "flag_hit": best_bonus > 0.0, "direct_hit": direct_hit})
+	if is_market and direct_hit and hit_flag:
+		# invest money into this flag instead of cashing
+		if hit_flag not in _market_investments:
+			_market_investments[hit_flag] = 0.0
+		_market_investments[hit_flag] += final_money
+		_update_market_label(hit_flag)
+		_text_queue.append({"money": final_money, "yards": yards, "flag_hit": true, "direct_hit": true, "invested": true})
+	else:
+		# cash out any market investments when a ball misses
+		var cashout = _cashout_all_investments()
+		final_money += cashout
+		GameState.money += final_money
+		GameState.money_changed.emit(GameState.money)
+		GameState.add_xp(final_money * 0.1)
+		_text_queue.append({"money": final_money, "yards": yards, "flag_hit": best_bonus > 0.0, "direct_hit": direct_hit, "cashout": cashout})
 	if not _queue_processing:
 		_process_text_queue()
 	else:
@@ -302,6 +357,78 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 	if is_instance_valid(ball):
 		ball.queue_free()
 
+
+func _cashout_all_investments() -> float:
+	var total := 0.0
+	for flag in _market_investments:
+		total += _market_investments[flag]
+		_remove_market_label(flag)
+	_market_investments.clear()
+	return total
+
+func _update_market_label(flag: Node3D) -> void:
+	if not is_instance_valid(flag):
+		return
+	var amount = _market_investments.get(flag, 0.0)
+	if flag not in _market_labels:
+		var label = Label3D.new()
+		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		label.font_size = 64
+		label.modulate = Color.CYAN
+		label.no_depth_test = true
+		label.render_priority = 10
+		var f = load("res://balatro.otf")
+		if f:
+			label.font = f
+		flag.add_child(label)
+		_market_labels[flag] = label
+	_market_labels[flag].text = "$%.0f" % amount
+	# scale based on camera distance so it's readable from far away
+	var cam = get_viewport().get_camera_3d()
+	var distance = flag.global_position.distance_to(cam.global_position)
+	var scale_factor = pow(distance * 0.05, 1.0) * 1.5
+	_market_labels[flag].scale = Vector3(scale_factor, scale_factor, scale_factor)
+	# position above the flag sprite
+	_market_labels[flag].position = Vector3(0, scale_factor * 1.5, 0)
+
+func _remove_market_label(flag: Node3D) -> void:
+	if flag in _market_labels:
+		if is_instance_valid(_market_labels[flag]):
+			_market_labels[flag].queue_free()
+		_market_labels.erase(flag)
+
+func _start_golden_timer() -> void:
+	_golden_timer.wait_time = randf_range(GOLDEN_FLAG_INTERVAL_MIN, GOLDEN_FLAG_INTERVAL_MAX)
+	_golden_timer.start()
+
+func _spawn_golden_flag() -> void:
+	# deactivate any existing golden flag
+	if _golden_flag and is_instance_valid(_golden_flag):
+		_golden_flag.deactivate_golden()
+
+	var flags = _get_active_flags().get_children()
+	if flags.size() == 0:
+		_start_golden_timer()
+		return
+
+	# pick a random flag
+	_golden_flag = flags[randi() % flags.size()]
+	_golden_flag.activate_golden()
+
+func _on_golden_flag_hit(flag: Node3D, bonus: float) -> void:
+	var final_money = bonus * GameState.get_money_mult()
+	GameState.money += final_money
+	GameState.money_changed.emit(GameState.money)
+	GameState.add_xp(final_money * 0.1)
+	_golden_flag = null
+
+	# show golden cashout text
+	_text_queue.append({"money": final_money, "yards": 0.0, "flag_hit": true, "direct_hit": true, "golden": true})
+	if not _queue_processing:
+		_process_text_queue()
+
+	# start timer for next golden flag
+	_start_golden_timer()
 
 func _get_dynamic_lifetime() -> float:
 	# base 1.0s, shrinks as queue + active texts grow, minimum 0.3s
@@ -318,7 +445,7 @@ func _process_text_queue() -> void:
 				if _text_queue.size() == 0:
 					break
 				var data = _text_queue.pop_front()
-				_spawn_floating_text(data["money"], data["yards"], data.get("flag_hit", false), data.get("direct_hit", false))
+				_spawn_floating_text(data["money"], data["yards"], data.get("flag_hit", false), data.get("direct_hit", false), data.get("invested", false), data.get("cashout", 0.0), data.get("golden", false))
 				await get_tree().create_timer(TEXT_QUEUE_INTERVAL).timeout
 
 			# collapse everything remaining into one summary
@@ -338,7 +465,7 @@ func _process_text_queue() -> void:
 				await get_tree().create_timer(TEXT_QUEUE_INTERVAL).timeout
 		else:
 			var data = _text_queue.pop_front()
-			_spawn_floating_text(data["money"], data["yards"], data.get("flag_hit", false), data.get("direct_hit", false))
+			_spawn_floating_text(data["money"], data["yards"], data.get("flag_hit", false), data.get("direct_hit", false), data.get("invested", false), data.get("cashout", 0.0), data.get("golden", false))
 			await get_tree().create_timer(TEXT_QUEUE_INTERVAL).timeout
 	_queue_processing = false
 
@@ -354,13 +481,20 @@ func _push_existing_texts_up() -> void:
 			var shift_tween = create_tween()
 			shift_tween.tween_property(existing, "global_position:y", existing.global_position.y + .1, 0.15)
 
-func _spawn_floating_text(money: float, yards: float, flag_hit: bool = false, direct_hit: bool = false) -> void:
+func _spawn_floating_text(money: float, yards: float, flag_hit: bool = false, direct_hit: bool = false, invested: bool = false, cashout: float = 0.0, golden: bool = false) -> void:
 	_push_existing_texts_up()
 
 	var text = FloatingText.instantiate()
 	add_child(text)
 	text.global_position = golfer.global_position + Vector3(0, 1.5, 0)
-	text.setup(money, yards, flag_hit, direct_hit, _get_dynamic_lifetime())
+	if golden:
+		text.setup_summary("GOLDEN FLAG! +$%.0f" % money, _get_dynamic_lifetime(), Color(1.0, 0.84, 0.0))
+	elif invested:
+		text.setup_summary("INVESTED $%.0f" % money, _get_dynamic_lifetime(), Color.CYAN)
+	elif cashout > 0.0:
+		text.setup_summary("CASHOUT! +$%.0f" % money, _get_dynamic_lifetime(), Color.GREEN)
+	else:
+		text.setup(money, yards, flag_hit, direct_hit, _get_dynamic_lifetime())
 	_floating_texts.append(text)
 	text.tree_exited.connect(func(): _floating_texts.erase(text))
 
@@ -477,6 +611,12 @@ func _setup_settings_menu() -> void:
 	medals_btn.add_theme_font_size_override("font_size", 16)
 	vbox.add_child(medals_btn)
 
+	var money_btn = Button.new()
+	money_btn.text = "+$1,000,000"
+	money_btn.add_theme_font_override("font", font)
+	money_btn.add_theme_font_size_override("font_size", 16)
+	vbox.add_child(money_btn)
+
 	settings_btn.pressed.connect(func(): _settings_panel.visible = !_settings_panel.visible)
 
 	sfx_btn.pressed.connect(func():
@@ -502,4 +642,9 @@ func _setup_settings_menu() -> void:
 	medals_btn.pressed.connect(func():
 		GameState.medals += 100
 		GameState.medals_changed.emit(GameState.medals)
+	)
+
+	money_btn.pressed.connect(func():
+		GameState.money += 1000000
+		GameState.money_changed.emit(GameState.money)
 	)

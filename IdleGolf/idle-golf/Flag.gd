@@ -1,5 +1,7 @@
 extends Node3D
 
+signal golden_hit(flag: Node3D, bonus: float)
+
 @export var radius_x: float = 5.0     # hit detection width
 @export var radius_z: float = 5.0     # hit detection depth
 @export var direct_radius_x: float = 1.5  # direct hit width
@@ -11,6 +13,9 @@ extends Node3D
 @onready var sprite: Sprite3D = $Sprite3D
 
 var _wiggle_tween: Tween
+var _is_golden := false
+var _golden_tween: Tween
+var _original_modulate: Color
 
 func _process(_delta: float) -> void:
 	var distance = global_position.distance_to(camera.global_position)
@@ -23,6 +28,7 @@ func _process(_delta: float) -> void:
 func _ready() -> void:
 	if flag_texture:
 		sprite.texture = flag_texture
+	_original_modulate = sprite.modulate
 	var yards = global_position.length() * 1.094
 	distance_label.text = "%.0f yds" % yards
 	distance_label.font = load("res://balatro.otf")
@@ -43,8 +49,26 @@ func check_hit(ball_position: Vector3) -> Array:
 	if direct:
 		AudioManager.play_sfx("flag_stick")
 		_wiggle()
+		if _is_golden:
+			var golden_bonus = bonus * 50.0
+			golden_hit.emit(self, golden_bonus)
+			deactivate_golden()
 
 	return [bonus, direct]
+
+func activate_golden() -> void:
+	_is_golden = true
+	if _golden_tween and _golden_tween.is_valid():
+		_golden_tween.kill()
+	_golden_tween = create_tween().set_loops()
+	_golden_tween.tween_property(distance_label, "modulate", Color(1.0, 0.85, 0.0, 1.0), 0.5)
+	_golden_tween.tween_property(distance_label, "modulate", Color(1.0, 1.0, 0.5, 1.0), 0.5)
+
+func deactivate_golden() -> void:
+	_is_golden = false
+	if _golden_tween and _golden_tween.is_valid():
+		_golden_tween.kill()
+	distance_label.modulate = Color.WHITE
 
 func _wiggle() -> void:
 	if _wiggle_tween and _wiggle_tween.is_valid():

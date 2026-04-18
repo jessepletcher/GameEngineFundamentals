@@ -17,6 +17,7 @@ var _is_homing := false
 var _target_flag: Node3D = null
 var _has_peaked := false
 var _prev_velocity_y := 0.0
+var _initial_velocity_y := 0.0
 var _homing_time := 0.0
 var _launch_modifier := Vector2.ZERO  # x = curve, y = launch angle
 @onready var sprite: Sprite3D = $Sprite3D
@@ -43,11 +44,12 @@ func _physics_process(delta: float) -> void:
 	elif not trail.emitting and dist_from_origin < 800.0:
 		trail.emitting = true
 	
-	# firework explosion at apex — detect when velocity flips from up to down
-	if _is_firework and not _has_peaked and _prev_velocity_y > 0 and linear_velocity.y <= 0:
-		_has_peaked = true
-		_explode()
-		return
+	# firework explosion before apex — trigger when upward velocity drops below 40% of initial
+	if _is_firework and not _has_peaked and _prev_velocity_y > 0:
+		if linear_velocity.y < _initial_velocity_y * 0.4:
+			_has_peaked = true
+			_explode()
+			return
 	_prev_velocity_y = linear_velocity.y
 
 	# homing
@@ -217,6 +219,7 @@ func _ready() -> void:
 		_start_homing()
 
 	_is_firework = ball_data.get("is_firework", false)
+	_initial_velocity_y = linear_velocity.y
 
 var _curve := 0.0
 

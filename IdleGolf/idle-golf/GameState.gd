@@ -50,6 +50,7 @@ var balls = {
 	"homing_ball": {"name": "Homing Ball", "desc": "Homes in on nearest flag", "medal_cost": 5, "owned": false, "speed_mult": 1.0, "money_mult": 1.5, "can_home": true, "trail_color": Color.LIME_GREEN, "texture": preload("res://HomingBalllIcon.png"), "flag_mult": 1.0, "unlock_level": 5},
 	"pin_seeker": {"name": "Pin Seeker", "desc": "2x flag bonus money", "medal_cost": 25, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.GOLD, "texture": preload("res://PinSeekBalllIcon.png"), "flag_mult": 2.0, "unlock_level": 15},
 	"firework": {"name": "Firework Ball", "desc": "Explodes into 6 balls at apex", "medal_cost": 60, "owned": false, "speed_mult": 1.0, "money_mult": 0.5, "can_home": false, "trail_color": Color.ORANGE_RED, "texture": preload("res://FireWorksBalllIcon.png"), "flag_mult": 1.0, "is_firework": true, "unlock_level": 30},
+	"market": {"name": "Market Ball", "desc": "Flag hits invest money, grows 10%/s. Miss to cash out!", "medal_cost": 40, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.CYAN, "texture": null, "flag_mult": 1.0, "is_market": true, "unlock_level": 20},
 }
 
 var golfers = {
