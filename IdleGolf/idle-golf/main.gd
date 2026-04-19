@@ -295,7 +295,8 @@ func _hit_ball() -> void:
 	for i in ball_count:
 		var ball = Ball.instantiate()
 		ball._speed = BASE_SPEED * GameState.get_ball_speed()
-		ball._spread = BASE_SPREAD / GameState.get_consistency()
+		var consistency_mult = GameState.balls[GameState.equipped_ball].get("consistency_mult", 1.0)
+		ball._spread = BASE_SPREAD / (GameState.get_consistency() * consistency_mult)
 		ball._aim = -aim_slider.value
 		ball._launch_modifier = modifier
 		ball.position = tee_position.global_position
@@ -353,10 +354,72 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 			_queue_processing = false
 			_process_text_queue()
 
-	await get_tree().create_timer(3.0).timeout
+	var is_pinball = GameState.balls[GameState.equipped_ball].get("is_pinball", false)
+	if is_pinball and direct_hit and hit_flag and is_instance_valid(ball):
+		_pinball_chain(ball, hit_flag)
+	elif direct_hit and is_instance_valid(ball):
+		ball.queue_free()
+	else:
+		await get_tree().create_timer(3.0).timeout
+		if is_instance_valid(ball):
+			ball.queue_free()
+
+
+func _pinball_chain(ball: RigidBody3D, first_flag: Node3D) -> void:
+	# stop physics so we can tween the ball manually
+	ball.freeze = true
+
+	# gather remaining flags sorted by distance from first flag
+	var remaining_flags: Array = []
+	for flag in _get_active_flags().get_children():
+		if flag != first_flag:
+			remaining_flags.append(flag)
+	remaining_flags.sort_custom(func(a, b):
+		return a.global_position.distance_to(first_flag.global_position) < b.global_position.distance_to(first_flag.global_position)
+	)
+
+	for flag in remaining_flags:
+		if not is_instance_valid(ball) or not is_instance_valid(flag):
+			break
+
+		# fly to the flag
+		var fly_tween = create_tween()
+		var travel_dist = ball.global_position.distance_to(flag.global_position)
+		var fly_time = clampf(travel_dist * 0.003, 0.1, 0.4)
+		# arc upward slightly
+		var mid_point = (ball.global_position + flag.global_position) / 2.0
+		mid_point.y += travel_dist * 0.15
+		fly_tween.tween_property(ball, "global_position", mid_point, fly_time * 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		fly_tween.tween_property(ball, "global_position", flag.global_position, fly_time * 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		await fly_tween.finished
+
+		if not is_instance_valid(ball):
+			break
+
+		# cash this flag hit
+		AudioManager.play_sfx("flag_stick")
+		flag._wiggle()
+		var flag_bonus = flag.global_position.z * 0.1 * flag.distance_mult
+		var flag_mult = GameState.balls[GameState.equipped_ball].get("flag_mult", 1.0)
+		var pin_money = (flag_bonus * flag_mult * 2.5) * GameState.get_money_mult()
+		GameState.money += pin_money
+		GameState.money_changed.emit(GameState.money)
+		GameState.add_xp(pin_money * 0.1)
+
+		var pin_yards = flag.global_position.distance_to(tee_position.global_position) * 1.094
+		_text_queue.append({"money": pin_money, "yards": pin_yards, "flag_hit": true, "direct_hit": true})
+		if not _queue_processing:
+			_process_text_queue()
+
+		# check golden flag
+		if flag._is_golden:
+			var golden_bonus = flag_bonus * 50.0
+			flag.golden_hit.emit(flag, golden_bonus)
+			flag.deactivate_golden()
+
+	# done chaining — despawn
 	if is_instance_valid(ball):
 		ball.queue_free()
-
 
 func _cashout_all_investments() -> float:
 	var total := 0.0

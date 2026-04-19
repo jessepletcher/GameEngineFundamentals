@@ -65,27 +65,40 @@ func _start_homing() -> void:
 	if flags.size() == 0:
 		return
 
-	# estimate landing Z based on current speed
-	var forward_speed = abs(linear_velocity.z)
+	# estimate landing position using full velocity (including aim direction)
 	var time_to_land = 0.0
 	if linear_velocity.y > 0:
 		time_to_land = (linear_velocity.y * 2.0) / 9.8
-	var estimated_landing_z = global_position.z + forward_speed * time_to_land
+	var estimated_landing = global_position + Vector3(
+		linear_velocity.x * time_to_land,
+		0.0,
+		linear_velocity.z * time_to_land
+	)
 
-	# sort flags by Z distance (furthest first)
+	# sort flags by distance to estimated landing (closest to landing spot first)
 	var sorted_flags = flags.duplicate()
-	sorted_flags.sort_custom(func(a, b): return a.global_position.z > b.global_position.z)
+	sorted_flags.sort_custom(func(a, b):
+		var da = Vector2(a.global_position.x, a.global_position.z).distance_to(Vector2(estimated_landing.x, estimated_landing.z))
+		var db = Vector2(b.global_position.x, b.global_position.z).distance_to(Vector2(estimated_landing.x, estimated_landing.z))
+		return da < db
+	)
 
-	# pick the furthest flag the ball can realistically reach
+	# pick the closest flag to where we'd naturally land, but only if reachable
+	var flat_speed = Vector2(linear_velocity.x, linear_velocity.z).length()
+	var max_range = flat_speed * time_to_land * 0.9  # conservative 90% of max distance
 	var best_flag: Node3D = null
 	for flag in sorted_flags:
-		if flag.global_position.z <= estimated_landing_z * 1.2:
+		var flag_dist = Vector2(flag.global_position.x, flag.global_position.z).distance_to(Vector2(global_position.x, global_position.z))
+		if flag_dist <= max_range:
 			best_flag = flag
 			break
 
-	# fallback to closest flag if none are reachable
+	# fallback to nearest flag if none are in range
 	if not best_flag:
-		best_flag = sorted_flags[sorted_flags.size() - 1]
+		sorted_flags.sort_custom(func(a, b):
+			return a.global_position.distance_to(global_position) < b.global_position.distance_to(global_position)
+		)
+		best_flag = sorted_flags[0]
 
 	_target_flag = best_flag
 	_is_homing = true

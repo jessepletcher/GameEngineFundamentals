@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://jpgh2nrmomt8" path="res://ShopClubButtonPressed.png" id="7_6epge"]
 [ext_resource type="Texture2D" uid="uid://c2l25sbjc0eiq" path="res://ShopCourseButton.png" id="8_cl6py"]
 [ext_resource type="Texture2D" uid="uid://bw71mgrr3f8gl" path="res://ShopCourseButtonPressed.png" id="9_wr8g1"]
+[ext_resource type="Script" uid="uid://cnhehn3ryqal3" path="res://RelicShop.gd" id="10_relic"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_db8k6"]
 
@@ -101,6 +102,40 @@ offset_bottom = 155.0
 [node name="CourseList" type="VBoxContainer" parent="CoursesPanel" unique_id=505792622]
 layout_mode = 2
 
+[node name="RelicsPanel" type="PanelContainer" parent="." unique_id=1886247589]
+layout_mode = 0
+offset_left = 1200.0
+offset_top = 155.0
+offset_right = 1724.0
+offset_bottom = 755.0
+script = ExtResource("10_relic")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="RelicsPanel" unique_id=557898328]
+layout_mode = 2
+
+[node name="UnboxButton" type="Button" parent="RelicsPanel/VBoxContainer" unique_id=890408112]
+layout_mode = 2
+text = "Unbox!"
+
+[node name="SpinContainer" type="HBoxContainer" parent="RelicsPanel/VBoxContainer" unique_id=1490242425]
+clip_contents = true
+custom_minimum_size = Vector2(500, 90)
+layout_mode = 2
+
+[node name="SpinStrip" type="Control" parent="RelicsPanel/VBoxContainer/SpinContainer" unique_id=1414190974]
+layout_mode = 2
+
+[node name="ResultLabel" type="Label" parent="RelicsPanel/VBoxContainer" unique_id=849500497]
+layout_mode = 2
+
+[node name="OwnedRelicsPanel" type="ScrollContainer" parent="RelicsPanel/VBoxContainer" unique_id=489015074]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="OwnedRelicsList" type="VBoxContainer" parent="RelicsPanel/VBoxContainer/OwnedRelicsPanel" unique_id=860498008]
+layout_mode = 2
+
 [node name="Panel" type="Panel" parent="." unique_id=2087887156]
 layout_mode = 1
 anchors_preset = 15
@@ -117,9 +152,9 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -650.0
+offset_left = -727.92004
 offset_top = 55.0
-offset_right = -126.0
+offset_right = -68.920044
 offset_bottom = 132.0
 grow_horizontal = 0
 
@@ -158,3 +193,7 @@ size_flags_vertical = 4
 theme_override_styles/normal = SubResource("StyleBoxTexture_8rl2n")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_olj3c")
 theme_override_styles/hover = SubResource("StyleBoxTexture_8rl2n")
+
+[node name="RelicsTabBtn" type="Button" parent="Panel/VBoxContainer/TabBar" unique_id=592340944]
+layout_mode = 2
+text = "Relics"

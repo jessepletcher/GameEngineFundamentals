@@ -15,6 +15,8 @@ const ShopItem = preload("res://ShopItem.tscn")
 @onready var balls_tab: Button = $Panel/VBoxContainer/TabBar/BallsTabBtn
 @onready var golfers_tab: Button = $Panel/VBoxContainer/TabBar/ClubsTabBtn
 @onready var courses_tab: Button = $Panel/VBoxContainer/TabBar/CoursesTabBtn
+@onready var relics_tab: Button = $Panel/VBoxContainer/TabBar/RelicsTabBtn
+@onready var relics_panel = $RelicsPanel
 
 var _medal_icon: TextureRect
 
@@ -23,6 +25,7 @@ func _ready() -> void:
 	balls_tab.pressed.connect(_show_balls)
 	golfers_tab.pressed.connect(_show_golfers)
 	courses_tab.pressed.connect(_show_courses)
+	relics_tab.pressed.connect(_show_relics)
 	_setup_medal_icon()
 	_update_medals_label()
 	_populate_shop()
@@ -42,20 +45,27 @@ func _setup_medal_icon() -> void:
 func _update_medals_label() -> void:
 	medals_label.text = "       %.0f" % GameState.medals
 
-func _show_balls() -> void:
-	balls_panel.visible = true
+func _hide_all_panels() -> void:
+	balls_panel.visible = false
 	golfers_panel.visible = false
 	courses_panel.visible = false
+	relics_panel.visible = false
+
+func _show_balls() -> void:
+	_hide_all_panels()
+	balls_panel.visible = true
 
 func _show_golfers() -> void:
-	balls_panel.visible = false
+	_hide_all_panels()
 	golfers_panel.visible = true
-	courses_panel.visible = false
 
 func _show_courses() -> void:
-	balls_panel.visible = false
-	golfers_panel.visible = false
+	_hide_all_panels()
 	courses_panel.visible = true
+
+func _show_relics() -> void:
+	_hide_all_panels()
+	relics_panel.visible = true
 
 func _populate_shop() -> void:
 	for child in ball_list.get_children():

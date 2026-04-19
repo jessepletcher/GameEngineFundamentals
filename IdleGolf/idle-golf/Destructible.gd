@@ -20,6 +20,8 @@ var _yardage_tween: Tween
 func _ready() -> void:
 	add_to_group("destructibles")
 	_create_yardage_label()
+	static_body.mouse_entered.connect(func(): _yardage_label.visible = true)
+	static_body.mouse_exited.connect(func(): _yardage_label.visible = false)
 
 func _create_yardage_label() -> void:
 	_yardage_label = Label3D.new()
@@ -128,7 +130,8 @@ func _crumble() -> void:
 	collision_shape.disabled = true
 
 	var distance = global_position.distance_to(Vector3.ZERO) * 1.094  # convert to yards
-	var reward = money_per_hit * _hits_taken * distance * GameState.get_money_mult()
+	var destruct_mult = GameState.balls[GameState.equipped_ball].get("destruct_mult", 1.0)
+	var reward = money_per_hit * _hits_taken * distance * GameState.get_money_mult() * destruct_mult
 	destroyed.emit(reward)
 	_spawn_reward_text(reward)
 
@@ -154,7 +157,8 @@ func _crumble() -> void:
 		shake_tween.kill()
 		scaled_sprite.position.x = 0.0
 	)
-	fall_tween.tween_interval(respawn_time)
+	var respawn_mult = GameState.get_golfer_data().get("respawn_mult", 1.0)
+	fall_tween.tween_interval(respawn_time * respawn_mult)
 	fall_tween.tween_callback(_respawn)
 
 var _reward_label: Label3D
