@@ -2,25 +2,68 @@
 
 [ext_resource type="Script" uid="uid://de3yivc76hmok" path="res://ShopItem.gd" id="1_4eib6"]
 [ext_resource type="Texture2D" uid="uid://c8vb6eulm2tik" path="res://GolfBall2.png" id="1_vfou5"]
+[ext_resource type="Texture2D" uid="uid://bc3adaobyp44y" path="res://ShopItemBackground.png" id="2_sbmo1"]
+[ext_resource type="FontFile" uid="uid://dg4ug6srbh1wt" path="res://balatro.otf" id="3_21tsp"]
+[ext_resource type="Texture2D" uid="uid://ke6bvn0lw7xr" path="res://BuyButton.png" id="4_24oa2"]
+[ext_resource type="Texture2D" uid="uid://b1hv0i7sh6gmp" path="res://BuyButtonPressed.png" id="5_21tsp"]
+[ext_resource type="Texture2D" uid="uid://be25gxxvjexcd" path="res://MedalIcon.png" id="7_24oa2"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_3runs"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ifa3v"]
+texture = ExtResource("4_24oa2")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_24oa2"]
+texture = ExtResource("5_21tsp")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
 
 [node name="PanelContainer" type="PanelContainer" unique_id=1602042632]
-offset_right = 81.0
-offset_bottom = 50.0
+custom_minimum_size = Vector2(670, 75)
+offset_left = 5.0
+offset_right = 675.0
+offset_bottom = 75.0
+size_flags_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxTexture_3runs")
 script = ExtResource("1_4eib6")
+
+[node name="Control" type="Control" parent="." unique_id=947204495]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Control" unique_id=116876985]
+texture_filter = 1
+layout_mode = 0
+offset_left = -5.0
+offset_right = 665.0
+offset_bottom = 75.0
+texture = ExtResource("2_sbmo1")
+stretch_mode = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1672567150]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer" unique_id=1552362067]
+[node name="BuyButton" type="Button" parent="HBoxContainer" unique_id=256065745]
+texture_filter = 1
+custom_minimum_size = Vector2(115, 55)
 layout_mode = 2
-
-[node name="NameLabel" type="Label" parent="HBoxContainer/VBoxContainer" unique_id=2029863367]
-layout_mode = 2
-text = "Ball 1"
-
-[node name="DescLabel" type="Label" parent="HBoxContainer/VBoxContainer" unique_id=1290840658]
-layout_mode = 2
-text = "crazy stuff"
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.69411767, 0.50980395, 0.22352941, 1)
+theme_override_colors/font_focus_color = Color(0.69411767, 0.50980395, 0.22352941, 1)
+theme_override_colors/font_pressed_color = Color(0.69411767, 0.50980395, 0.22352941, 1)
+theme_override_colors/font_hover_color = Color(0.69411767, 0.50980395, 0.22352941, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.69411767, 0.50980395, 0.22352941, 1)
+theme_override_colors/font_disabled_color = Color(0.69411767, 0.50980395, 0.22352941, 1)
+theme_override_constants/icon_max_width = 21
+theme_override_fonts/font = ExtResource("3_21tsp")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxTexture_ifa3v")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_24oa2")
+theme_override_styles/hover = SubResource("StyleBoxTexture_ifa3v")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_ifa3v")
+text = "BUY"
 
 [node name="ItemIcon" type="TextureRect" parent="HBoxContainer" unique_id=754316225]
 texture_filter = 1
@@ -28,6 +71,31 @@ layout_mode = 2
 texture = ExtResource("1_vfou5")
 expand_mode = 3
 
-[node name="BuyButton" type="Button" parent="HBoxContainer" unique_id=256065745]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer" unique_id=1552362067]
 layout_mode = 2
-text = "Buy"
+alignment = 1
+
+[node name="NameLabel" type="Label" parent="HBoxContainer/VBoxContainer" unique_id=2029863367]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_21tsp")
+text = "Ball 1"
+
+[node name="DescLabel" type="Label" parent="HBoxContainer/VBoxContainer" unique_id=1290840658]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_21tsp")
+text = "crazy stuff"
+
+[node name="Control2" type="Control" parent="." unique_id=1883825482]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MedalIcon" type="TextureRect" parent="Control2" unique_id=462259595]
+texture_filter = 1
+layout_mode = 0
+offset_left = 15.0
+offset_top = 28.0
+offset_right = 50.0
+offset_bottom = 73.0
+scale = Vector2(0.5, 0.5)
+mouse_filter = 2
+texture = ExtResource("7_24oa2")

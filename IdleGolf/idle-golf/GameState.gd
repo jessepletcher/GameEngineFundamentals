@@ -360,7 +360,7 @@ func get_money_mult() -> float:
 	return (1.0 + upgrades["money_mult"]["level"] * 0.18) * get_level_mult("money_mult") * get_golfer_data()["money_mult"] * (1.0 + get_relic_bonus("money_mult"))
 
 func get_consistency() -> float:
-	return (0.5 + upgrades["consistency"]["level"] * 200) * get_level_mult("consistency") * (1.0 + get_relic_bonus("consistency"))
+	return (0.5 + upgrades["consistency"]["level"] * .2) * get_level_mult("consistency") * (1.0 + get_relic_bonus("consistency"))
 
 func get_xp_mult() -> float:
 	return (1.0 + upgrades["xp_mult"]["level"] * 0.18) * get_level_mult("xp_mult") * (1.0 + get_relic_bonus("xp_mult"))

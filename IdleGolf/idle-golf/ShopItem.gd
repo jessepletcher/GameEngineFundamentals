@@ -6,6 +6,7 @@ signal purchase_requested(item_id: String)
 @onready var desc_label: Label = $HBoxContainer/VBoxContainer/DescLabel
 @onready var buy_button: Button = $HBoxContainer/BuyButton
 @onready var icon: TextureRect = $HBoxContainer/ItemIcon
+@onready var medal_icon: TextureRect = $Control2/MedalIcon
 
 var item_id: String
 var medal_cost: int = 0
@@ -24,6 +25,7 @@ func setup(id: String, item_name: String, desc: String, cost: float, texture: Te
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 
 	# check if locked by level
+	medal_icon.visible = false
 	var locked = GameState.level < unlock_level and not owned
 	if locked:
 		buy_button.text = "🔒 Lvl %d" % unlock_level
@@ -40,17 +42,8 @@ func setup(id: String, item_name: String, desc: String, cost: float, texture: Te
 		buy_button.disabled = GameState.money < cost
 
 		if medal_cost > 0:
-			buy_button.text = "   %d" % medal_cost
+			buy_button.text = "%d" % medal_cost
 			buy_button.disabled = GameState.medals < medal_cost
-			var medal_icon = TextureRect.new()
-			medal_icon.texture = preload("res://MedalIcon.png")
-			medal_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-			medal_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			medal_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			medal_icon.custom_minimum_size = Vector2(16, 16)
-			medal_icon.set_anchors_preset(Control.PRESET_CENTER_LEFT)
-			medal_icon.position.x = 4
-			medal_icon.position.y = -8
-			buy_button.add_child(medal_icon)
+			medal_icon.visible = true
 
 	buy_button.pressed.connect(func(): purchase_requested.emit(item_id))
