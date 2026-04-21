@@ -1192,6 +1192,7 @@ fps = 2.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 700)
 hits_required = 100
 shake_factor = 0.1
+money_per_hit = 4.0
 
 [node name="ScaledSprite" parent="Level1/Destructible" index="0" unique_id=1915457829]
 texture = ExtResource("73_ksmap")
@@ -1212,7 +1213,7 @@ mesh = SubResource("BoxMesh_11yus")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 459.67224)
 hits_required = 50
 shake_factor = 0.1
-money_per_hit = 4.0
+money_per_hit = 3.0
 
 [node name="ScaledSprite" parent="Level1/Destructible2" index="0" unique_id=1915457829]
 texture = ExtResource("74_ygd8o")
@@ -1274,7 +1275,7 @@ mesh = SubResource("BoxMesh_ndrjj")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 300)
 hits_required = 25
 shake_factor = 0.1
-money_per_hit = 3.0
+money_per_hit = 2.0
 
 [node name="ScaledSprite" parent="Level1/Destructible5" index="0" unique_id=1915457829]
 texture = ExtResource("76_xaipn")
