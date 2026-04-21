@@ -6,7 +6,7 @@ extends Node3D
 var _fade_tween: Tween
 
 func setup(money: float, yards: float, flag_hit: bool = false, direct_hit: bool = false, lifetime: float = 1.0) -> void:
-	label.text = "$%.0f | %.0f yds" % [money, yards]
+	label.text = "$%s | %s yds" % [GameState.format_number(money), GameState.format_number(yards)]
 	if direct_hit:
 		label.modulate = Color(1.0, 0.84, 0.0)  # gold
 	elif flag_hit:

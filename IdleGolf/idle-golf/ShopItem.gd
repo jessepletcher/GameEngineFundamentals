@@ -38,11 +38,11 @@ func setup(id: String, item_name: String, desc: String, cost: float, texture: Te
 		buy_button.text = "Equip"
 		buy_button.disabled = false
 	else:
-		buy_button.text = "$%.0f" % cost
+		buy_button.text = "$%s" % GameState.format_number(cost)
 		buy_button.disabled = GameState.money < cost
 
 		if medal_cost > 0:
-			buy_button.text = "%d" % medal_cost
+			buy_button.text = "%s" % GameState.format_number(medal_cost)
 			buy_button.disabled = GameState.medals < medal_cost
 			medal_icon.visible = true
 

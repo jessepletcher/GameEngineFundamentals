@@ -26,7 +26,7 @@ func _ready() -> void:
 func _create_yardage_label() -> void:
 	_yardage_label = Label3D.new()
 	var yards = global_position.length() * 1.094
-	_yardage_label.text = "%.0f yds" % yards
+	_yardage_label.text = "%s yds" % GameState.format_number(yards)
 	_yardage_label.font = load("res://balatro.otf")
 	_yardage_label.font_size = 40
 	_yardage_label.modulate = Color.WHITE
@@ -169,11 +169,12 @@ func _spawn_reward_text(reward: float) -> void:
 		_reward_label.queue_free()
 
 	_reward_label = Label3D.new()
-	_reward_label.text = "+$%.0f" % reward
+	_reward_label.text = "+$%s" % GameState.format_number(reward)
 	_reward_label.font = load("res://balatro.otf")
 	_reward_label.font_size = 32
 	_reward_label.modulate = Color(1.0, 0.84, 0.0)  # gold
 	_reward_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	_reward_label.no_depth_test = true
 	_reward_label.outline_size = 0
 
 	var ds = _get_distance_scale()

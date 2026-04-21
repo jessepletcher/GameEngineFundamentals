@@ -196,7 +196,7 @@ func _ready() -> void:
 	var ball_speed_mult = ball_data["speed_mult"]
 	
 	var spread_rad = deg_to_rad(randf_range(-_spread, _spread))
-	var aim_angle = _aim * deg_to_rad(75.0)
+	var aim_angle = _aim * deg_to_rad(50.0)
 	var consistency = GameState.get_consistency()
 	var worst_possible = 1.0 - (1.0 / consistency)
 	var distance_mult = randf_range(worst_possible, 1.0)
@@ -214,10 +214,11 @@ func _ready() -> void:
 	var flat_bonus = GameState.get_flat_distance()
 	var curve = -_launch_modifier.x
 
+	var total_horizontal_speed = _speed * distance_mult * ball_speed_mult * distance_mult_from_curve + flat_bonus
 	linear_velocity = Vector3(
-		sin(aim_angle) * _speed * 0.5,
+		sin(aim_angle) * total_horizontal_speed,
 		_speed * launch_angle * ball_speed_mult,
-		cos(aim_angle) * (_speed) * distance_mult * ball_speed_mult * distance_mult_from_curve + flat_bonus
+		cos(aim_angle) * total_horizontal_speed
 	)
 	
 	# check for negative velocity (ball going backwards)

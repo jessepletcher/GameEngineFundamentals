@@ -47,11 +47,11 @@ func _refresh(_money: float) -> void:
 				cost_label.text = "MAX"
 				btn.disabled = true
 			else:
-				cost_label.text = "  %.0f" % cost
+				cost_label.text = "  %s" % GameState.format_number(cost)
 				btn.disabled = GameState.medals < cost
 				_add_medal_icon(cost_label)
 		else:
-			cost_label.text = "$%.0f" % cost
+			cost_label.text = "$%s" % GameState.format_number(cost)
 			btn.disabled = GameState.money < cost
 
 func _add_medal_icon(label: Label) -> void:

@@ -30,7 +30,7 @@ func _ready() -> void:
 		sprite.texture = flag_texture
 	_original_modulate = sprite.modulate
 	var yards = global_position.length() * 1.094
-	distance_label.text = "%.0f yds" % yards
+	distance_label.text = "%s yds" % GameState.format_number(yards)
 	distance_label.font = load("res://balatro.otf")
 
 ## Returns [bonus, is_direct_hit]

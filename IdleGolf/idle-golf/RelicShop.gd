@@ -24,7 +24,7 @@ func _ready() -> void:
 
 func _update_button() -> void:
 	var cost = GameState.get_unbox_cost()
-	unbox_button.text = "Unbox! (%.0f Medals)" % cost
+	unbox_button.text = "Unbox! (%s Medals)" % GameState.format_number(cost)
 	unbox_button.disabled = GameState.medals < cost or _is_spinning
 
 func _on_unbox_pressed() -> void:

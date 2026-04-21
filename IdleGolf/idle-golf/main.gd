@@ -45,7 +45,7 @@ var _settings_panel: PanelContainer
 # Market Ball — invested money per flag
 var _market_investments := {}  # flag node -> invested money
 var _market_labels := {}  # flag node -> Label3D showing invested amount
-const MARKET_GROWTH_RATE := 0.10  # 10% per second
+const MARKET_GROWTH_RATE := 0.20  # 10% per second
 
 # Golden Flag
 var _golden_flag: Node3D = null
@@ -74,6 +74,7 @@ func _switch_course() -> void:
 	var cashout = _cashout_all_investments()
 	if cashout > 0.0:
 		GameState.money += cashout
+		GameState.lifetime_money += cashout
 		GameState.money_changed.emit(GameState.money)
 	# deactivate golden flag on course switch
 	if _golden_flag and is_instance_valid(_golden_flag):
@@ -94,7 +95,7 @@ func _ready() -> void:
 	_course_data["course2"]["flags"] = level2_flags
 	_switch_course()
 	GameState.course_changed.connect(_switch_course)
-	money_label.text = "%.0f" % GameState.money
+	money_label.text = GameState.format_number(GameState.money)
 	level_label.text = "Level %d" % GameState.level
 	xp_progress.max_value = GameState.xp_to_next_level
 	xp_progress.value = GameState.xp
@@ -111,7 +112,7 @@ func _ready() -> void:
 	cancel_retire.pressed.connect(_on_cancel_retire)
 	retire_dialog.visible = false
 	GameState.medals_changed.connect(_on_medals_changed)
-	medals_label.text = "%.0f" % GameState.medals
+	medals_label.text = GameState.format_number(GameState.medals)
 
 	# auto-save every 15 seconds
 	var save_timer = Timer.new()
@@ -170,6 +171,7 @@ func _show_all_yardage() -> void:
 
 func _on_destructible_destroyed(reward: float) -> void:
 	GameState.money += reward
+	GameState.lifetime_money += reward
 	GameState.money_changed.emit(GameState.money)
 	GameState.add_xp(reward * 0.1)
 	_text_queue.append({"money": reward, "yards": 0.0, "flag_hit": false, "direct_hit": true})
@@ -189,11 +191,12 @@ func _on_cancel_retire() -> void:
 	retire_dialog.visible = false
 
 func _on_medals_changed(amount: float) -> void:
-	medals_label.text = " %.0f" % amount
+	medals_label.text = " " + GameState.format_number(amount)
 
 func _on_retire_pressed() -> void:
+	print("DEBUG: lifetime_money=", GameState.lifetime_money, " money=", GameState.money)
 	var medals = GameState.get_medal_reward()
-	retire_info_label.text = "You will earn %.0f Medals!\n\nUpgrades will be reset.\nBalls, clubs, levels and level bonuses are kept." % medals
+	retire_info_label.text = "You will earn %s Medals!\n\nUpgrades will be reset.\nBalls, clubs, levels and level bonuses are kept." % GameState.format_number(medals)
 	retire_dialog.visible = true
 
 func _on_leveled_up(new_level: int, stat_boosted: String) -> void:
@@ -281,7 +284,7 @@ func _on_golfer_swung() -> void:
 
 
 func _on_money_changed(new_amount: float) -> void:
-	money_label.text = "%.0f" % new_amount
+	money_label.text = GameState.format_number(new_amount)
 
 func _on_ShotTimer_timeout() -> void:
 	shot_timer.wait_time = BASE_INTERVAL / GameState.get_fire_rate()
@@ -343,6 +346,7 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 		var cashout = _cashout_all_investments()
 		final_money += cashout
 		GameState.money += final_money
+		GameState.lifetime_money += final_money
 		GameState.money_changed.emit(GameState.money)
 		GameState.add_xp(final_money * 0.1)
 		_text_queue.append({"money": final_money, "yards": yards, "flag_hit": best_bonus > 0.0, "direct_hit": direct_hit, "cashout": cashout})
@@ -403,6 +407,7 @@ func _pinball_chain(ball: RigidBody3D, first_flag: Node3D) -> void:
 		var flag_mult = GameState.balls[GameState.equipped_ball].get("flag_mult", 1.0)
 		var pin_money = (flag_bonus * flag_mult * 2.5) * GameState.get_money_mult()
 		GameState.money += pin_money
+		GameState.lifetime_money += pin_money
 		GameState.money_changed.emit(GameState.money)
 		GameState.add_xp(pin_money * 0.1)
 
@@ -445,7 +450,7 @@ func _update_market_label(flag: Node3D) -> void:
 			label.font = f
 		flag.add_child(label)
 		_market_labels[flag] = label
-	_market_labels[flag].text = "$%.0f" % amount
+	_market_labels[flag].text = "$" + GameState.format_number(amount)
 	# scale based on camera distance so it's readable from far away
 	var cam = get_viewport().get_camera_3d()
 	var distance = flag.global_position.distance_to(cam.global_position)
@@ -481,6 +486,7 @@ func _spawn_golden_flag() -> void:
 func _on_golden_flag_hit(flag: Node3D, bonus: float) -> void:
 	var final_money = bonus * GameState.get_money_mult()
 	GameState.money += final_money
+	GameState.lifetime_money += final_money
 	GameState.money_changed.emit(GameState.money)
 	GameState.add_xp(final_money * 0.1)
 	_golden_flag = null
@@ -551,11 +557,11 @@ func _spawn_floating_text(money: float, yards: float, flag_hit: bool = false, di
 	add_child(text)
 	text.global_position = golfer.global_position + Vector3(0, 1.5, 0)
 	if golden:
-		text.setup_summary("GOLDEN FLAG! +$%.0f" % money, _get_dynamic_lifetime(), Color(1.0, 0.84, 0.0))
+		text.setup_summary("GOLDEN FLAG! +$%s" % GameState.format_number(money), _get_dynamic_lifetime(), Color(1.0, 0.84, 0.0))
 	elif invested:
-		text.setup_summary("INVESTED $%.0f" % money, _get_dynamic_lifetime(), Color.CYAN)
+		text.setup_summary("INVESTED $%s" % GameState.format_number(money), _get_dynamic_lifetime(), Color.CYAN)
 	elif cashout > 0.0:
-		text.setup_summary("CASHOUT! +$%.0f" % money, _get_dynamic_lifetime(), Color.GREEN)
+		text.setup_summary("CASHOUT! +$%s" % GameState.format_number(money), _get_dynamic_lifetime(), Color.GREEN)
 	else:
 		text.setup(money, yards, flag_hit, direct_hit, _get_dynamic_lifetime())
 	_floating_texts.append(text)
@@ -567,7 +573,7 @@ func _spawn_summary_text(total_money: float, hit_count: int, any_flag: bool, any
 	var text = FloatingText.instantiate()
 	add_child(text)
 	text.global_position = golfer.global_position + Vector3(0, 1.5, 0)
-	var summary = "+$%.0f (%d more hits)" % [total_money, hit_count]
+	var summary = "+$%s (%d more hits)" % [GameState.format_number(total_money), hit_count]
 	text.setup_summary(summary, _get_dynamic_lifetime())
 	_floating_texts.append(text)
 	text.tree_exited.connect(func(): _floating_texts.erase(text))
@@ -708,6 +714,7 @@ func _setup_settings_menu() -> void:
 	)
 
 	money_btn.pressed.connect(func():
-		GameState.money += 1000000
+		GameState.money += 100000
+		GameState.lifetime_money += 100000
 		GameState.money_changed.emit(GameState.money)
 	)

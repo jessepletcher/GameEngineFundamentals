@@ -19,6 +19,17 @@ signal xp_changed(current_xp: float, required_xp: float)
 signal golfer_changed
 signal course_changed
 
+static func format_number(value: float) -> String:
+	var num_str = str(int(value))
+	var result = ""
+	var count = 0
+	for i in range(num_str.length() - 1, -1, -1):
+		if count > 0 and count % 3 == 0 and num_str[i] != "-":
+			result = "," + result
+		result = num_str[i] + result
+		count += 1
+	return result
+
 const SAVE_PATH = "user://save.cfg"
 
 const LEVEL_REWARDS = [
@@ -42,7 +53,7 @@ var upgrades = {
 	"consistency":  {"level": 0, "base_cost": 12.0,  "label": "Consistency"},
 	"xp_mult":      {"level": 0, "base_cost": 20.0,  "label": "XP Multiplier"},
 	"flat_distance": {"level": 0, "base_cost": 8.0, "label": "Flat Distance", "use_medals": true},
-	"multi_ball": {"level": 0, "base_cost": 15.0, "label": "Multi Ball", "use_medals": true, "max_level": 3},
+	"multi_ball": {"level": 0, "base_cost": 150.0, "label": "Multi Ball", "use_medals": true, "max_level": 3},
 }
 
 var balls = {
@@ -86,7 +97,7 @@ var relics = {
 
 var unbox_count := 0
 const UNBOX_BASE_COST := 5.0
-const UNBOX_COST_MULT := 1.5
+const UNBOX_COST_MULT := 1.2
 
 
 var equipped_ball: String = "standard"
@@ -140,12 +151,23 @@ func _play_button_sound() -> void:
 	AudioManager.play_sfx("button")
 	
 func get_flat_distance() -> float:
-	return upgrades["flat_distance"]["level"] * 2.0  # +2 yards per level → 100 yds at lv50
+	return upgrades["flat_distance"]["level"] * 1.0  # +2 yards per level → 100 yds at lv50
 
 func get_medal_reward() -> float:
-	var xp_improvement = max(lifetime_xp - best_run_xp, 0.0)
-	var money_improvement = max(lifetime_money - best_run_money, 0.0)
-	return floor((xp_improvement * 0.001) + (money_improvement * 0.0001))
+	if lifetime_money <= 1.0:
+		return 0.0
+	var raw_medals: float
+	if best_run_money <= 0.0:
+		# first run: log scaling
+		raw_medals = 16.67 * log(lifetime_money) / log(10.0)
+	elif lifetime_money <= best_run_money:
+		return 0.0
+	else:
+		# medals based on how much you beat your best by (ratio-based, log-dampened)
+		var improvement_ratio = (lifetime_money - best_run_money) / best_run_money
+		raw_medals = 150.0 * log(1.0 + improvement_ratio) / log(2.0)
+	# asymptotic soft cap — trails off toward 250, never quite reaches it
+	return floor(250.0 * (1.0 - exp(-raw_medals / 250.0)))
 
 func retire() -> void:
 	var earned_medals = get_medal_reward()
@@ -323,10 +345,10 @@ func get_ball_count() -> int:
 func get_cost(upgrade: String) -> float:
 	var level = upgrades[upgrade]["level"]
 	if upgrade == "multi_ball":
-		return floor(upgrades[upgrade]["base_cost"] * pow(5.0, level))  # 15 → 75 → 375
+		return floor(upgrades[upgrade]["base_cost"] * pow(3.0, level))  # 150 → 450 → 1350
 	if upgrade == "flat_distance":
-		return floor(upgrades[upgrade]["base_cost"] * pow(3.0, level))  # 8 → 24 → 72 → 216
-	return floor(upgrades[upgrade]["base_cost"] * pow(1.12, level))
+		return floor(upgrades[upgrade]["base_cost"] * pow(1.8, level))  # 8 → 14 → 26 → 46 → 83
+	return floor(upgrades[upgrade]["base_cost"] * pow(1.08, level))
 
 func try_purchase(upgrade: String) -> bool:
 	var cost = get_cost(upgrade)
@@ -351,16 +373,16 @@ func get_unbox_cost() -> float:
 	return floor(UNBOX_BASE_COST * pow(UNBOX_COST_MULT, unbox_count))
 
 func get_ball_speed() -> float:
-	return (1.0 + upgrades["ball_speed"]["level"] * 0.08) * get_level_mult("ball_speed") * get_golfer_data()["speed_mult"] * (1.0 + get_relic_bonus("ball_speed"))
+	return (1.0 + upgrades["ball_speed"]["level"] * 0.04) * get_level_mult("ball_speed") * get_golfer_data()["speed_mult"] * (1.0 + get_relic_bonus("ball_speed"))
 
 func get_fire_rate() -> float:
-	return (1.0 + upgrades["fire_rate"]["level"] * 0.06) * get_level_mult("fire_rate") * get_golfer_data()["fire_rate_mult"] * (1.0 + get_relic_bonus("fire_rate"))
+	return (1.0 + upgrades["fire_rate"]["level"] * 0.03) * get_level_mult("fire_rate") * get_golfer_data()["fire_rate_mult"] * (1.0 + get_relic_bonus("fire_rate"))
 
 func get_money_mult() -> float:
-	return (1.0 + upgrades["money_mult"]["level"] * 0.18) * get_level_mult("money_mult") * get_golfer_data()["money_mult"] * (1.0 + get_relic_bonus("money_mult"))
+	return (1.0 + upgrades["money_mult"]["level"] * 0.09) * get_level_mult("money_mult") * get_golfer_data()["money_mult"] * (1.0 + get_relic_bonus("money_mult"))
 
 func get_consistency() -> float:
-	return (0.5 + upgrades["consistency"]["level"] * .2) * get_level_mult("consistency") * (1.0 + get_relic_bonus("consistency"))
+	return (0.5 + upgrades["consistency"]["level"] * .1) * get_level_mult("consistency") * (1.0 + get_relic_bonus("consistency"))
 
 func get_xp_mult() -> float:
-	return (1.0 + upgrades["xp_mult"]["level"] * 0.18) * get_level_mult("xp_mult") * (1.0 + get_relic_bonus("xp_mult"))
+	return (1.0 + upgrades["xp_mult"]["level"] * 0.09) * get_level_mult("xp_mult") * (1.0 + get_relic_bonus("xp_mult"))

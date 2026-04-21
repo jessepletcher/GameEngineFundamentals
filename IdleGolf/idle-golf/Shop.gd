@@ -43,7 +43,7 @@ func _setup_medal_icon() -> void:
 	_medal_icon.set_deferred("position", Vector2(0, (medals_label.size.y - 48) / 2))
 
 func _update_medals_label() -> void:
-	medals_label.text = "       %.0f" % GameState.medals
+	medals_label.text = "       %s" % GameState.format_number(GameState.medals)
 
 func _hide_all_panels() -> void:
 	balls_panel.visible = false
