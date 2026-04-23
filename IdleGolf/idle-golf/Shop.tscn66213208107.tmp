@@ -9,17 +9,6 @@
 [ext_resource type="Texture2D" uid="uid://cheex54y110pu" path="res://GolferShopIconPressed.png" id="7_wr8g1"]
 [ext_resource type="Texture2D" uid="uid://dpv81vqp6fcrk" path="res://CourseShopIcon.png" id="8_bmy5l"]
 [ext_resource type="Texture2D" uid="uid://djnsgelx8v0i1" path="res://CourseShopIconPressed.png" id="9_u5mf3"]
-[ext_resource type="Texture2D" uid="uid://b6b16odt5uhws" path="res://MedalAndExitSign.png" id="10_6epge"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6epge"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cl6py"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_wr8g1"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bmy5l"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_u5mf3"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_db8k6"]
 
@@ -65,18 +54,14 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 35.0
-offset_top = -950.0
-offset_right = 300.0
-offset_bottom = -835.0
+offset_left = 15.0
+offset_top = -115.0
+offset_right = 189.0
+offset_bottom = -19.0
 grow_vertical = 0
 theme_override_fonts/font = ExtResource("3_f511j")
 theme_override_font_sizes/font_size = 64
-theme_override_styles/normal = SubResource("StyleBoxEmpty_6epge")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_cl6py")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_wr8g1")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_bmy5l")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_u5mf3")
+text = "BACK"
 
 [node name="MedalsLabel" type="Label" parent="." unique_id=229128025]
 layout_mode = 0
@@ -173,24 +158,3 @@ size_flags_vertical = 4
 theme_override_styles/normal = SubResource("StyleBoxTexture_8rl2n")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_olj3c")
 theme_override_styles/hover = SubResource("StyleBoxTexture_8rl2n")
-
-[node name="MedalAndExitTexture" type="TextureRect" parent="." unique_id=1308032950]
-texture_filter = 1
-layout_mode = 1
-offset_left = 5.0
-offset_right = 330.0
-offset_bottom = 245.0
-mouse_filter = 2
-texture = ExtResource("10_6epge")
-
-[node name="MedalsLabel" type="Label" parent="MedalAndExitTexture" unique_id=920648914]
-layout_mode = 0
-offset_left = 60.0
-offset_top = 6.0
-offset_right = 295.0
-offset_bottom = 55.0
-theme_override_colors/font_color = Color(0.40784314, 0.40784314, 0.40784314, 1)
-theme_override_fonts/font = ExtResource("3_f511j")
-theme_override_font_sizes/font_size = 48
-text = "Medals"
-vertical_alignment = 1

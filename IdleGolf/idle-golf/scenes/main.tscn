@@ -2,8 +2,10 @@
 
 [ext_resource type="Script" uid="uid://wqdug6vmrqs0" path="res://main.gd" id="1_0wfyh"]
 [ext_resource type="Script" uid="uid://dyg5jvssl6fxu" path="res://scenes/UpgradeShop.gd" id="2_tbgi4"]
+[ext_resource type="Texture2D" uid="uid://bq4vjd2tsujup" path="res://AimSlider.png" id="3_ih3m7"]
 [ext_resource type="Texture2D" uid="uid://c1u0p70utp4s1" path="res://scenes/ShopSignAnimation-export.png" id="3_xrs0c"]
 [ext_resource type="Texture2D" uid="uid://bp7y27ehp5b5j" path="res://LeftBarWholeBackground.png" id="3_y57op"]
+[ext_resource type="Texture2D" uid="uid://c4jrxuodo0atc" path="res://AimBar.png" id="4_11yus"]
 [ext_resource type="Texture2D" uid="uid://b8l1suyvq4pm6" path="res://GolfSwing-Sheet.png" id="4_tbgi4"]
 [ext_resource type="Script" uid="uid://dvlxily612f3h" path="res://scenes/golfer.gd" id="4_tefeu"]
 [ext_resource type="FontFile" uid="uid://dg4ug6srbh1wt" path="res://balatro.otf" id="4_trceg"]
@@ -103,6 +105,16 @@ sky_material = SubResource("ProceduralSkyMaterial_0xm2m")
 [sub_resource type="Environment" id="Environment_1bvp3"]
 background_mode = 2
 sky = SubResource("Sky_h2yge")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_b6ruc"]
+texture = ExtResource("4_11yus")
+texture_margin_top = 50.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_155or"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ih3m7"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xrs0c"]
 
@@ -352,16 +364,25 @@ autostart = true
 script = ExtResource("2_tbgi4")
 
 [node name="AimSlider" type="HSlider" parent="CanvasLayer" unique_id=811697383]
+texture_filter = 1
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -350.0
-offset_top = -77.0
-offset_right = 350.0
+offset_left = -270.0
+offset_top = -78.0
+offset_right = 270.0
+offset_bottom = -1.0014648
 grow_horizontal = 2
 grow_vertical = 0
+pivot_offset_ratio = Vector2(0.5, 0)
+theme_override_icons/grabber = ExtResource("3_ih3m7")
+theme_override_icons/grabber_highlight = ExtResource("3_ih3m7")
+theme_override_icons/grabber_disabled = ExtResource("3_ih3m7")
+theme_override_styles/slider = SubResource("StyleBoxTexture_b6ruc")
+theme_override_styles/grabber_area = SubResource("StyleBoxEmpty_155or")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxEmpty_ih3m7")
 min_value = -1.0
 max_value = 1.0
 step = 0.01
@@ -1321,7 +1342,7 @@ flag_texture = ExtResource("6_o6xl0")
 
 [node name="Level2Flags" type="Node3D" parent="." unique_id=1087643447]
 
-[node name="Flag" parent="Level2Flags" unique_id=1248909520 instance=ExtResource("9_85g3d")]
+[node name="Flag" parent="Level2Flags" unique_id=1248909520 groups=["flags"] instance=ExtResource("9_85g3d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 201.52298)
 radius_x = 20.0
 radius_z = 20.0

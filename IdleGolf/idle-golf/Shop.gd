@@ -4,7 +4,7 @@ signal shop_closed
 
 const ShopItem = preload("res://ShopItem.tscn")
 
-@onready var medals_label: Label = $MedalsLabel
+@onready var medals_label: Label = $MedalAndExitTexture/MedalsLabel
 @onready var back_button: Button = $BackButton
 @onready var balls_panel = $BallsPanel
 @onready var golfers_panel = $ClubsPanel
@@ -15,41 +15,23 @@ const ShopItem = preload("res://ShopItem.tscn")
 @onready var balls_tab: Button = $Panel/VBoxContainer/TabBar/BallsTabBtn
 @onready var golfers_tab: Button = $Panel/VBoxContainer/TabBar/ClubsTabBtn
 @onready var courses_tab: Button = $Panel/VBoxContainer/TabBar/CoursesTabBtn
-@onready var relics_tab: Button = $Panel/VBoxContainer/TabBar/RelicsTabBtn
-@onready var relics_panel = $RelicsPanel
-
-var _medal_icon: TextureRect
 
 func _ready() -> void:
 	back_button.pressed.connect(_on_back_pressed)
 	balls_tab.pressed.connect(_show_balls)
 	golfers_tab.pressed.connect(_show_golfers)
 	courses_tab.pressed.connect(_show_courses)
-	relics_tab.pressed.connect(_show_relics)
-	_setup_medal_icon()
 	_update_medals_label()
 	_populate_shop()
 	_show_balls()  # default tab
 
-func _setup_medal_icon() -> void:
-	_medal_icon = TextureRect.new()
-	_medal_icon.texture = preload("res://MedalIcon.png")
-	_medal_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	_medal_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	_medal_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_medal_icon.custom_minimum_size = Vector2(48, 48)
-	medals_label.clip_contents = false
-	medals_label.add_child(_medal_icon)
-	_medal_icon.set_deferred("position", Vector2(0, (medals_label.size.y - 48) / 2))
-
 func _update_medals_label() -> void:
-	medals_label.text = "       %s" % GameState.format_number(GameState.medals)
+	medals_label.text = GameState.format_number(GameState.medals)
 
 func _hide_all_panels() -> void:
 	balls_panel.visible = false
 	golfers_panel.visible = false
 	courses_panel.visible = false
-	relics_panel.visible = false
 
 func _show_balls() -> void:
 	_hide_all_panels()
@@ -62,10 +44,6 @@ func _show_golfers() -> void:
 func _show_courses() -> void:
 	_hide_all_panels()
 	courses_panel.visible = true
-
-func _show_relics() -> void:
-	_hide_all_panels()
-	relics_panel.visible = true
 
 func _populate_shop() -> void:
 	for child in ball_list.get_children():

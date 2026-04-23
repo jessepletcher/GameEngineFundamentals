@@ -79,26 +79,6 @@ var courses = {
 	"course2": {"name": "Course 2", "desc": "A new challenge", "medal_cost": 10, "owned": false, "unlock_level": 8},
 }
 
-var relics = {
-	"speed_i":       {"name": "Swift Shoes",      "desc": "+5% ball speed",     "stat": "ball_speed",  "bonus": 0.05, "rarity": "common",    "owned": false},
-	"speed_ii":      {"name": "Turbo Cleats",     "desc": "+10% ball speed",    "stat": "ball_speed",  "bonus": 0.10, "rarity": "rare",      "owned": false},
-	"speed_iii":     {"name": "Rocket Boots",     "desc": "+20% ball speed",    "stat": "ball_speed",  "bonus": 0.20, "rarity": "legendary", "owned": false},
-	"money_i":       {"name": "Lucky Coin",       "desc": "+5% money",          "stat": "money_mult",  "bonus": 0.05, "rarity": "common",    "owned": false},
-	"money_ii":      {"name": "Golden Gloves",    "desc": "+15% money",         "stat": "money_mult",  "bonus": 0.15, "rarity": "rare",      "owned": false},
-	"money_iii":     {"name": "Midas Touch",      "desc": "+30% money",         "stat": "money_mult",  "bonus": 0.30, "rarity": "legendary", "owned": false},
-	"fire_i":        {"name": "Quick Grip",       "desc": "+5% fire rate",      "stat": "fire_rate",   "bonus": 0.05, "rarity": "common",    "owned": false},
-	"fire_ii":       {"name": "Steady Hands",     "desc": "+12% fire rate",     "stat": "fire_rate",   "bonus": 0.12, "rarity": "rare",      "owned": false},
-	"fire_iii":      {"name": "Rapid Driver",     "desc": "+25% fire rate",     "stat": "fire_rate",   "bonus": 0.25, "rarity": "legendary", "owned": false},
-	"consist_i":     {"name": "Focus Band",       "desc": "+8% consistency",    "stat": "consistency", "bonus": 0.08, "rarity": "common",    "owned": false},
-	"consist_ii":    {"name": "Zen Stone",        "desc": "+15% consistency",   "stat": "consistency", "bonus": 0.15, "rarity": "rare",      "owned": false},
-	"xp_i":          {"name": "Study Guide",      "desc": "+10% XP",            "stat": "xp_mult",     "bonus": 0.10, "rarity": "common",    "owned": false},
-	"xp_ii":         {"name": "Knowledge Crown",  "desc": "+20% XP",            "stat": "xp_mult",     "bonus": 0.20, "rarity": "rare",      "owned": false},
-}
-
-var unbox_count := 0
-const UNBOX_BASE_COST := 5.0
-const UNBOX_COST_MULT := 1.2
-
 
 var equipped_ball: String = "standard"
 var equipped_golfer: String = "standard"
@@ -219,10 +199,6 @@ func full_reset() -> void:
 	for key in courses:
 		courses[key]["owned"] = (key == "course1")
 
-	for key in relics:
-		relics[key]["owned"] = false
-	unbox_count = 0
-
 	money_changed.emit(money)
 	medals_changed.emit(medals)
 	xp_changed.emit(xp, xp_to_next_level)
@@ -264,10 +240,6 @@ func save() -> void:
 	for key in courses:
 		config.set_value("courses", key, courses[key]["owned"])
 
-	for key in relics:
-		config.set_value("relics", key, relics[key]["owned"])
-	config.set_value("player", "unbox_count", unbox_count)
-
 	config.save(SAVE_PATH)
 
 func load_game() -> void:
@@ -304,18 +276,14 @@ func load_game() -> void:
 	for key in courses:
 		courses[key]["owned"] = config.get_value("courses", key, false)
 
-	for key in relics:
-		relics[key]["owned"] = config.get_value("relics", key, false)
-	unbox_count = config.get_value("player", "unbox_count", 0)
-
 func add_xp(amount: float) -> void:
 	var gained = amount * get_xp_mult()
 	xp += gained
 	lifetime_xp += gained
-	xp_changed.emit(xp, xp_to_next_level)
 	while xp >= xp_to_next_level:
 		xp -= xp_to_next_level
 		_level_up()
+	xp_changed.emit(xp, xp_to_next_level)
 
 func _level_up() -> void:
 	level += 1
@@ -362,27 +330,17 @@ func try_purchase(upgrade: String) -> bool:
 func get_golfer_data() -> Dictionary:
 	return golfers[equipped_golfer]
 
-func get_relic_bonus(stat: String) -> float:
-	var total := 0.0
-	for key in relics:
-		if relics[key]["owned"] and relics[key]["stat"] == stat:
-			total += relics[key]["bonus"]
-	return total
-
-func get_unbox_cost() -> float:
-	return floor(UNBOX_BASE_COST * pow(UNBOX_COST_MULT, unbox_count))
-
 func get_ball_speed() -> float:
-	return (1.0 + upgrades["ball_speed"]["level"] * 0.04) * get_level_mult("ball_speed") * get_golfer_data()["speed_mult"] * (1.0 + get_relic_bonus("ball_speed"))
+	return (1.0 + upgrades["ball_speed"]["level"] * 0.04) * get_level_mult("ball_speed") * get_golfer_data()["speed_mult"]
 
 func get_fire_rate() -> float:
-	return (1.0 + upgrades["fire_rate"]["level"] * 0.03) * get_level_mult("fire_rate") * get_golfer_data()["fire_rate_mult"] * (1.0 + get_relic_bonus("fire_rate"))
+	return (1.0 + upgrades["fire_rate"]["level"] * 0.03) * get_level_mult("fire_rate") * get_golfer_data()["fire_rate_mult"]
 
 func get_money_mult() -> float:
-	return (1.0 + upgrades["money_mult"]["level"] * 0.09) * get_level_mult("money_mult") * get_golfer_data()["money_mult"] * (1.0 + get_relic_bonus("money_mult"))
+	return (1.0 + upgrades["money_mult"]["level"] * 0.09) * get_level_mult("money_mult") * get_golfer_data()["money_mult"]
 
 func get_consistency() -> float:
-	return (0.5 + upgrades["consistency"]["level"] * .1) * get_level_mult("consistency") * (1.0 + get_relic_bonus("consistency"))
+	return (0.5 + upgrades["consistency"]["level"] * .1) * get_level_mult("consistency")
 
 func get_xp_mult() -> float:
-	return (1.0 + upgrades["xp_mult"]["level"] * 0.09) * get_level_mult("xp_mult") * (1.0 + get_relic_bonus("xp_mult"))
+	return (1.0 + upgrades["xp_mult"]["level"] * 0.09) * get_level_mult("xp_mult")
