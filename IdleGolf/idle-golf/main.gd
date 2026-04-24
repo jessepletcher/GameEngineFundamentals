@@ -224,6 +224,7 @@ func _on_open_shop_pressed() -> void:
 	GameState.save()
 	if _shop_instance or _transitioning:
 		return
+	AudioManager.play_sfx("bell")
 	_transitioning = true
 	AudioManager.music_player.stream_paused = true
 	AudioManager.ambience_player.stream_paused = true
