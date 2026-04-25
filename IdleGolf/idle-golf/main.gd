@@ -12,6 +12,8 @@ const Ball = preload("res://scenes/Ball.tscn")
 @onready var level1_flags = $Level1Flags
 @onready var level2_sprites = $Level2
 @onready var level2_flags = $Level2Flags
+@onready var level3_sprites = $Level3
+@onready var level3_flags = $Level3Flags
 @onready var open_shop_button: Button = $CanvasLayer/OpenShopButton
 @onready var xp_progress: ProgressBar = $CanvasLayer/LeftVBox/XPBar/XPProgress
 @onready var level_label: Label = $CanvasLayer/LeftVBox/XPBar/LevelLabel
@@ -56,6 +58,7 @@ const GOLDEN_FLAG_INTERVAL_MAX := 40.0
 var _course_data := {
 	"course1": {"sprites": null, "flags": null},
 	"course2": {"sprites": null, "flags": null},
+	"course3": {"sprites": null, "flags": null},
 }
 
 func _get_active_flags() -> Node3D:
@@ -93,6 +96,8 @@ func _ready() -> void:
 	_course_data["course1"]["flags"] = level1_flags
 	_course_data["course2"]["sprites"] = level2_sprites
 	_course_data["course2"]["flags"] = level2_flags
+	_course_data["course3"]["sprites"] = level3_sprites
+	_course_data["course3"]["flags"] = level3_flags
 	_switch_course()
 	GameState.course_changed.connect(_switch_course)
 	money_label.text = GameState.format_number(GameState.money)

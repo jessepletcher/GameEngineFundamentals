@@ -6,9 +6,8 @@
 [node name="Flag" type="Node3D" unique_id=196980026]
 script = ExtResource("1_xhxf4")
 
-[node name="Sprite3D" type="Sprite3D" parent="." unique_id=783599252]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
-offset = Vector2(0, 32.02)
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1432428472]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.64967847, 0)
 texture_filter = 0
 texture = ExtResource("1_oftpb")
 
