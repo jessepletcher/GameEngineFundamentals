@@ -21,6 +21,12 @@
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_u5mf3"]
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8rl2n"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_olj3c"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_yfn0r"]
+
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_db8k6"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vdbi3"]
@@ -92,6 +98,7 @@ offset_left = 1200.0
 offset_top = 155.0
 offset_right = 1724.0
 offset_bottom = 155.0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_8rl2n")
 
 [node name="BallList" type="VBoxContainer" parent="BallsPanel" unique_id=792553906]
 layout_mode = 2
@@ -102,6 +109,7 @@ offset_left = 1200.0
 offset_top = 155.0
 offset_right = 1724.0
 offset_bottom = 155.0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_olj3c")
 
 [node name="ClubList" type="VBoxContainer" parent="ClubsPanel" unique_id=1555220713]
 layout_mode = 2
@@ -112,6 +120,7 @@ offset_left = 1200.0
 offset_top = 155.0
 offset_right = 1724.0
 offset_bottom = 155.0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_yfn0r")
 
 [node name="CourseList" type="VBoxContainer" parent="CoursesPanel" unique_id=505792622]
 layout_mode = 2

@@ -80,6 +80,20 @@
 [ext_resource type="Texture2D" uid="uid://di2f6fqtsvpdm" path="res://WaterTower.png" id="74_ygd8o"]
 [ext_resource type="Texture2D" uid="uid://bnc70jy861j2h" path="res://Target.png" id="75_2s0kr"]
 [ext_resource type="Texture2D" uid="uid://c2mmos8ylkods" path="res://HotAirBalloon.png" id="76_xaipn"]
+[ext_resource type="Texture2D" uid="uid://c78hy8wb8gm8o" path="res://BackgroundSprites/Desert/Ground.png" id="83_b6ruc"]
+[ext_resource type="Texture2D" uid="uid://dryusptu11eab" path="res://BackgroundSprites/Desert/Sky.png" id="84_155or"]
+[ext_resource type="Texture2D" uid="uid://cd0p6vuquyoeh" path="res://BackgroundSprites/Desert/FrontGrass.png" id="85_r4ag1"]
+[ext_resource type="Texture2D" uid="uid://b1lw4geijapjd" path="res://BackgroundSprites/Desert/LeftCactus.png" id="86_v0wtd"]
+[ext_resource type="Texture2D" uid="uid://bgvdae2t56g4l" path="res://BackgroundSprites/Desert/RightCactus.png" id="87_sgvw8"]
+[ext_resource type="Texture2D" uid="uid://v8ensjdn46xo" path="res://BackgroundSprites/Desert/BackGrass.png" id="88_6nfnn"]
+[ext_resource type="Texture2D" uid="uid://3crldvxhau4t" path="res://BackgroundSprites/Desert/OilPump.png" id="89_4ue30"]
+[ext_resource type="Texture2D" uid="uid://ct00nro74o6to" path="res://BackgroundSprites/Desert/PalmTrees.png" id="90_k42av"]
+[ext_resource type="Texture2D" uid="uid://7icwp26vx4wk" path="res://BackgroundSprites/Desert/Dunes.png" id="91_v0wtd"]
+[ext_resource type="Texture2D" uid="uid://cuy6cjdqaeam" path="res://BackgroundSprites/Desert/FrontHills.png" id="92_4ue30"]
+[ext_resource type="Texture2D" uid="uid://cwsp51o6u0jwa" path="res://BackgroundSprites/Desert/BackHills.png" id="93_k42av"]
+[ext_resource type="Texture2D" uid="uid://b7br5kequhfxt" path="res://BackgroundSprites/Desert/Pyramids.png" id="94_gr8w0"]
+[ext_resource type="Texture2D" uid="uid://bryp8xxpvjdff" path="res://BackgroundSprites/Desert/Clouds.png" id="95_k42av"]
+[ext_resource type="Texture2D" uid="uid://uye3qry700sk" path="res://BackgroundSprites/Desert/Blimp.png" id="96_gr8w0"]
 [ext_resource type="Script" uid="uid://dvcvompk6cw5p" path="res://DebugCamera.gd" id="debug_cam"]
 [ext_resource type="Script" uid="uid://4viempthtba8" path="res://ShopSignAnimation.gd" id="shopsign_script"]
 
@@ -1095,6 +1109,7 @@ shape = SubResource("BoxShape3D_jyhfs")
 
 [node name="Level1" type="Node3D" parent="." unique_id=193502691]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 0)
+visible = false
 
 [node name="ScaledSprite" parent="Level1" unique_id=1933655206 instance=ExtResource("51_bu4jf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 58.110775)
@@ -1316,6 +1331,7 @@ visible = false
 mesh = SubResource("BoxMesh_xaipn")
 
 [node name="Level1Flags" type="Node3D" parent="." unique_id=1592995379]
+visible = false
 
 [node name="BlackFlag" parent="Level1Flags" unique_id=196980026 groups=["flags"] instance=ExtResource("9_85g3d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 200)
@@ -1339,6 +1355,109 @@ distance_mult = 1.5
 flag_texture = ExtResource("6_o6xl0")
 
 [node name="Level2" type="Node3D" parent="." unique_id=653858414]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.741, 0)
+
+[node name="ScaledSprite7" parent="Level2" unique_id=2063711652 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 899)
+texture = ExtResource("83_b6ruc")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+
+[node name="ScaledSprite8" parent="Level2" unique_id=1483864395 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5000)
+texture = ExtResource("84_155or")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+
+[node name="ScaledSprite9" parent="Level2" unique_id=717877215 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 30)
+texture = ExtResource("85_r4ag1")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+
+[node name="ScaledSprite10" parent="Level2" unique_id=281727016 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 45)
+texture = ExtResource("86_v0wtd")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+
+[node name="ScaledSprite11" parent="Level2" unique_id=348819401 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 45)
+texture = ExtResource("87_sgvw8")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+
+[node name="ScaledSprite12" parent="Level2" unique_id=1393090707 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 55)
+texture = ExtResource("88_6nfnn")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+
+[node name="ScaledSprite13" parent="Level2" unique_id=1113275809 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 100)
+texture = ExtResource("89_4ue30")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+
+[node name="ScaledSprite14" parent="Level2" unique_id=1838361981 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 200)
+texture = ExtResource("90_k42av")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+
+[node name="ScaledSprite15" parent="Level2" unique_id=213662513 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 400)
+texture = ExtResource("91_v0wtd")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+
+[node name="ScaledSprite16" parent="Level2" unique_id=1609351385 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 600)
+texture = ExtResource("92_4ue30")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+
+[node name="ScaledSprite17" parent="Level2" unique_id=36733592 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 900)
+texture = ExtResource("93_k42av")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+
+[node name="ScaledSprite18" parent="Level2" unique_id=573801585 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2000)
+texture = ExtResource("94_gr8w0")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+
+[node name="ScaledSprite19" parent="Level2" unique_id=52438207 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4000)
+texture = ExtResource("95_k42av")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+bob_enabled = true
+bob_height = 8.0
+
+[node name="ScaledSprite20" parent="Level2" unique_id=604309853 instance=ExtResource("51_bu4jf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 800)
+texture = ExtResource("96_gr8w0")
+flip_h = true
+pixel_offset = Vector2(0, 0)
+sprite_scale = 0.2
+bob_enabled = true
+bob_height = 6.0
 
 [node name="Level2Flags" type="Node3D" parent="." unique_id=1087643447]
 
