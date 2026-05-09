@@ -193,6 +193,7 @@ func _on_destructible_destroyed(reward: float) -> void:
 	_text_queue.append({"money": reward, "yards": 0.0, "flag_hit": false, "direct_hit": true})
 	if not _queue_processing:
 		_process_text_queue()
+	_show_target_destroyed_banner()
 
 func _on_xp_changed(current_xp: float, required_xp: float) -> void:
 	xp_progress.max_value = required_xp
@@ -976,3 +977,107 @@ func _show_gold_flag_banner() -> void:
 	pop.tween_interval(2.0)
 	pop.tween_property(banner, "modulate:a", 0.0, 0.5)
 	pop.tween_callback(banner.queue_free)
+
+# ---------- TARGET DESTROYED banner ----------
+
+const BRACKET_TRAVEL := 220.0
+const SLAM_DELAY := 0.28
+
+func _show_target_destroyed_banner() -> void:
+	var screen_w: float = get_viewport().get_visible_rect().size.x
+	var screen_h: float = get_viewport().get_visible_rect().size.y
+
+	var banner := Control.new()
+	banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	banner.position = Vector2(screen_w / 2.0, screen_h / 2.0)
+	$CanvasLayer.add_child(banner)
+
+	var text := "TARGET DESTROYED"
+	var font: Font = load("res://balatro.otf")
+	var font_size := 88
+	var red := Color(1.0, 0.25, 0.2)
+
+	var text_size: Vector2 = font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
+	var pad := 40.0
+	var half_w: float = text_size.x / 2.0 + pad
+	var half_h: float = text_size.y / 2.0 + pad
+
+	# main text label, centered, hidden until slam
+	var lbl := Label.new()
+	lbl.text = text
+	lbl.add_theme_font_override("font", font)
+	lbl.add_theme_font_size_override("font_size", font_size)
+	lbl.add_theme_color_override("font_color", red)
+	lbl.size = text_size
+	lbl.position = -text_size / 2.0
+	lbl.pivot_offset = text_size / 2.0
+	lbl.scale = Vector2(4.0, 4.0)
+	lbl.modulate.a = 0.0
+	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	banner.add_child(lbl)
+
+	AudioManager.play_sfx("beep")
+	get_tree().create_timer(0.12).timeout.connect(func(): AudioManager.play_sfx("beep"))
+	# 4 corner brackets — start offscreen direction, travel inward
+	var bracket_chars := ["┌", "┐", "└", "┘"]
+	var corners := [
+		Vector2(-half_w, -half_h),
+		Vector2(half_w, -half_h),
+		Vector2(-half_w, half_h),
+		Vector2(half_w, half_h),
+	]
+	var travel_dirs := [
+		Vector2(-1, -1),
+		Vector2(1, -1),
+		Vector2(-1, 1),
+		Vector2(1, 1),
+	]
+	for i in 4:
+		var br := Label.new()
+		br.text = bracket_chars[i]
+		br.add_theme_font_override("font", font)
+		br.add_theme_font_size_override("font_size", 96)
+		br.add_theme_color_override("font_color", red)
+		br.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var br_size: Vector2 = font.get_string_size(bracket_chars[i], HORIZONTAL_ALIGNMENT_LEFT, -1, 96)
+		var final_pos: Vector2 = corners[i] - br_size / 2.0
+		var start_pos: Vector2 = final_pos + travel_dirs[i] * BRACKET_TRAVEL
+		br.position = start_pos
+		banner.add_child(br)
+
+		var bt := create_tween()
+		bt.tween_property(br, "position", final_pos, SLAM_DELAY).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+	# slam in the text after brackets converge
+	var slam := create_tween()
+	slam.tween_interval(SLAM_DELAY)
+	slam.tween_callback(func():
+		AudioManager.play_sfx("thud")
+		_screen_shake(8.0, 0.18)
+	)
+	slam.parallel().tween_property(lbl, "scale", Vector2.ONE, 0.09).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	slam.parallel().tween_property(lbl, "modulate:a", 1.0, 0.06)
+
+	# hold then fade
+	slam.tween_interval(1.4)
+	slam.tween_property(banner, "modulate:a", 0.0, 0.4)
+	slam.tween_callback(banner.queue_free)
+
+# ---------- screen shake ----------
+
+var _shake_tween: Tween
+
+func _screen_shake(amount: float, duration: float) -> void:
+	if _transitioning:
+		return
+	if _shake_tween and _shake_tween.is_valid():
+		_shake_tween.kill()
+	var base: Vector2 = $CanvasLayer.offset
+	_shake_tween = create_tween()
+	var steps := 8
+	var step_dur: float = duration / float(steps)
+	for i in steps:
+		var falloff: float = 1.0 - float(i) / float(steps)
+		var jitter := Vector2(randf_range(-amount, amount), randf_range(-amount, amount)) * falloff
+		_shake_tween.tween_property($CanvasLayer, "offset", base + jitter, step_dur)
+	_shake_tween.tween_property($CanvasLayer, "offset", base, step_dur)

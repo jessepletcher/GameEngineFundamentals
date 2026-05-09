@@ -11,18 +11,22 @@ var _sounds := {
 	"bell": preload("res://BellSound.mp3"),
 	"casino": preload("res://Casino2.mp3"),
 	"coin": preload("res://Coin.mp3"),
+	"thud": preload("res://Thud.mp3"),
+	"beep": preload("res://Beep.mp3"),
 }
 
 # Volume controls (0.0 to 1.0) — edit in Project > AutoLoad > AudioManager node inspector
 @export_range(0.0, 1.0) var hit_volume := .03
 @export_range(0.0, 1.0) var flag_volume := 0.01
 @export_range(0.0, 1.0) var flag_stick_volume := 0.05
-@export_range(0.0, 1.0) var destroy_volume := .008
+@export_range(0.0, 1.0) var destroy_volume := .012
 @export_range(0.0, 1.0) var button_volume := .5
 @export_range(0.0, 1.0) var blink_volume := 0.05
 @export_range(0.0, 1.0) var bell_volume := 0.5
 @export_range(0.0, 1.0) var casino_volume := 0.05
 @export_range(0.0, 1.0) var coin_volume := 0.10
+@export_range(0.0, 1.0) var thud_volume := 0.1
+@export_range(0.0, 1.0) var beep_volume := 0.025
 @export_range(0.0, 1.0) var music_volume := 0.05
 @export_range(0.0, 1.0) var ambience_volume := 0.3
 
@@ -48,6 +52,8 @@ func _ready() -> void:
 		"bell": func(): return bell_volume,
 		"casino": func(): return casino_volume,
 		"coin": func(): return coin_volume,
+		"thud": func(): return thud_volume,
+		"beep": func(): return beep_volume,
 	}
 
 	# build player pool
