@@ -42,6 +42,19 @@ const TEXT_QUEUE_INTERVAL := 0.15
 const MAX_INDIVIDUAL_TEXTS := 4  # show this many individually, then batch the rest
 var _settings_panel: PanelContainer
 
+# hole-out combo
+var _combo_count: int = 0
+var _combo_timer: Timer
+var _combo_banner: Control
+var _combo_banner_tween: Tween
+const COMBO_RESET_DELAY := 4.0
+
+# money label animation
+var _displayed_money: float = 0.0
+var _money_count_tween: Tween
+var _money_pulse_tween: Tween
+var _money_label_base_color: Color = Color(0.082, 0.502, 0.098)
+
 # Market Ball — invested money per flag
 var _market_investments := {}  # flag node -> invested money
 var _market_labels := {}  # flag node -> Label3D showing invested amount
@@ -95,7 +108,9 @@ func _ready() -> void:
 	_course_data["course2"]["flags"] = level2_flags
 	_switch_course()
 	GameState.course_changed.connect(_switch_course)
+	_displayed_money = GameState.money
 	money_label.text = GameState.format_number(GameState.money)
+	_money_label_base_color = money_label.get_theme_color("font_color")
 	level_label.text = "Level %d" % GameState.level
 	xp_progress.max_value = GameState.xp_to_next_level
 	xp_progress.value = GameState.xp
@@ -163,6 +178,7 @@ func _ready() -> void:
 	_start_golden_timer()
 
 	_show_all_yardage()
+	_setup_combo_banner()
 
 func _show_all_yardage() -> void:
 	for obj in get_tree().get_nodes_in_group("destructibles"):
@@ -285,7 +301,32 @@ func _on_golfer_swung() -> void:
 
 
 func _on_money_changed(new_amount: float) -> void:
-	money_label.text = GameState.format_number(new_amount)
+	if _money_count_tween and _money_count_tween.is_valid():
+		_money_count_tween.kill()
+	var gained := new_amount > _displayed_money
+	_money_count_tween = create_tween()
+	_money_count_tween.tween_method(_set_displayed_money, _displayed_money, new_amount, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	if gained:
+		_pulse_money_label()
+
+func _set_displayed_money(v: float) -> void:
+	_displayed_money = v
+	money_label.text = GameState.format_number(v)
+
+func _pulse_money_label() -> void:
+	if _money_pulse_tween and _money_pulse_tween.is_valid():
+		_money_pulse_tween.kill()
+	money_label.pivot_offset = money_label.size / 2.0
+	money_label.scale = Vector2(1.18, 1.18)
+	money_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.4))
+	_money_pulse_tween = create_tween().set_parallel(true)
+	_money_pulse_tween.tween_property(money_label, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_money_pulse_tween.tween_method(
+		func(c: Color): money_label.add_theme_color_override("font_color", c),
+		Color(1.0, 0.95, 0.4),
+		_money_label_base_color,
+		0.3
+	)
 
 func _on_ShotTimer_timeout() -> void:
 	shot_timer.wait_time = BASE_INTERVAL / GameState.get_fire_rate()
@@ -334,6 +375,11 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 
 	var final_money = base_money * GameState.get_money_mult()
 	var is_market = GameState.balls[GameState.equipped_ball].get("is_market", false)
+
+	if direct_hit:
+		_register_direct_hit()
+	else:
+		_register_miss()
 
 	if is_market and direct_hit and hit_flag:
 		# invest money into this flag instead of cashing
@@ -404,6 +450,7 @@ func _pinball_chain(ball: RigidBody3D, first_flag: Node3D) -> void:
 		# cash this flag hit
 		AudioManager.play_sfx("flag_stick")
 		flag._wiggle()
+		_register_direct_hit()
 		var flag_bonus = flag.global_position.z * 0.1 * flag.distance_mult
 		var flag_mult = GameState.balls[GameState.equipped_ball].get("flag_mult", 1.0)
 		var pin_money = (flag_bonus * flag_mult * 2.5) * GameState.get_money_mult()
@@ -496,6 +543,10 @@ func _on_golden_flag_hit(flag: Node3D, bonus: float) -> void:
 	_text_queue.append({"money": final_money, "yards": 0.0, "flag_hit": true, "direct_hit": true, "golden": true})
 	if not _queue_processing:
 		_process_text_queue()
+
+	AudioManager.play_sfx("casino")
+	_spawn_money_rain()
+	_show_gold_flag_banner()
 
 	# start timer for next golden flag
 	_start_golden_timer()
@@ -719,3 +770,209 @@ func _setup_settings_menu() -> void:
 		GameState.lifetime_money += 100000
 		GameState.money_changed.emit(GameState.money)
 	)
+
+# ---------- hole-out combo ----------
+
+func _setup_combo_banner() -> void:
+	_combo_banner = Control.new()
+	_combo_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_combo_banner.anchor_left = 0.5
+	_combo_banner.anchor_right = 0.5
+	_combo_banner.anchor_top = 0.0
+	_combo_banner.anchor_bottom = 0.0
+	_combo_banner.offset_left = 0
+	_combo_banner.offset_right = 0
+	_combo_banner.offset_top = 160
+	_combo_banner.offset_bottom = 160
+	_combo_banner.modulate.a = 0.0
+	$CanvasLayer.add_child(_combo_banner)
+
+	_combo_timer = Timer.new()
+	_combo_timer.one_shot = true
+	_combo_timer.wait_time = COMBO_RESET_DELAY
+	_combo_timer.timeout.connect(_on_combo_timeout)
+	add_child(_combo_timer)
+
+func _register_direct_hit() -> void:
+	_combo_count += 1
+	if _combo_count >= 2:
+		_show_combo_banner(_combo_count)
+	_combo_timer.start()
+
+func _register_miss() -> void:
+	_combo_count = 0
+	_combo_timer.stop()
+
+func _on_combo_timeout() -> void:
+	_combo_count = 0
+
+func _combo_color(combo: int) -> Color:
+	if combo < 3:
+		return Color.WHITE
+	elif combo < 5:
+		return Color(1.0, 0.95, 0.3)
+	elif combo < 8:
+		return Color(1.0, 0.55, 0.1)
+	elif combo < 12:
+		return Color(1.0, 0.25, 0.25)
+	else:
+		return Color(0.4, 0.9, 1.0)
+
+func _show_combo_banner(combo: int) -> void:
+	for child in _combo_banner.get_children():
+		child.queue_free()
+
+	var text := "HOLE OUT COMBO x%d" % combo
+	var font: Font = load("res://balatro.otf")
+	var font_size := int(64 + min(combo - 2, 10) * 4)
+	var color := _combo_color(combo)
+
+	var widths: Array = []
+	var total_width := 0.0
+	for c in text:
+		var w: float = font.get_string_size(c, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+		widths.append(w)
+		total_width += w
+
+	var x := -total_width / 2.0
+	for i in text.length():
+		var c := text[i]
+		var lbl := Label.new()
+		lbl.text = c
+		lbl.add_theme_font_override("font", font)
+		lbl.add_theme_font_size_override("font_size", font_size)
+		lbl.add_theme_color_override("font_color", color)
+		lbl.position = Vector2(x, 0)
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_combo_banner.add_child(lbl)
+		x += widths[i]
+
+		var bounce := create_tween()
+		bounce.tween_interval(i * 0.035)
+		bounce.tween_property(lbl, "position:y", -30.0, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		bounce.tween_property(lbl, "position:y", 0.0, 0.30).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+
+	if _combo_banner_tween and _combo_banner_tween.is_valid():
+		_combo_banner_tween.kill()
+	_combo_banner.modulate = Color(1, 1, 1, 1)
+	_combo_banner.scale = Vector2(1.3, 1.3)
+	_combo_banner_tween = create_tween()
+	_combo_banner_tween.tween_property(_combo_banner, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_combo_banner_tween.tween_interval(1.6)
+	_combo_banner_tween.tween_property(_combo_banner, "modulate:a", 0.0, 0.5)
+
+# ---------- gold flag effects ----------
+
+const MONEY_RAIN_COUNT := 35
+const MONEY_RAIN_DURATION := 2.0
+
+func _spawn_money_rain() -> void:
+	var dollar_tex: Texture2D = load("res://DollarBill.png")
+	var coin_tex: Texture2D = load("res://GoldCoin.png")
+
+	var layer := CanvasLayer.new()
+	layer.layer = 5
+	add_child(layer)
+
+	var spawn_interval: float = MONEY_RAIN_DURATION / float(MONEY_RAIN_COUNT)
+	for i in MONEY_RAIN_COUNT:
+		var spawn_at: float = i * spawn_interval
+		var spawn_tween := create_tween()
+		spawn_tween.tween_interval(spawn_at)
+		spawn_tween.tween_callback(_spawn_money_piece.bind(layer, dollar_tex, coin_tex))
+
+	var cleanup := create_tween()
+	cleanup.tween_interval(MONEY_RAIN_DURATION + 3.5)
+	cleanup.tween_callback(layer.queue_free)
+
+func _spawn_money_piece(layer: CanvasLayer, dollar_tex: Texture2D, coin_tex: Texture2D) -> void:
+	if not is_instance_valid(layer):
+		return
+	var screen_w: float = get_viewport().get_visible_rect().size.x
+	var screen_h: float = get_viewport().get_visible_rect().size.y
+
+	var sprite := TextureRect.new()
+	var is_coin := randf() < 0.5
+	sprite.texture = coin_tex if is_coin else dollar_tex
+	if is_coin:
+		AudioManager.play_sfx("coin")
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	sprite.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sz: float = randf_range(48.0, 96.0)
+	sprite.custom_minimum_size = Vector2(sz, sz)
+	sprite.size = Vector2(sz, sz)
+	sprite.pivot_offset = Vector2(sz, sz) / 2.0
+	var start_x: float = randf_range(-50.0, screen_w + 50.0)
+	sprite.position = Vector2(start_x, -sz - randf_range(0.0, 100.0))
+	sprite.rotation = randf_range(0.0, TAU)
+	layer.add_child(sprite)
+
+	var fall_dur: float = randf_range(1.1, 1.7)
+	var end_y: float = screen_h + sz + 50.0
+	var drift_x: float = sprite.position.x + randf_range(-80.0, 80.0)
+	var spin: float = randf_range(-TAU * 2.0, TAU * 2.0)
+
+	var t := create_tween().set_parallel(true)
+	t.tween_property(sprite, "position:y", end_y, fall_dur).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	t.tween_property(sprite, "position:x", drift_x, fall_dur).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_property(sprite, "rotation", sprite.rotation + spin, fall_dur)
+
+const GOLD_SHADES := [
+	Color(1.0, 0.84, 0.0),
+	Color(1.0, 0.9, 0.3),
+	Color(1.0, 0.95, 0.55),
+	Color(1.0, 1.0, 0.75),
+]
+
+func _show_gold_flag_banner() -> void:
+	var screen_w: float = get_viewport().get_visible_rect().size.x
+	var screen_h: float = get_viewport().get_visible_rect().size.y
+
+	var banner := Control.new()
+	banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	banner.position = Vector2(screen_w / 2.0, screen_h / 2.0)
+	$CanvasLayer.add_child(banner)
+
+	var text := "GOLD FLAG"
+	var font: Font = load("res://balatro.otf")
+	var font_size := 128
+
+	var widths: Array = []
+	var total_width := 0.0
+	for c in text:
+		var w: float = font.get_string_size(c, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+		widths.append(w)
+		total_width += w
+
+	var x := -total_width / 2.0
+	for i in text.length():
+		var c := text[i]
+		var lbl := Label.new()
+		lbl.text = c
+		lbl.add_theme_font_override("font", font)
+		lbl.add_theme_font_size_override("font_size", font_size)
+		lbl.add_theme_color_override("font_color", GOLD_SHADES[0])
+		lbl.position = Vector2(x, -font_size / 2.0)
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		banner.add_child(lbl)
+		x += widths[i]
+
+		var letter_idx := i
+		var bounce := create_tween()
+		bounce.tween_interval(letter_idx * 0.06)
+		bounce.tween_callback(func():
+			var shade: Color = GOLD_SHADES[letter_idx % GOLD_SHADES.size()]
+			lbl.add_theme_color_override("font_color", shade)
+		)
+		bounce.parallel().tween_property(lbl, "position:y", -font_size / 2.0 - 50.0, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		bounce.tween_property(lbl, "position:y", -font_size / 2.0, 0.35).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+		bounce.tween_callback(func():
+			lbl.add_theme_color_override("font_color", GOLD_SHADES[GOLD_SHADES.size() - 1])
+		)
+
+	banner.scale = Vector2(1.3, 1.3)
+	var pop := create_tween()
+	pop.tween_property(banner, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	pop.tween_interval(2.0)
+	pop.tween_property(banner, "modulate:a", 0.0, 0.5)
+	pop.tween_callback(banner.queue_free)
