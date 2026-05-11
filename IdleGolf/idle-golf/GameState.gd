@@ -61,22 +61,22 @@ var balls = {
 	"homing_ball": {"name": "Homing Ball", "desc": "Homes in on nearest flag", "medal_cost": 5, "owned": false, "speed_mult": 1.0, "money_mult": 1.5, "can_home": true, "trail_color": Color.LIME_GREEN, "texture": preload("res://HomingBalllIcon.png"), "flag_mult": 1.0, "unlock_level": 5},
 	"pin_seeker": {"name": "Pin Seeker", "desc": "2x flag bonus money", "medal_cost": 25, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.GOLD, "texture": preload("res://PinSeekBalllIcon.png"), "flag_mult": 2.0, "unlock_level": 15},
 	"firework": {"name": "Firework Ball", "desc": "Explodes into 6 balls at apex", "medal_cost": 60, "owned": false, "speed_mult": 1.0, "money_mult": 0.5, "can_home": false, "trail_color": Color.ORANGE_RED, "texture": preload("res://FireWorksBalllIcon.png"), "flag_mult": 1.0, "is_firework": true, "unlock_level": 30},
-	"market": {"name": "Market Ball", "desc": "Flag hits invest money, grows 10%/s. Miss to cash out!", "medal_cost": 40, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.CYAN, "texture": null, "flag_mult": 1.5, "is_market": true, "unlock_level": 20, "consistency_mult": 1.5},
-	"wrecking": {"name": "Wrecking Ball", "desc": "1.5x distance, 2x destructible money", "medal_cost": 30, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.DARK_GRAY, "texture": null, "flag_mult": 1.0, "destruct_mult": 2.0, "unlock_level": 12},
-	"pinball": {"name": "Pin Ball", "desc": "Hits a flag then flies to every other flag! 1.5x consistency", "medal_cost": 50, "owned": false, "speed_mult": 1.0, "money_mult": 0.7, "can_home": false, "trail_color": Color.MAGENTA, "texture": null, "flag_mult": 1.0, "consistency_mult": 10.5, "is_pinball": true, "unlock_level": 18},
+	"market": {"name": "Market Ball", "desc": "Flag hits invest money, grows 10%/s. Miss to cash out!", "medal_cost": 40, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.CYAN, "texture": preload("res://BallIcon.png"), "flag_mult": 1.5, "is_market": true, "unlock_level": 20, "consistency_mult": 1.5},
+	"wrecking": {"name": "Wrecking Ball", "desc": "1.5x distance, 2x destructible money", "medal_cost": 30, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.DARK_GRAY, "texture": preload("res://BallIcon.png"), "flag_mult": 1.0, "destruct_mult": 2.0, "unlock_level": 12},
+	"pinball": {"name": "Pin Ball", "desc": "Hits a flag then flies to every other flag! 1.5x consistency", "medal_cost": 50, "owned": false, "speed_mult": 1.0, "money_mult": 0.7, "can_home": false, "trail_color": Color.MAGENTA, "texture": preload("res://BallIcon.png"), "flag_mult": 1.0, "consistency_mult": 10.5, "is_pinball": true, "unlock_level": 18},
 }
 
 var golfers = {
-	"standard":    {"name": "Standard Golfer", "desc": "A reliable swing",             "medal_cost": 0,  "owned": true,  "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 1},
-	"power":       {"name": "Power Golfer",    "desc": "+15% distance, -5% fire rate", "medal_cost": 5,  "owned": false, "speed_mult": 1.15, "fire_rate_mult": 0.95, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 3},
-	"speedy":      {"name": "Speedy Golfer",   "desc": "+25% fire rate",               "medal_cost": 20, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.25, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 10},
-	"Lion Trees":      {"name": "Lion Trees",   "desc": "+25% money, +20% distance",   "medal_cost": 50, "owned": false, "speed_mult": 1.2, "fire_rate_mult": 1.0, "money_mult": 1.25, "spritesheet": "res://LionTreesSwing.png", "h_frames": 5, "frame_size": 96, "unlock_level": 25},
-	"construction":    {"name": "Construction Worker", "desc": "Destructibles respawn 50% faster", "medal_cost": 15, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.0, "respawn_mult": 0.5, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 7},
+	"standard":    {"name": "Standard Golfer", "desc": "A reliable swing",             "medal_cost": 0,  "owned": true,  "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 1, "texture": preload("res://BallIcon.png")},
+	"power":       {"name": "Power Golfer",    "desc": "+15% distance, -5% fire rate", "medal_cost": 5,  "owned": false, "speed_mult": 1.15, "fire_rate_mult": 0.95, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 3, "texture": preload("res://BallIcon.png")},
+	"speedy":      {"name": "Speedy Golfer",   "desc": "+25% fire rate",               "medal_cost": 20, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.25, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 10, "texture": preload("res://BallIcon.png")},
+	"Lion Trees":      {"name": "Lion Trees",   "desc": "+25% money, +20% distance",   "medal_cost": 50, "owned": false, "speed_mult": 1.2, "fire_rate_mult": 1.0, "money_mult": 1.25, "spritesheet": "res://LionTreesSwing.png", "h_frames": 5, "frame_size": 96, "unlock_level": 25, "texture": preload("res://BallIcon.png")},
+	"construction":    {"name": "Construction Worker", "desc": "Destructibles respawn 50% faster", "medal_cost": 15, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.0, "respawn_mult": 0.5, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 7, "texture": preload("res://BallIcon.png")},
 }
 
 var courses = {
-	"course1": {"name": "Driving Range", "desc": "The classic range", "medal_cost": 0, "owned": true, "unlock_level": 1},
-	"course2": {"name": "Course 2", "desc": "A new challenge", "medal_cost": 10, "owned": false, "unlock_level": 8},
+	"course1": {"name": "Driving Range", "desc": "The classic range", "medal_cost": 0, "owned": true, "unlock_level": 1, "texture": preload("res://BallIcon.png")},
+	"course2": {"name": "Course 2", "desc": "A new challenge", "medal_cost": 10, "owned": false, "unlock_level": 8, "texture": preload("res://BallIcon.png")},
 }
 
 
