@@ -767,8 +767,8 @@ func _setup_settings_menu() -> void:
 	)
 
 	money_btn.pressed.connect(func():
-		GameState.money += 100000
-		GameState.lifetime_money += 100000
+		GameState.money += 1000000
+		GameState.lifetime_money += 1000000
 		GameState.money_changed.emit(GameState.money)
 	)
 

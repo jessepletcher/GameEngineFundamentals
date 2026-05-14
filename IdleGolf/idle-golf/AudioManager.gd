@@ -40,6 +40,7 @@ var music_player: AudioStreamPlayer
 var ambience_player: AudioStreamPlayer
 
 var _volume_map := {}
+var _cleaned_up := false
 
 func _ready() -> void:
 	_volume_map = {
@@ -71,6 +72,8 @@ func _ready() -> void:
 	add_child(ambience_player)
 
 func play_sfx(sound_name: String) -> void:
+	if _is_headless():
+		return
 	if sfx_muted:
 		return
 	if not _sounds.has(sound_name):
@@ -87,16 +90,37 @@ func play_sfx(sound_name: String) -> void:
 	player.play()
 
 func play_music(stream: AudioStream) -> void:
+	if _is_headless():
+		return
 	music_player.stream = stream
 	music_player.volume_db = _volume_to_db(music_volume)
 	if not music_muted:
 		music_player.play()
 
 func play_ambience(stream: AudioStream) -> void:
+	if _is_headless():
+		return
 	ambience_player.stream = stream
 	ambience_player.volume_db = _volume_to_db(ambience_volume)
 	if not music_muted:
 		ambience_player.play()
+
+func cleanup_audio() -> void:
+	if _cleaned_up:
+		return
+	_cleaned_up = true
+	_stop_and_clear_player(music_player)
+	_stop_and_clear_player(ambience_player)
+	for player in _player_pool:
+		_stop_and_clear_player(player)
+	_sounds.clear()
+
+func _exit_tree() -> void:
+	cleanup_audio()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE:
+		cleanup_audio()
 
 func toggle_sfx_mute() -> void:
 	sfx_muted = !sfx_muted
@@ -117,6 +141,15 @@ func _get_free_player() -> AudioStreamPlayer:
 		if not p.playing:
 			return p
 	return _player_pool[0]
+
+func _stop_and_clear_player(player: AudioStreamPlayer) -> void:
+	if not player:
+		return
+	player.stop()
+	player.stream = null
+
+func _is_headless() -> bool:
+	return DisplayServer.get_name() == "headless"
 
 func _volume_to_db(vol: float) -> float:
 	if vol <= 0.0:

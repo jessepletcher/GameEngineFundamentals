@@ -268,13 +268,13 @@ func load_game() -> void:
 		level_bonuses[key] = config.get_value("level_bonuses", key, 0.0)
 
 	for key in balls:
-		balls[key]["owned"] = config.get_value("balls", key, false)
+		balls[key]["owned"] = config.get_value("balls", key, balls[key].get("owned", false))
 	
 	for key in golfers:
-		golfers[key]["owned"] = config.get_value("golfers", key, false)
+		golfers[key]["owned"] = config.get_value("golfers", key, golfers[key].get("owned", false))
 
 	for key in courses:
-		courses[key]["owned"] = config.get_value("courses", key, false)
+		courses[key]["owned"] = config.get_value("courses", key, courses[key].get("owned", false))
 
 func add_xp(amount: float) -> void:
 	var gained = amount * get_xp_mult()
