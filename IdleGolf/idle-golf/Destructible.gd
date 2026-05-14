@@ -136,6 +136,7 @@ func _crumble() -> void:
 	_spawn_reward_text(reward)
 
 	AudioManager.play_sfx("destroy")
+	_spawn_break_pieces()
 
 	var ds = _get_distance_scale()
 	var fall_distance = 3.0 * ds
@@ -199,6 +200,31 @@ func _fade_sprite() -> void:
 	var sprite_3d = scaled_sprite.get_node("Sprite3D")
 	var fade_tween = create_tween()
 	fade_tween.tween_property(sprite_3d, "modulate:a", 0.0, 0.3)
+
+func _spawn_break_pieces() -> void:
+	var sprite_3d: Sprite3D = scaled_sprite.get_node("Sprite3D")
+	var base_color: Color = sprite_3d.modulate
+	var effect_scale: float = clampf(_get_distance_scale() / 4.0, 0.25, 1.0)
+	for i in 14:
+		var piece := MeshInstance3D.new()
+		var box := BoxMesh.new()
+		var sz: float = randf_range(0.12, 0.34) * effect_scale
+		box.size = Vector3(sz, sz, sz)
+		piece.mesh = box
+		var mat := StandardMaterial3D.new()
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.albedo_color = base_color.lightened(randf_range(0.0, 0.25))
+		mat.roughness = 0.8
+		piece.material_override = mat
+		get_tree().current_scene.add_child(piece)
+		piece.global_position = collision_shape.global_position + Vector3(randf_range(-0.8, 0.8), randf_range(-0.3, 0.8), randf_range(-0.4, 0.4)) * effect_scale
+		piece.rotation = Vector3(randf(), randf(), randf()) * TAU
+		var scatter: Vector3 = Vector3(randf_range(-1.8, 1.8), randf_range(1.0, 3.2), randf_range(-1.4, 1.4)) * effect_scale
+		var tween := piece.create_tween().set_parallel(true)
+		tween.tween_property(piece, "global_position", piece.global_position + scatter, 0.65).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.tween_property(piece, "rotation", piece.rotation + Vector3(randf(), randf(), randf()) * TAU * 2.0, 0.65)
+		tween.tween_property(mat, "albedo_color:a", 0.0, 0.65).set_delay(0.25)
+		tween.chain().tween_callback(piece.queue_free)
 
 func _respawn() -> void:
 	_hits_taken = 0

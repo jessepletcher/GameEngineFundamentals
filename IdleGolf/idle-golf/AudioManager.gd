@@ -13,6 +13,7 @@ var _sounds := {
 	"coin": preload("res://Coin.mp3"),
 	"thud": preload("res://Thud.mp3"),
 	"beep": preload("res://Beep.mp3"),
+	"firework": preload("res://Firework.mp3"),
 }
 
 # Volume controls (0.0 to 1.0) — edit in Project > AutoLoad > AudioManager node inspector
@@ -27,6 +28,7 @@ var _sounds := {
 @export_range(0.0, 1.0) var coin_volume := 0.10
 @export_range(0.0, 1.0) var thud_volume := 0.1
 @export_range(0.0, 1.0) var beep_volume := 0.025
+@export_range(0.0, 1.0) var firework_volume := 0.1
 @export_range(0.0, 1.0) var music_volume := 0.05
 @export_range(0.0, 1.0) var ambience_volume := 0.3
 
@@ -55,6 +57,7 @@ func _ready() -> void:
 		"coin": func(): return coin_volume,
 		"thud": func(): return thud_volume,
 		"beep": func(): return beep_volume,
+		"firework": func(): return firework_volume,
 	}
 
 	# build player pool
@@ -71,7 +74,7 @@ func _ready() -> void:
 	ambience_player = AudioStreamPlayer.new()
 	add_child(ambience_player)
 
-func play_sfx(sound_name: String) -> void:
+func play_sfx(sound_name: String, pitch_scale: float = 1.0) -> void:
 	if _is_headless():
 		return
 	if sfx_muted:
@@ -87,6 +90,7 @@ func play_sfx(sound_name: String) -> void:
 	var vol = _volume_map[sound_name].call() if _volume_map.has(sound_name) else 1.0
 	player.stream = _sounds[sound_name]
 	player.volume_db = _volume_to_db(vol)
+	player.pitch_scale = pitch_scale
 	player.play()
 
 func play_music(stream: AudioStream) -> void:
@@ -140,7 +144,10 @@ func _get_free_player() -> AudioStreamPlayer:
 	for p in _player_pool:
 		if not p.playing:
 			return p
-	return _player_pool[0]
+	var p := AudioStreamPlayer.new()
+	add_child(p)
+	p.finished.connect(p.queue_free)
+	return p
 
 func _stop_and_clear_player(player: AudioStreamPlayer) -> void:
 	if not player:

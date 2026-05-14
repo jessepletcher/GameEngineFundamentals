@@ -54,6 +54,8 @@ var upgrades = {
 	"xp_mult":      {"level": 0, "base_cost": 20.0,  "label": "XP Multiplier"},
 	"flat_distance": {"level": 0, "base_cost": 8.0, "label": "Flat Distance", "use_medals": true},
 	"multi_ball": {"level": 0, "base_cost": 150.0, "label": "Multi Ball", "use_medals": true, "max_level": 3},
+	"multi_ball_spread": {"level": 0, "base_cost": 75.0, "label": "Multi Ball Spread", "use_medals": true, "max_level": 6},
+	"consistency_mult": {"level": 0, "base_cost": 100.0, "label": "Consistency Mult", "use_medals": true, "max_level": 10},
 }
 
 var balls = {
@@ -310,13 +312,23 @@ func add_money(amount: float) -> void:
 func get_ball_count() -> int:
 	return 1 + upgrades["multi_ball"]["level"]
 
-func get_cost(upgrade: String) -> float:
-	var level = upgrades[upgrade]["level"]
+func get_multi_ball_spread_degrees() -> float:
+	return max(6.0, 26.0 - upgrades["multi_ball_spread"]["level"] * 3.0)
+
+func get_cost_for_level(upgrade: String, level: int) -> float:
 	if upgrade == "multi_ball":
 		return floor(upgrades[upgrade]["base_cost"] * pow(3.0, level))  # 150 → 450 → 1350
+	if upgrade == "multi_ball_spread":
+		return floor(upgrades[upgrade]["base_cost"] * pow(1.9, level))
+	if upgrade == "consistency_mult":
+		return floor(upgrades[upgrade]["base_cost"] * pow(2.0, level))
 	if upgrade == "flat_distance":
 		return floor(upgrades[upgrade]["base_cost"] * pow(1.8, level))  # 8 → 14 → 26 → 46 → 83
 	return floor(upgrades[upgrade]["base_cost"] * pow(1.08, level))
+
+func get_cost(upgrade: String) -> float:
+	var level = int(upgrades[upgrade]["level"])
+	return get_cost_for_level(upgrade, level)
 
 func try_purchase(upgrade: String) -> bool:
 	var cost = get_cost(upgrade)
@@ -340,7 +352,8 @@ func get_money_mult() -> float:
 	return (1.0 + upgrades["money_mult"]["level"] * 0.09) * get_level_mult("money_mult") * get_golfer_data()["money_mult"]
 
 func get_consistency() -> float:
-	return (0.5 + upgrades["consistency"]["level"] * .1) * get_level_mult("consistency")
+	var medal_mult = 1.0 + upgrades["consistency_mult"]["level"] * 0.5
+	return (0.5 + upgrades["consistency"]["level"] * .1) * get_level_mult("consistency") * medal_mult
 
 func get_xp_mult() -> float:
 	return (1.0 + upgrades["xp_mult"]["level"] * 0.09) * get_level_mult("xp_mult")

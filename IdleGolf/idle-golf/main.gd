@@ -54,10 +54,18 @@ var _displayed_money: float = 0.0
 var _money_count_tween: Tween
 var _money_pulse_tween: Tween
 var _money_label_base_color: Color = Color(0.082, 0.502, 0.098)
+const MONEY_COUNT_UP_COLOR := Color(1.0, 0.95, 0.4)
 
 # Market Ball — invested money per flag
 var _market_investments := {}  # flag node -> invested money
 var _market_labels := {}  # flag node -> Label3D showing invested amount
+var _market_label_displayed := {}  # flag node -> displayed counter value
+var _market_label_color_tweens := {}  # flag node -> color pulse tween
+var _market_label_hit_tweens := {}  # flag node -> scale/rotation impact tween
+var _market_label_hit_scale := {}  # flag node -> active impact scale multiplier
+var _market_label_hit_rotation := {}  # flag node -> active impact z rotation
+var _market_streak_flag: Node3D = null
+var _market_streak_count := 0
 const MARKET_GROWTH_RATE := 0.20  # 10% per second
 
 # Golden Flag
@@ -219,6 +227,7 @@ func _on_retire_pressed() -> void:
 func _on_leveled_up(new_level: int, stat_boosted: String) -> void:
 	level_label.text = "Level %d" % new_level
 	_show_level_up_popup(new_level, stat_boosted)
+	_show_stat_up_text(GameState.upgrades[stat_boosted]["label"])
 
 func _show_level_up_popup(new_level: int, stat: String) -> void:
 	var label = Label.new()
@@ -231,6 +240,23 @@ func _show_level_up_popup(new_level: int, stat: String) -> void:
 	tween.tween_property(label, "position:y", label.position.y - 100, 1.5)
 	tween.parallel().tween_property(label, "modulate:a", 0.0, 1.5)
 	tween.tween_callback(label.queue_free)
+
+func _show_stat_up_text(stat_label: String) -> void:
+	var label := Label.new()
+	label.text = "%s Up" % stat_label
+	label.add_theme_font_override("font", load("res://balatro.otf"))
+	label.add_theme_font_size_override("font_size", 24)
+	label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.35))
+	label.add_theme_constant_override("outline_size", 0)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.size = Vector2(260, 42)
+	$CanvasLayer.add_child(label)
+	label.position = Vector2(get_viewport().size.x / 2.0 - label.size.x / 2.0, get_viewport().size.y / 2.0 + 78.0)
+	var tween := label.create_tween().set_parallel(true)
+	tween.tween_property(label, "position:y", label.position.y - 42.0, 0.55)
+	tween.tween_property(label, "modulate:a", 0.0, 0.55).set_delay(0.15)
+	tween.chain().tween_callback(label.queue_free)
 
 var _shop_instance: Control = null
 var _shop_layer: CanvasLayer = null
@@ -319,12 +345,12 @@ func _pulse_money_label() -> void:
 		_money_pulse_tween.kill()
 	money_label.pivot_offset = money_label.size / 2.0
 	money_label.scale = Vector2(1.18, 1.18)
-	money_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.4))
+	money_label.add_theme_color_override("font_color", MONEY_COUNT_UP_COLOR)
 	_money_pulse_tween = create_tween().set_parallel(true)
 	_money_pulse_tween.tween_property(money_label, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_money_pulse_tween.tween_method(
 		func(c: Color): money_label.add_theme_color_override("font_color", c),
-		Color(1.0, 0.95, 0.4),
+		MONEY_COUNT_UP_COLOR,
 		_money_label_base_color,
 		0.3
 	)
@@ -338,12 +364,16 @@ func _hit_ball() -> void:
 	AudioManager.play_sfx("hit")
 	var modifier = shot_control.get_launch_modifier()
 	var ball_count = GameState.get_ball_count()
+	var multi_spread := GameState.get_multi_ball_spread_degrees()
 	for i in ball_count:
 		var ball = Ball.instantiate()
 		ball._speed = BASE_SPEED * GameState.get_ball_speed()
 		var consistency_mult = GameState.balls[GameState.equipped_ball].get("consistency_mult", 1.0)
 		ball._spread = BASE_SPREAD / (GameState.get_consistency() * consistency_mult)
-		ball._aim = -aim_slider.value
+		var fan_offset := 0.0
+		if ball_count > 1:
+			fan_offset = lerpf(-multi_spread, multi_spread, float(i) / float(ball_count - 1)) / 50.0
+		ball._aim = -aim_slider.value + fan_offset
 		ball._launch_modifier = modifier
 		ball.position = tee_position.global_position
 		add_child(ball)
@@ -374,7 +404,11 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 	if direct_hit:
 		base_money *= 2.5
 
-	var final_money = base_money * GameState.get_money_mult()
+	var payout_multiplier := 1.0
+	var ball_payout = ball.get("_payout_multiplier")
+	if ball_payout != null:
+		payout_multiplier = float(ball_payout)
+	var final_money = base_money * payout_multiplier * GameState.get_money_mult()
 	var is_market = GameState.balls[GameState.equipped_ball].get("is_market", false)
 
 	if direct_hit:
@@ -384,11 +418,17 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 
 	if is_market and direct_hit and hit_flag:
 		# invest money into this flag instead of cashing
+		if is_instance_valid(_market_streak_flag) and hit_flag == _market_streak_flag:
+			_market_streak_count += 1
+		else:
+			_market_streak_flag = hit_flag
+			_market_streak_count = 1
+		var pot_add: float = final_money * float(_market_streak_count)
 		if hit_flag not in _market_investments:
 			_market_investments[hit_flag] = 0.0
-		_market_investments[hit_flag] += final_money
-		_update_market_label(hit_flag)
-		_text_queue.append({"money": final_money, "yards": yards, "flag_hit": true, "direct_hit": true, "invested": true})
+		_market_investments[hit_flag] += pot_add
+		_update_market_label(hit_flag, true)
+		_text_queue.append({"money": pot_add, "yards": yards, "flag_hit": true, "direct_hit": true, "invested": true})
 	else:
 		# cash out any market investments when a ball misses
 		var cashout = _cashout_all_investments()
@@ -405,6 +445,10 @@ func _on_ball_landed(yards: float, ball: RigidBody3D) -> void:
 		if _floating_texts.size() == 0 and _text_queue.size() > 3:
 			_queue_processing = false
 			_process_text_queue()
+
+	if yards > 500.0 and is_instance_valid(ball):
+		ball.queue_free()
+		return
 
 	var is_pinball = GameState.balls[GameState.equipped_ball].get("is_pinball", false)
 	if is_pinball and direct_hit and hit_flag and is_instance_valid(ball):
@@ -439,8 +483,10 @@ func _pinball_chain(ball: RigidBody3D, first_flag: Node3D) -> void:
 		var travel_dist = ball.global_position.distance_to(flag.global_position)
 		var fly_time = clampf(travel_dist * 0.003, 0.1, 0.4)
 		# arc upward slightly
+		var from_pos := ball.global_position
 		var mid_point = (ball.global_position + flag.global_position) / 2.0
 		mid_point.y += travel_dist * 0.15
+		_spawn_pinball_beam(from_pos, flag.global_position, fly_time * 2.0)
 		fly_tween.tween_property(ball, "global_position", mid_point, fly_time * 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		fly_tween.tween_property(ball, "global_position", flag.global_position, fly_time * 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 		await fly_tween.finished
@@ -451,6 +497,7 @@ func _pinball_chain(ball: RigidBody3D, first_flag: Node3D) -> void:
 		# cash this flag hit
 		AudioManager.play_sfx("flag_stick")
 		flag._wiggle()
+		_spawn_pinball_bumper_flash(flag.global_position)
 		_register_direct_hit()
 		var flag_bonus = flag.global_position.z * 0.1 * flag.distance_mult
 		var flag_mult = GameState.balls[GameState.equipped_ball].get("flag_mult", 1.0)
@@ -462,6 +509,7 @@ func _pinball_chain(ball: RigidBody3D, first_flag: Node3D) -> void:
 
 		var pin_yards = flag.global_position.distance_to(tee_position.global_position) * 1.094
 		_text_queue.append({"money": pin_money, "yards": pin_yards, "flag_hit": true, "direct_hit": true})
+		_spawn_pinball_score_pop(flag.global_position, pin_money)
 		if not _queue_processing:
 			_process_text_queue()
 
@@ -479,19 +527,24 @@ func _cashout_all_investments() -> float:
 	var total := 0.0
 	for flag in _market_investments:
 		total += _market_investments[flag]
+		_spawn_cashout_particles_from_flag(flag, _market_investments[flag])
 		_remove_market_label(flag)
 	_market_investments.clear()
+	_market_streak_flag = null
+	_market_streak_count = 0
 	return total
 
-func _update_market_label(flag: Node3D) -> void:
+func _update_market_label(flag: Node3D, pulse: bool = false) -> void:
 	if not is_instance_valid(flag):
 		return
-	var amount = _market_investments.get(flag, 0.0)
+	var amount = float(_market_investments.get(flag, 0.0))
 	if flag not in _market_labels:
 		var label = Label3D.new()
 		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		label.font_size = 64
-		label.modulate = Color.CYAN
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		label.modulate = _money_label_base_color
 		label.no_depth_test = true
 		label.render_priority = 10
 		var f = load("res://balatro.otf")
@@ -499,20 +552,88 @@ func _update_market_label(flag: Node3D) -> void:
 			label.font = f
 		flag.add_child(label)
 		_market_labels[flag] = label
-	_market_labels[flag].text = "$" + GameState.format_number(amount)
+		_market_label_displayed[flag] = amount
+		_market_label_hit_scale[flag] = 1.0
+		_market_label_hit_rotation[flag] = 0.0
+		label.text = "$" + GameState.format_number(amount)
+	elif amount > float(_market_label_displayed.get(flag, 0.0)):
+		_set_market_label_amount(amount, flag)
+		if pulse:
+			_pulse_market_label_color(flag)
+			_pop_market_label_hit(flag)
+		else:
+			var shimmer := 0.45 + sin(Time.get_ticks_msec() * 0.009) * 0.25
+			var label: Label3D = _market_labels[flag]
+			label.modulate = _money_label_base_color.lerp(MONEY_COUNT_UP_COLOR, shimmer)
+	else:
+		_set_market_label_amount(amount, flag)
 	# scale based on camera distance so it's readable from far away
 	var cam = get_viewport().get_camera_3d()
 	var distance = flag.global_position.distance_to(cam.global_position)
 	var scale_factor = pow(distance * 0.05, 1.0) * 1.5
-	_market_labels[flag].scale = Vector3(scale_factor, scale_factor, scale_factor)
+	var amount_scale = 1.0 + clamp(log(max(amount, 1.0)) / log(10.0) * 0.055, 0.0, 0.45)
+	var hit_scale = float(_market_label_hit_scale.get(flag, 1.0))
+	var label: Label3D = _market_labels[flag]
+	label.scale = Vector3.ONE * scale_factor * amount_scale * hit_scale
+	label.rotation.z = float(_market_label_hit_rotation.get(flag, 0.0))
 	# position above the flag sprite
-	_market_labels[flag].position = Vector3(0, scale_factor * 1.5, 0)
+	label.position = Vector3(0, scale_factor * 1.5 * amount_scale, 0)
+
+func _set_market_label_amount(value: float, flag: Node3D) -> void:
+	if not is_instance_valid(flag) or flag not in _market_labels:
+		return
+	var label: Label3D = _market_labels[flag]
+	if not is_instance_valid(label):
+		return
+	_market_label_displayed[flag] = value
+	label.text = "$" + GameState.format_number(value)
+
+func _pulse_market_label_color(flag: Node3D) -> void:
+	if flag not in _market_labels or not is_instance_valid(_market_labels[flag]):
+		return
+	if flag in _market_label_color_tweens and _market_label_color_tweens[flag] and _market_label_color_tweens[flag].is_valid():
+		_market_label_color_tweens[flag].kill()
+	var label: Label3D = _market_labels[flag]
+	label.modulate = MONEY_COUNT_UP_COLOR
+	var tween := create_tween()
+	_market_label_color_tweens[flag] = tween
+	tween.tween_property(label, "modulate", _money_label_base_color, 0.22)
+
+func _pop_market_label_hit(flag: Node3D) -> void:
+	if flag not in _market_labels or not is_instance_valid(_market_labels[flag]):
+		return
+	if flag in _market_label_hit_tweens and _market_label_hit_tweens[flag] and _market_label_hit_tweens[flag].is_valid():
+		_market_label_hit_tweens[flag].kill()
+	var rotation_kick := deg_to_rad(randf_range(-24.0, 24.0))
+	_market_label_hit_scale[flag] = 1.55
+	_market_label_hit_rotation[flag] = rotation_kick
+	var tween := create_tween().set_parallel(true)
+	_market_label_hit_tweens[flag] = tween
+	tween.tween_method(_set_market_hit_scale.bind(flag), 1.55, 1.0, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_method(_set_market_hit_rotation.bind(flag), rotation_kick, 0.0, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+func _set_market_hit_scale(value: float, flag: Node3D) -> void:
+	if is_instance_valid(flag):
+		_market_label_hit_scale[flag] = value
+
+func _set_market_hit_rotation(value: float, flag: Node3D) -> void:
+	if is_instance_valid(flag):
+		_market_label_hit_rotation[flag] = value
 
 func _remove_market_label(flag: Node3D) -> void:
+	if flag in _market_label_color_tweens and _market_label_color_tweens[flag] and _market_label_color_tweens[flag].is_valid():
+		_market_label_color_tweens[flag].kill()
+	if flag in _market_label_hit_tweens and _market_label_hit_tweens[flag] and _market_label_hit_tweens[flag].is_valid():
+		_market_label_hit_tweens[flag].kill()
 	if flag in _market_labels:
 		if is_instance_valid(_market_labels[flag]):
 			_market_labels[flag].queue_free()
-		_market_labels.erase(flag)
+	_market_labels.erase(flag)
+	_market_label_displayed.erase(flag)
+	_market_label_color_tweens.erase(flag)
+	_market_label_hit_tweens.erase(flag)
+	_market_label_hit_scale.erase(flag)
+	_market_label_hit_rotation.erase(flag)
 
 func _start_golden_timer() -> void:
 	_golden_timer.wait_time = randf_range(GOLDEN_FLAG_INTERVAL_MIN, GOLDEN_FLAG_INTERVAL_MAX)
@@ -861,6 +982,130 @@ func _show_combo_banner(combo: int) -> void:
 	_combo_banner_tween.tween_property(_combo_banner, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_combo_banner_tween.tween_interval(1.6)
 	_combo_banner_tween.tween_property(_combo_banner, "modulate:a", 0.0, 0.5)
+
+# ---------- shot juice ----------
+
+func _spawn_cashout_particles_from_flag(flag: Node3D, amount: float) -> void:
+	if not is_instance_valid(flag):
+		return
+	var camera := get_viewport().get_camera_3d()
+	if not camera:
+		return
+	var dollar_tex: Texture2D = load("res://DollarBill.png")
+	var coin_tex: Texture2D = load("res://GoldCoin.png")
+	var start := flag.global_position + Vector3.UP * 1.0
+	var end := _get_money_counter_world_target(start)
+	var count := clampi(int(amount / 1000.0) + 6, 6, 18)
+	for i in count:
+		var sprite := Sprite3D.new()
+		sprite.texture = coin_tex if i % 2 == 0 else dollar_tex
+		sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+		sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		sprite.no_depth_test = true
+		sprite.render_priority = 12
+		sprite.pixel_size = 0.024
+		sprite.modulate = Color(1.0, 1.0, 1.0, 0.95)
+		add_child(sprite)
+		var start_offset := Vector3(randf_range(-0.35, 0.35), randf_range(-0.15, 0.45), randf_range(-0.25, 0.25))
+		sprite.global_position = start + start_offset
+		sprite.scale = Vector3.ONE * randf_range(0.75, 1.15)
+		var target := end + Vector3(randf_range(-0.35, 0.35), randf_range(-0.22, 0.22), randf_range(-0.25, 0.25))
+		var control := sprite.global_position.lerp(target, 0.45) + Vector3(randf_range(-0.5, 0.5), randf_range(1.4, 2.4), randf_range(-0.35, 0.35))
+		var tween := sprite.create_tween().set_parallel(true)
+		var delay := i * 0.035
+		tween.tween_method(_move_cashout_sprite.bind(sprite, sprite.global_position, control, target), 0.0, 1.0, 0.62).set_delay(delay).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tween.tween_property(sprite, "scale", Vector3.ONE * 0.18, 0.62).set_delay(delay)
+		tween.tween_property(sprite, "rotation:z", randf_range(-TAU * 2.0, TAU * 2.0), 0.62).set_delay(delay)
+		tween.tween_property(sprite, "modulate:a", 0.0, 0.18).set_delay(delay + 0.48)
+		tween.chain().tween_callback(sprite.queue_free)
+
+func _get_money_counter_world_target(reference_pos: Vector3) -> Vector3:
+	var camera := get_viewport().get_camera_3d()
+	if not camera:
+		return reference_pos
+	var screen_pos := money_label.get_global_rect().get_center()
+	var depth: float = maxf(4.0, camera.global_position.distance_to(reference_pos))
+	return camera.project_position(screen_pos, depth)
+
+func _move_cashout_sprite(progress: float, sprite: Sprite3D, start: Vector3, control: Vector3, end: Vector3) -> void:
+	if not is_instance_valid(sprite):
+		return
+	var a := start.lerp(control, progress)
+	var b := control.lerp(end, progress)
+	sprite.global_position = a.lerp(b, progress)
+
+func _spawn_pinball_beam(from_pos: Vector3, to_pos: Vector3, lifetime: float) -> void:
+	_spawn_world_beam(from_pos, to_pos, Color(0.0, 0.95, 1.0, 0.9), 0.1, lifetime + 0.25)
+	_spawn_world_beam(from_pos + Vector3.UP * 0.08, to_pos + Vector3.UP * 0.08, Color(1.0, 0.05, 0.95, 0.75), 0.055, lifetime + 0.2)
+
+func _spawn_pinball_bumper_flash(pos: Vector3) -> void:
+	_spawn_world_ring(pos + Vector3.UP * 0.4, Color(0.0, 0.95, 1.0, 0.9), 0.35, 4.0, 0.32)
+	_spawn_world_ring(pos + Vector3.UP * 0.45, Color(1.0, 0.05, 0.95, 0.8), 0.18, 2.8, 0.28)
+
+func _spawn_pinball_score_pop(pos: Vector3, amount: float) -> void:
+	var effect_scale := _world_effect_scale(pos)
+	var label := Label3D.new()
+	label.text = "+$%s" % GameState.format_number(amount)
+	label.font = load("res://balatro.otf")
+	label.font_size = 34
+	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	label.outline_size = 0
+	label.no_depth_test = true
+	label.modulate = Color(0.0, 1.0, 1.0)
+	add_child(label)
+	label.global_position = pos + Vector3.UP * 1.2
+	label.scale = Vector3.ONE * 0.4 * effect_scale
+	var tween := label.create_tween().set_parallel(true)
+	tween.tween_property(label, "global_position:y", label.global_position.y + 1.4, 0.65)
+	tween.tween_property(label, "modulate:a", 0.0, 0.65)
+	tween.chain().tween_callback(label.queue_free)
+
+func _spawn_world_beam(from_pos: Vector3, to_pos: Vector3, color: Color, width: float, lifetime: float) -> void:
+	var length := from_pos.distance_to(to_pos)
+	if length < 0.01:
+		return
+	var effect_scale := _world_effect_scale((from_pos + to_pos) * 0.5)
+	var beam := MeshInstance3D.new()
+	var box := BoxMesh.new()
+	box.size = Vector3(width * effect_scale, width * effect_scale, length)
+	beam.mesh = box
+	var mat := StandardMaterial3D.new()
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = color
+	beam.material_override = mat
+	add_child(beam)
+	beam.global_position = (from_pos + to_pos) * 0.5
+	beam.global_transform.basis = Basis.looking_at((to_pos - from_pos).normalized(), Vector3.UP)
+	var tween := beam.create_tween()
+	tween.tween_property(mat, "albedo_color:a", 0.0, lifetime)
+	tween.tween_callback(beam.queue_free)
+
+func _spawn_world_ring(pos: Vector3, color: Color, start_scale: float, end_scale: float, lifetime: float) -> void:
+	var effect_scale := _world_effect_scale(pos)
+	var ring := MeshInstance3D.new()
+	var torus := TorusMesh.new()
+	torus.inner_radius = 0.04
+	torus.outer_radius = 0.5
+	ring.mesh = torus
+	var mat := StandardMaterial3D.new()
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = color
+	ring.material_override = mat
+	add_child(ring)
+	ring.global_position = pos
+	ring.scale = Vector3.ONE * start_scale * effect_scale
+	var tween := ring.create_tween().set_parallel(true)
+	tween.tween_property(ring, "scale", Vector3.ONE * end_scale * effect_scale, lifetime)
+	tween.tween_property(mat, "albedo_color:a", 0.0, lifetime)
+	tween.chain().tween_callback(ring.queue_free)
+
+func _world_effect_scale(pos: Vector3) -> float:
+	var camera := get_viewport().get_camera_3d()
+	if not camera:
+		return 1.0
+	return clamp(pos.distance_to(camera.global_position) / 35.0, 0.25, 1.0)
 
 # ---------- gold flag effects ----------
 

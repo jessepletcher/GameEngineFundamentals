@@ -155,13 +155,13 @@ func _play_unlock_animation(item_texture: Texture2D, item_name: String = "") -> 
 	glow.z_index = 0
 	overlay.add_child(glow)
 
-	var glow_intro := create_tween()
+	var glow_intro := overlay.create_tween()
 	glow_intro.tween_interval(0.48)
 	glow_intro.tween_property(glow, "scale", Vector2(1.4, 1.4), 1.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	glow_intro.tween_callback(func() -> void:
 		if not is_instance_valid(glow):
 			return
-		var glow_loop := create_tween().set_loops()
+		var glow_loop := glow.create_tween().set_loops()
 		glow_loop.tween_property(glow, "scale", Vector2(1.7, 1.7), 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		glow_loop.tween_property(glow, "scale", Vector2(1.4, 1.4), 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	)
@@ -176,9 +176,9 @@ func _play_unlock_animation(item_texture: Texture2D, item_name: String = "") -> 
 	burst.z_index = 10
 	overlay.add_child(burst)
 
-	var frame_cycle := create_tween().set_loops()
+	var frame_cycle := burst.create_tween().set_loops()
 	for f in 4:
-		frame_cycle.tween_callback(func(): if is_instance_valid(burst): burst.frame = f)
+		frame_cycle.tween_property(burst, "frame", f, 0.0)
 		frame_cycle.tween_interval(0.32)
 
 	if item_texture:
@@ -190,7 +190,7 @@ func _play_unlock_animation(item_texture: Texture2D, item_name: String = "") -> 
 		item_sprite.z_index = 20
 		overlay.add_child(item_sprite)
 
-		var item_tween := create_tween()
+		var item_tween := item_sprite.create_tween()
 		item_tween.tween_interval(0.48)
 		item_tween.tween_property(item_sprite, "scale", Vector2(16, 16), 1.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
@@ -200,18 +200,19 @@ func _play_unlock_animation(item_texture: Texture2D, item_name: String = "") -> 
 		name_label.add_theme_font_override("font", load("res://balatro.otf"))
 		name_label.add_theme_font_size_override("font_size", 64)
 		name_label.add_theme_color_override("font_color", Color(1, 1, 1))
-		name_label.add_theme_color_override("font_outline_color", Color.BLACK)
-		name_label.add_theme_constant_override("outline_size", 8)
+		name_label.add_theme_constant_override("outline_size", 0)
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		name_label.z_index = 30
 		name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		overlay.add_child(name_label)
 		await get_tree().process_frame
+		if not is_instance_valid(name_label):
+			return
 		var label_size: Vector2 = name_label.size
 		name_label.position = Vector2(center.x - label_size.x / 2.0, center.y + 200.0)
 		name_label.modulate.a = 0.0
 
-		var label_tween := create_tween()
+		var label_tween := name_label.create_tween()
 		label_tween.tween_interval(0.6)
 		label_tween.tween_property(name_label, "modulate:a", 1.0, 0.4)
 
@@ -221,7 +222,7 @@ func _play_unlock_animation(item_texture: Texture2D, item_name: String = "") -> 
 			return
 		if event is InputEventMouseButton and event.pressed:
 			dismissed[0] = true
-			var fade := create_tween()
+			var fade := overlay.create_tween()
 			fade.tween_property(overlay, "modulate:a", 0.0, 0.3)
 			fade.tween_callback(overlay.queue_free)
 	)

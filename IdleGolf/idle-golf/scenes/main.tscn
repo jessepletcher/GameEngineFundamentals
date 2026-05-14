@@ -691,7 +691,7 @@ offset_right = 313.0
 offset_bottom = 884.0
 
 [node name="UpgradesPanel" type="Control" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer" unique_id=1409310776]
-custom_minimum_size = Vector2(290, 935)
+custom_minimum_size = Vector2(290, 1180)
 layout_mode = 2
 
 [node name="CashTexture" type="TextureRect" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=439225322]
@@ -956,7 +956,7 @@ texture_filter = 1
 layout_mode = 0
 offset_top = 715.0
 offset_right = 275.0
-offset_bottom = 950.0
+offset_bottom = 1135.0
 size_flags_vertical = 0
 texture = ExtResource("20_5q0nq")
 stretch_mode = 1
@@ -1042,6 +1042,92 @@ theme_override_fonts/font = ExtResource("4_trceg")
 horizontal_alignment = 2
 
 [node name="CostLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow/VBoxContainer" unique_id=36602594]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+text = "Lvl. 1"
+horizontal_alignment = 2
+
+[node name="MultiBallSpreadRow" type="Control" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=777440359]
+anchors_preset = 0
+offset_left = 10.0
+offset_top = 978.0
+offset_right = 285.0
+offset_bottom = 995.0
+
+[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallSpreadRow" unique_id=1152465880]
+texture_filter = 1
+layout_mode = 0
+offset_top = -38.0
+offset_right = 260.0
+offset_bottom = 52.0
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxTexture_xrs0c")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_xljpf")
+theme_override_styles/hover = SubResource("StyleBoxTexture_xrs0c")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_j4bwh")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallSpreadRow" unique_id=1152961519]
+layout_mode = 0
+offset_left = 65.0
+offset_top = -23.0
+offset_right = 106.0
+offset_bottom = 36.0
+mouse_filter = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallSpreadRow/VBoxContainer" unique_id=30986466]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+horizontal_alignment = 2
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallSpreadRow/VBoxContainer" unique_id=653301929]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+horizontal_alignment = 2
+
+[node name="CostLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallSpreadRow/VBoxContainer" unique_id=1944402602]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+text = "Lvl. 1"
+horizontal_alignment = 2
+
+[node name="ConsistencyMultRow" type="Control" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel" unique_id=317043746]
+anchors_preset = 0
+offset_left = 10.0
+offset_top = 1078.0
+offset_right = 285.0
+offset_bottom = 1095.0
+
+[node name="BuyButton" type="Button" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyMultRow" unique_id=1524015848]
+texture_filter = 1
+layout_mode = 0
+offset_top = -38.0
+offset_right = 260.0
+offset_bottom = 52.0
+theme_override_fonts/font = ExtResource("4_trceg")
+theme_override_styles/normal = SubResource("StyleBoxTexture_xrs0c")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_xljpf")
+theme_override_styles/hover = SubResource("StyleBoxTexture_xrs0c")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_j4bwh")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyMultRow" unique_id=45928313]
+layout_mode = 0
+offset_left = 65.0
+offset_top = -23.0
+offset_right = 106.0
+offset_bottom = 36.0
+mouse_filter = 2
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyMultRow/VBoxContainer" unique_id=1164855677]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+horizontal_alignment = 2
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyMultRow/VBoxContainer" unique_id=916494461]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_trceg")
+horizontal_alignment = 2
+
+[node name="CostLabel" type="Label" parent="CanvasLayer/LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyMultRow/VBoxContainer" unique_id=1095923676]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_trceg")
 text = "Lvl. 1"
