@@ -3,17 +3,7 @@ extends CanvasLayer
 @onready var shop_panel = $LeftVBox/LeftMenu/ScrollContainer
 @onready var menu_background = $MenuBackground
 @onready var upgrades_button: Button = $LeftVBox/LeftMenu/TopBar/UpgradesButton
-@onready var rows = {
-	"ball_speed":  $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/BallSpeedRow,
-	"fire_rate":   $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FireRateRow,
-	"money_mult":  $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MoneyMultRow,
-	"consistency": $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyRow,
-	"xp_mult":     $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/XPMultRow,
-	"flat_distance": $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FlatDistanceRow,
-	"multi_ball":  $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow,
-	"multi_ball_spread": $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallSpreadRow,
-	"consistency_mult": $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyMultRow,
-}
+var rows := {}
 
 func _ready() -> void:
 	shop_panel.visible = true
@@ -21,12 +11,33 @@ func _ready() -> void:
 	GameState.money_changed.connect(_refresh)
 	GameState.medals_changed.connect(_refresh)
 	upgrades_button.pressed.connect(toggle)
+	_register_rows()
 
 	for key in rows:
 		var btn = rows[key].get_node("BuyButton")
 		btn.gui_input.connect(_on_buy_input.bind(key))
 
 	_refresh(GameState.money)
+
+func _register_rows() -> void:
+	var row_paths := {
+		"ball_speed": ^"LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/BallSpeedRow",
+		"fire_rate": ^"LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FireRateRow",
+		"money_mult": ^"LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MoneyMultRow",
+		"consistency": ^"LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyRow",
+		"xp_mult": ^"LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/XPMultRow",
+		"flat_distance": ^"LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/FlatDistanceRow",
+		"multi_ball": ^"LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallRow",
+		"multi_ball_spread": ^"LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MultiBallSpreadRow",
+		"consistency_mult": ^"LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/ConsistencyMultRow",
+	}
+	rows.clear()
+	for key in row_paths:
+		var row := get_node_or_null(row_paths[key])
+		if row:
+			rows[key] = row
+		else:
+			push_warning("UpgradeShop: missing row for %s" % key)
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.keycode == KEY_SHIFT:
@@ -40,6 +51,8 @@ func toggle() -> void:
 
 func _refresh(_money: float) -> void:
 	for key in rows:
+		if not GameState.upgrades.has(key):
+			continue
 		var upgrade = GameState.upgrades[key]
 		var cost = GameState.get_cost(key)
 		var level = upgrade["level"]

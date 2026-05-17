@@ -12,6 +12,10 @@ var item_id: String
 var medal_cost: int = 0
 var unlock_level: int = 1
 
+func _ready() -> void:
+	if not buy_button.pressed.is_connected(_on_buy_button_pressed):
+		buy_button.pressed.connect(_on_buy_button_pressed)
+
 func setup(id: String, item_name: String, desc: String, cost: float, texture: Texture2D, owned: bool, equipped: bool, p_medal_cost: int = 0, p_unlock_level: int = 1) -> void:
 	medal_cost = p_medal_cost
 	unlock_level = p_unlock_level
@@ -46,4 +50,5 @@ func setup(id: String, item_name: String, desc: String, cost: float, texture: Te
 			buy_button.disabled = GameState.medals < medal_cost
 			medal_icon.visible = true
 
-	buy_button.pressed.connect(func(): purchase_requested.emit(item_id))
+func _on_buy_button_pressed() -> void:
+	purchase_requested.emit(item_id)

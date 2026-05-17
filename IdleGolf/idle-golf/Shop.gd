@@ -158,13 +158,8 @@ func _play_unlock_animation(item_texture: Texture2D, item_name: String = "") -> 
 	var glow_intro := overlay.create_tween()
 	glow_intro.tween_interval(0.48)
 	glow_intro.tween_property(glow, "scale", Vector2(1.4, 1.4), 1.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	glow_intro.tween_callback(func() -> void:
-		if not is_instance_valid(glow):
-			return
-		var glow_loop := glow.create_tween().set_loops()
-		glow_loop.tween_property(glow, "scale", Vector2(1.7, 1.7), 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		glow_loop.tween_property(glow, "scale", Vector2(1.4, 1.4), 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	)
+	glow_intro.tween_property(glow, "scale", Vector2(1.7, 1.7), 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	glow_intro.tween_property(glow, "scale", Vector2(1.4, 1.4), 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 	var burst := Sprite2D.new()
 	burst.texture = load("res://ItemUnlocked.png")

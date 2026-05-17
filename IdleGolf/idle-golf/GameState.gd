@@ -79,6 +79,7 @@ var golfers = {
 var courses = {
 	"course1": {"name": "Driving Range", "desc": "The classic range", "medal_cost": 0, "owned": true, "unlock_level": 1, "texture": preload("res://BallIcon.png")},
 	"course2": {"name": "Course 2", "desc": "A new challenge", "medal_cost": 10, "owned": false, "unlock_level": 8, "texture": preload("res://BallIcon.png")},
+	"course3": {"name": "Course 3", "desc": "A longer course with tighter payouts", "medal_cost": 25, "owned": false, "unlock_level": 15, "texture": preload("res://BallIcon.png")},
 }
 
 
@@ -278,6 +279,8 @@ func load_game() -> void:
 	for key in courses:
 		courses[key]["owned"] = config.get_value("courses", key, courses[key].get("owned", false))
 
+	_sanitize_progress()
+
 func add_xp(amount: float) -> void:
 	var gained = amount * get_xp_mult()
 	xp += gained
@@ -357,3 +360,32 @@ func get_consistency() -> float:
 
 func get_xp_mult() -> float:
 	return (1.0 + upgrades["xp_mult"]["level"] * 0.09) * get_level_mult("xp_mult")
+
+func _sanitize_progress() -> void:
+	level = max(1, int(level))
+	xp_to_next_level = max(1.0, float(xp_to_next_level))
+	money = max(0.0, float(money))
+	xp = max(0.0, float(xp))
+	medals = max(0.0, float(medals))
+	lifetime_xp = max(0.0, float(lifetime_xp))
+	lifetime_money = max(0.0, float(lifetime_money))
+	best_run_xp = max(0.0, float(best_run_xp))
+	best_run_money = max(0.0, float(best_run_money))
+
+	for key in upgrades:
+		var level_value: int = max(0, int(upgrades[key].get("level", 0)))
+		var max_level: int = int(upgrades[key].get("max_level", -1))
+		if max_level >= 0:
+			level_value = min(level_value, max_level)
+		upgrades[key]["level"] = level_value
+
+	balls["standard"]["owned"] = true
+	golfers["standard"]["owned"] = true
+	courses["course1"]["owned"] = true
+
+	if not balls.has(equipped_ball) or not balls[equipped_ball].get("owned", false):
+		equipped_ball = "standard"
+	if not golfers.has(equipped_golfer) or not golfers[equipped_golfer].get("owned", false):
+		equipped_golfer = "standard"
+	if not courses.has(equipped_course) or not courses[equipped_course].get("owned", false):
+		equipped_course = "course1"

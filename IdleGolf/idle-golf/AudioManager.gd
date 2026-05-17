@@ -37,6 +37,8 @@ var music_muted := false
 
 var _player_pool: Array[AudioStreamPlayer] = []
 const POOL_SIZE := 8
+const MAX_TEMP_PLAYERS := 12
+var _temp_players: Array[AudioStreamPlayer] = []
 
 var music_player: AudioStreamPlayer
 var ambience_player: AudioStreamPlayer
@@ -117,6 +119,8 @@ func cleanup_audio() -> void:
 	_stop_and_clear_player(ambience_player)
 	for player in _player_pool:
 		_stop_and_clear_player(player)
+	for player in _temp_players:
+		_stop_and_clear_player(player)
 	_sounds.clear()
 
 func _exit_tree() -> void:
@@ -144,10 +148,18 @@ func _get_free_player() -> AudioStreamPlayer:
 	for p in _player_pool:
 		if not p.playing:
 			return p
+	if _temp_players.size() >= MAX_TEMP_PLAYERS:
+		return null
 	var p := AudioStreamPlayer.new()
 	add_child(p)
-	p.finished.connect(p.queue_free)
+	_temp_players.append(p)
+	p.finished.connect(_on_temp_player_finished.bind(p))
 	return p
+
+func _on_temp_player_finished(player: AudioStreamPlayer) -> void:
+	_temp_players.erase(player)
+	if is_instance_valid(player):
+		player.queue_free()
 
 func _stop_and_clear_player(player: AudioStreamPlayer) -> void:
 	if not player:
