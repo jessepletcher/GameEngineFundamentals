@@ -74,6 +74,9 @@ var golfers = {
 	"speedy":      {"name": "Speedy Golfer",   "desc": "+25% fire rate",               "medal_cost": 20, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.25, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 10, "texture": preload("res://BallIcon.png")},
 	"Lion Trees":      {"name": "Lion Trees",   "desc": "+25% money, +20% distance",   "medal_cost": 50, "owned": false, "speed_mult": 1.2, "fire_rate_mult": 1.0, "money_mult": 1.25, "spritesheet": "res://LionTreesSwing.png", "h_frames": 5, "frame_size": 96, "unlock_level": 25, "texture": preload("res://BallIcon.png")},
 	"construction":    {"name": "Construction Worker", "desc": "Destructibles respawn 50% faster", "medal_cost": 15, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.0, "respawn_mult": 0.5, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 7, "texture": preload("res://BallIcon.png")},
+	"golfer1": {"name": "Golfer 1", "desc": "+10% distance", "medal_cost": 8, "owned": false, "speed_mult": 1.1, "fire_rate_mult": 1.0, "money_mult": 1.0, "spritesheet": "res://Golfer1.png", "h_frames": 1, "frame_size": 96, "unlock_level": 4, "texture": preload("res://BallIcon.png")},
+	"golfer2": {"name": "Golfer 2", "desc": "+15% fire rate", "medal_cost": 18, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.15, "money_mult": 1.0, "spritesheet": "res://Golfer2.png", "h_frames": 1, "frame_size": 96, "unlock_level": 9, "texture": preload("res://BallIcon.png")},
+	"golfer4": {"name": "Golfer 4", "desc": "+15% money", "medal_cost": 35, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.15, "spritesheet": "res://Golfer4.png", "h_frames": 1, "frame_size": 96, "unlock_level": 14, "texture": preload("res://BallIcon.png")},
 }
 
 var courses = {
@@ -290,6 +293,12 @@ func add_xp(amount: float) -> void:
 		_level_up()
 	xp_changed.emit(xp, xp_to_next_level)
 
+func add_level(amount: int = 1) -> void:
+	for i in maxi(1, amount):
+		_level_up()
+	xp_changed.emit(xp, xp_to_next_level)
+	save()
+
 func _level_up() -> void:
 	level += 1
 	xp_to_next_level = floor(100.0 * pow(1.4, level - 1))
@@ -316,7 +325,7 @@ func get_ball_count() -> int:
 	return 1 + upgrades["multi_ball"]["level"]
 
 func get_multi_ball_spread_degrees() -> float:
-	return max(6.0, 26.0 - upgrades["multi_ball_spread"]["level"] * 3.0)
+	return max(8.0, 20.0 - upgrades["multi_ball_spread"]["level"] * 2.0)
 
 func get_cost_for_level(upgrade: String, level: int) -> float:
 	if upgrade == "multi_ball":

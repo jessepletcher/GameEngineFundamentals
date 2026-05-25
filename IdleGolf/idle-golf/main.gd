@@ -42,7 +42,10 @@ var _text_queue: Array = []
 var _queue_processing: bool = false
 const TEXT_QUEUE_INTERVAL := 0.15
 const MAX_INDIVIDUAL_TEXTS := 4  # show this many individually, then batch the rest
+const HIDE_WITH_UI_GROUP := "hide_with_ui"
 var _settings_panel: PanelContainer
+var _ui_hidden := false
+var _spawning_disabled := false
 
 # hole-out combo
 var _combo_count: int = 0
@@ -92,6 +95,53 @@ func _process(delta: float) -> void:
 			continue
 		_market_investments[flag] *= (1.0 + MARKET_GROWTH_RATE * delta)
 		_update_market_label(flag)
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F2:
+		_set_ui_hidden(not _ui_hidden)
+		get_viewport().set_input_as_handled()
+	elif event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F3:
+		_set_spawning_disabled(not _spawning_disabled)
+		get_viewport().set_input_as_handled()
+
+func _set_ui_hidden(hidden: bool) -> void:
+	_ui_hidden = hidden
+	$CanvasLayer.visible = not hidden
+	if _shop_layer and is_instance_valid(_shop_layer):
+		_shop_layer.visible = not hidden
+	for node in get_tree().get_nodes_in_group(HIDE_WITH_UI_GROUP):
+		_set_ui_node_visible(node, not hidden)
+	for flag in _market_labels:
+		if is_instance_valid(_market_labels[flag]):
+			_set_ui_node_visible(_market_labels[flag], not hidden)
+	for text in _floating_texts:
+		if is_instance_valid(text):
+			_set_ui_node_visible(text, not hidden)
+
+func _register_hide_with_ui(node: Node) -> void:
+	node.add_to_group(HIDE_WITH_UI_GROUP)
+	_set_ui_node_visible(node, not _ui_hidden)
+
+func _set_ui_node_visible(node: Node, visible: bool) -> void:
+	if node is CanvasItem:
+		(node as CanvasItem).visible = visible
+	elif node is Node3D:
+		(node as Node3D).visible = visible
+	elif node is CanvasLayer:
+		(node as CanvasLayer).visible = visible
+
+func _set_spawning_disabled(disabled: bool) -> void:
+	_spawning_disabled = disabled
+	if golfer and is_instance_valid(golfer):
+		if golfer.has_method("set_spawn_disabled"):
+			golfer.set_spawn_disabled(disabled)
+		else:
+			golfer.visible = not disabled
+	if disabled:
+		shot_timer.stop()
+	else:
+		shot_timer.wait_time = BASE_INTERVAL / GameState.get_fire_rate()
+		shot_timer.start()
 
 func _switch_course() -> void:
 	# cash out any market investments before switching
@@ -239,6 +289,7 @@ func _show_level_up_popup(new_level: int, stat: String) -> void:
 	label.text = "LEVEL UP! %d\n+5%% %s" % [new_level, GameState.upgrades[stat]["label"]]
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	$CanvasLayer.add_child(label)
+	_register_hide_with_ui(label)
 	label.position = Vector2(get_viewport().size.x / 2 - 100, get_viewport().size.y / 2)
 	
 	var tween = create_tween()
@@ -257,6 +308,7 @@ func _show_stat_up_text(stat_label: String) -> void:
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.size = Vector2(260, 42)
 	$CanvasLayer.add_child(label)
+	_register_hide_with_ui(label)
 	label.position = Vector2(get_viewport().size.x / 2.0 - label.size.x / 2.0, get_viewport().size.y / 2.0 + 78.0)
 	var tween := label.create_tween().set_parallel(true)
 	tween.tween_property(label, "position:y", label.position.y - 42.0, 0.55)
@@ -329,6 +381,8 @@ func _on_shop_closed() -> void:
 	_show_all_yardage()
 
 func _on_golfer_swung() -> void:
+	if _spawning_disabled:
+		return
 	_hit_ball()
 
 
@@ -361,27 +415,41 @@ func _pulse_money_label() -> void:
 	)
 
 func _on_ShotTimer_timeout() -> void:
+	if _spawning_disabled:
+		return
 	shot_timer.wait_time = BASE_INTERVAL / GameState.get_fire_rate()
 	golfer.play_swing()
 
 
 func _hit_ball() -> void:
+	if _spawning_disabled:
+		return
 	AudioManager.play_sfx("hit")
 	var modifier = shot_control.get_launch_modifier()
 	var ball_count = GameState.get_ball_count()
-	var multi_spread := GameState.get_multi_ball_spread_degrees()
+	var multi_spread_step := GameState.get_multi_ball_spread_degrees()
+	var consistency_mult := float(GameState.balls[GameState.equipped_ball].get("consistency_mult", 1.0))
+	var shot_spread: float = BASE_SPREAD / (GameState.get_consistency() * consistency_mult)
+	var shared_spread_degrees := randf_range(-shot_spread, shot_spread)
+	var shot_balls: Array[RigidBody3D] = []
 	for i in ball_count:
 		var ball = Ball.instantiate()
 		ball._speed = BASE_SPEED * GameState.get_ball_speed()
-		var consistency_mult = GameState.balls[GameState.equipped_ball].get("consistency_mult", 1.0)
-		ball._spread = BASE_SPREAD / (GameState.get_consistency() * consistency_mult)
-		var fan_offset := 0.0
-		if ball_count > 1:
-			fan_offset = lerpf(-multi_spread, multi_spread, float(i) / float(ball_count - 1)) / 50.0
-		ball._aim = -aim_slider.value + fan_offset
+		ball._spread = 0.0
+		var fan_offset_degrees := 0.0
+		if i > 0:
+			var fan_step := int((i + 1) / 2)
+			var fan_side := -1.0 if i % 2 == 1 else 1.0
+			fan_offset_degrees = fan_side * float(fan_step) * multi_spread_step
+		ball._aim = -aim_slider.value + ((shared_spread_degrees + fan_offset_degrees) / 50.0)
 		ball._launch_modifier = modifier
 		ball.position = tee_position.global_position
 		add_child(ball)
+		for other_ball in shot_balls:
+			if is_instance_valid(other_ball):
+				ball.add_collision_exception_with(other_ball)
+				other_ball.add_collision_exception_with(ball)
+		shot_balls.append(ball)
 		ball.landed.connect(_on_ball_landed.bind(ball))
 		ball.exploded.connect(_on_ball_exploded)
 		if ball._is_whiff:
@@ -556,6 +624,7 @@ func _update_market_label(flag: Node3D, pulse: bool = false) -> void:
 		if f:
 			label.font = f
 		flag.add_child(label)
+		_register_hide_with_ui(label)
 		_market_labels[flag] = label
 		_market_label_displayed[flag] = amount
 		_market_label_hit_scale[flag] = 1.0
@@ -734,6 +803,7 @@ func _spawn_floating_text(money: float, yards: float, flag_hit: bool = false, di
 
 	var text = FloatingText.instantiate()
 	add_child(text)
+	_register_hide_with_ui(text)
 	text.global_position = golfer.global_position + Vector3(0, 1.5, 0)
 	if golden:
 		text.setup_summary("GOLDEN FLAG! +$%s" % GameState.format_number(money), _get_dynamic_lifetime(), Color(1.0, 0.84, 0.0))
@@ -751,6 +821,7 @@ func _spawn_summary_text(total_money: float, hit_count: int, any_flag: bool, any
 
 	var text = FloatingText.instantiate()
 	add_child(text)
+	_register_hide_with_ui(text)
 	text.global_position = golfer.global_position + Vector3(0, 1.5, 0)
 	var summary = "+$%s (%d more hits)" % [GameState.format_number(total_money), hit_count]
 	text.setup_summary(summary, _get_dynamic_lifetime())
@@ -821,7 +892,7 @@ func _setup_settings_menu() -> void:
 	_settings_panel.offset_left = -200
 	_settings_panel.offset_right = -10
 	_settings_panel.offset_top = 55
-	_settings_panel.offset_bottom = 200
+	_settings_panel.offset_bottom = 285
 	_settings_panel.visible = false
 	$CanvasLayer.add_child(_settings_panel)
 
@@ -859,11 +930,23 @@ func _setup_settings_menu() -> void:
 	medals_btn.add_theme_font_size_override("font_size", 16)
 	vbox.add_child(medals_btn)
 
+	var small_money_btn = Button.new()
+	small_money_btn.text = "+$1,000"
+	small_money_btn.add_theme_font_override("font", font)
+	small_money_btn.add_theme_font_size_override("font_size", 16)
+	vbox.add_child(small_money_btn)
+
 	var money_btn = Button.new()
 	money_btn.text = "+$1,000,000"
 	money_btn.add_theme_font_override("font", font)
 	money_btn.add_theme_font_size_override("font_size", 16)
 	vbox.add_child(money_btn)
+
+	var level_btn = Button.new()
+	level_btn.text = "+1 Level"
+	level_btn.add_theme_font_override("font", font)
+	level_btn.add_theme_font_size_override("font_size", 16)
+	vbox.add_child(level_btn)
 
 	settings_btn.pressed.connect(func(): _settings_panel.visible = !_settings_panel.visible)
 
@@ -892,10 +975,20 @@ func _setup_settings_menu() -> void:
 		GameState.medals_changed.emit(GameState.medals)
 	)
 
+	small_money_btn.pressed.connect(func():
+		GameState.money += 1000
+		GameState.lifetime_money += 1000
+		GameState.money_changed.emit(GameState.money)
+	)
+
 	money_btn.pressed.connect(func():
 		GameState.money += 1000000
 		GameState.lifetime_money += 1000000
 		GameState.money_changed.emit(GameState.money)
+	)
+
+	level_btn.pressed.connect(func():
+		GameState.add_level()
 	)
 
 # ---------- hole-out combo ----------
@@ -913,6 +1006,7 @@ func _setup_combo_banner() -> void:
 	_combo_banner.offset_bottom = 160
 	_combo_banner.modulate.a = 0.0
 	$CanvasLayer.add_child(_combo_banner)
+	_register_hide_with_ui(_combo_banner)
 
 	_combo_timer = Timer.new()
 	_combo_timer.one_shot = true
@@ -1011,6 +1105,7 @@ func _spawn_cashout_particles_from_flag(flag: Node3D, amount: float) -> void:
 		sprite.pixel_size = 0.024
 		sprite.modulate = Color(1.0, 1.0, 1.0, 0.95)
 		add_child(sprite)
+		_register_hide_with_ui(sprite)
 		var start_offset := Vector3(randf_range(-0.35, 0.35), randf_range(-0.15, 0.45), randf_range(-0.25, 0.25))
 		sprite.global_position = start + start_offset
 		sprite.scale = Vector3.ONE * randf_range(0.75, 1.15)
@@ -1058,6 +1153,7 @@ func _spawn_pinball_score_pop(pos: Vector3, amount: float) -> void:
 	label.no_depth_test = true
 	label.modulate = Color(0.0, 1.0, 1.0)
 	add_child(label)
+	_register_hide_with_ui(label)
 	label.global_position = pos + Vector3.UP * 1.2
 	label.scale = Vector3.ONE * 0.4 * effect_scale
 	var tween := label.create_tween().set_parallel(true)
@@ -1124,6 +1220,7 @@ func _spawn_money_rain() -> void:
 	var layer := CanvasLayer.new()
 	layer.layer = 5
 	add_child(layer)
+	_register_hide_with_ui(layer)
 
 	var spawn_interval: float = MONEY_RAIN_DURATION / float(MONEY_RAIN_COUNT)
 	for i in MONEY_RAIN_COUNT:

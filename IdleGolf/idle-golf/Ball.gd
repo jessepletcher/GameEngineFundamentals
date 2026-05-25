@@ -5,6 +5,9 @@ signal whiffed
 signal exploded(fragments: Array)
 
 const PARTICLE_DESPAWN_YARDS := 500.0
+const MIN_WHIFF_CHANCE := 0.02
+const MAX_WHIFF_CHANCE := 0.55
+const WHIFF_CHANCE_SCALE := 0.32
 
 var _start_z: float
 var _has_landed := false
@@ -259,10 +262,10 @@ func _ready() -> void:
 	var consistency = GameState.get_consistency()
 	var worst_possible = max(0.05, 1.0 - (1.0 / consistency))
 	var distance_mult = randf_range(worst_possible, 1.0)
-	var whiff_percent = clamp(0.2 / consistency, 0.01, 0.2)  # shrinks as consistency levels up
+	var whiff_percent = clamp(WHIFF_CHANCE_SCALE / consistency, MIN_WHIFF_CHANCE, MAX_WHIFF_CHANCE)
 	var whiff_threshold = worst_possible + (1.0 - worst_possible) * whiff_percent
 	if distance_mult < whiff_threshold:
-		distance_mult *= 0.3
+		distance_mult *= randf_range(0.08, 0.25)
 		_is_whiff = true
 	var horizontal_offset = abs(_launch_modifier.x)
 	var distance_mult_from_curve = lerp(1.0, 0.5, horizontal_offset)
