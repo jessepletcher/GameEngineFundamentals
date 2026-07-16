@@ -36,6 +36,11 @@ func force_fade() -> void:
 	tween.tween_callback(queue_free)
 
 func _process(_delta: float) -> void:
+	if not is_instance_valid(camera):
+		camera = get_viewport().get_camera_3d()
+	if not is_instance_valid(camera):
+		return
+
 	var distance = global_position.distance_to(camera.global_position)
 	var scale_factor = max(pow(distance * 0.05, 1.5), 0.8)
 	label.scale = Vector3(scale_factor, scale_factor, scale_factor)

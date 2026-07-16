@@ -1,3 +1,7 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+idle-golf/.godot/
+idle-golf/builds/
+idle-golf/*.tmp
+idle-golf/scenes/*.tmp

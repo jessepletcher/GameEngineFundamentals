@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#183f2c"/>
+  <rect y="420" width="1280" height="300" fill="#2c783f"/>
+  <path d="M0 485 C160 420 300 470 455 420 C650 357 790 420 985 350 C1110 305 1190 290 1280 245 L1280 720 L0 720 Z" fill="#65b94a"/>
+  <path d="M0 590 C170 520 330 555 500 510 C720 450 870 505 1040 455 C1155 420 1230 412 1280 385 L1280 720 L0 720 Z" fill="#95d45c"/>
+  <circle cx="390" cy="342" r="70" fill="#f7f7ee"/>
+  <circle cx="365" cy="318" r="10" fill="#b7bfb0"/>
+  <circle cx="415" cy="320" r="10" fill="#b7bfb0"/>
+  <circle cx="388" cy="372" r="10" fill="#b7bfb0"/>
+  <rect x="870" y="120" width="16" height="380" fill="#fff5d6"/>
+  <path d="M886 125 L1110 210 L886 290 Z" fill="#e23a3a"/>
+  <ellipse cx="870" cy="500" rx="120" ry="34" fill="#1e5a33"/>
+  <text x="90" y="150" font-family="Arial, sans-serif" font-size="86" font-weight="900" fill="#fff7cc">IDLE GOLF</text>
+  <text x="94" y="225" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#ffffff">Public Demo v0.1.0</text>
+  <text x="96" y="635" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#183f2c">Upgrade. Retire. Unlock weirder golf.</text>
+</svg>

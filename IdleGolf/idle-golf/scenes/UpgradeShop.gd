@@ -3,6 +3,11 @@ extends CanvasLayer
 @onready var shop_panel = $LeftVBox/LeftMenu/ScrollContainer
 @onready var menu_background = $MenuBackground
 @onready var upgrades_button: Button = $LeftVBox/LeftMenu/TopBar/UpgradesButton
+@onready var medals_texture: TextureRect = $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MedalsTexture
+@onready var medals_background: TextureRect = $LeftVBox/LeftMenu/ScrollContainer/UpgradesPanel/MedalsBackground
+const MEDAL_BACKGROUND_PADDING := 5.0
+const MEDAL_ROW_TEXT_LEFT := 68.0
+const MEDAL_ROW_TEXT_WIDTH := 180.0
 var rows := {}
 
 func _ready() -> void:
@@ -17,6 +22,7 @@ func _ready() -> void:
 		var btn = rows[key].get_node("BuyButton")
 		btn.gui_input.connect(_on_buy_input.bind(key))
 
+	_sync_medal_panel_background()
 	_refresh(GameState.money)
 
 func _register_rows() -> void:
@@ -35,9 +41,58 @@ func _register_rows() -> void:
 	for key in row_paths:
 		var row := get_node_or_null(row_paths[key])
 		if row:
+			if GameState.is_demo_hidden_upgrade(key):
+				row.visible = false
+				continue
+			row.visible = true
+			_prepare_row_layout(key, row)
 			rows[key] = row
 		else:
 			push_warning("UpgradeShop: missing row for %s" % key)
+
+func _prepare_row_layout(key: String, row: Control) -> void:
+	if not GameState.upgrades.has(key):
+		return
+	if not GameState.upgrades[key].get("use_medals", false):
+		return
+	var vbox := row.get_node_or_null("VBoxContainer") as Control
+	if vbox == null:
+		return
+	vbox.z_index = 10
+	row.move_child(vbox, row.get_child_count() - 1)
+	vbox.position.x = MEDAL_ROW_TEXT_LEFT
+	vbox.size.x = MEDAL_ROW_TEXT_WIDTH
+	vbox.offset_left = MEDAL_ROW_TEXT_LEFT
+	vbox.offset_right = MEDAL_ROW_TEXT_LEFT + MEDAL_ROW_TEXT_WIDTH
+	for child in vbox.get_children():
+		if child is Label:
+			var label := child as Label
+			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+			label.custom_minimum_size = Vector2(MEDAL_ROW_TEXT_WIDTH, 18.0)
+
+func _sync_medal_panel_background() -> void:
+	var bottom := medals_background.offset_top
+	var visible_medal_rows := 0
+	for key in rows:
+		if not GameState.upgrades.has(key):
+			continue
+		if not GameState.upgrades[key].get("use_medals", false):
+			continue
+		var row := rows[key] as Control
+		if not row.visible:
+			continue
+		visible_medal_rows += 1
+		var row_bottom := row.position.y + row.size.y
+		var buy_button := row.get_node_or_null("BuyButton") as Control
+		if buy_button != null:
+			row_bottom = max(row_bottom, row.position.y + buy_button.position.y + buy_button.size.y)
+		bottom = max(bottom, row_bottom + MEDAL_BACKGROUND_PADDING)
+
+	var has_visible_medal_rows := visible_medal_rows > 0
+	medals_texture.visible = has_visible_medal_rows
+	medals_background.visible = has_visible_medal_rows
+	if has_visible_medal_rows:
+		medals_background.offset_bottom = bottom
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.keycode == KEY_SHIFT:
@@ -53,41 +108,42 @@ func _refresh(_money: float) -> void:
 	for key in rows:
 		if not GameState.upgrades.has(key):
 			continue
+		if GameState.is_demo_hidden_upgrade(key):
+			rows[key].visible = false
+			continue
 		var upgrade = GameState.upgrades[key]
 		var cost = GameState.get_cost(key)
 		var level = upgrade["level"]
 		rows[key].get_node("VBoxContainer/NameLabel").text = upgrade["label"]
 		rows[key].get_node("VBoxContainer/LevelLabel").text = "Lv.%d" % level
-		var cost_label = rows[key].get_node("VBoxContainer/CostLabel")
+		var row := rows[key] as Control
+		var cost_label = row.get_node("VBoxContainer/CostLabel")
 		var btn = rows[key].get_node("BuyButton")
 		var refund_mode := Input.is_key_pressed(KEY_SHIFT)
 		btn.text = ""
+		_clear_medal_icons(row)
 		if upgrade.get("use_medals", false):
 			var max_lvl = upgrade.get("max_level", -1)
 			if max_lvl >= 0 and level >= max_lvl:
 				cost_label.text = "MAX"
 				btn.disabled = level <= 0 if refund_mode else true
 			else:
-				cost_label.text = "  %s" % GameState.format_number(cost)
+				cost_label.text = GameState.format_number(cost)
 				btn.disabled = level <= 0 if refund_mode else GameState.medals < cost
-				_add_medal_icon(cost_label)
 		else:
 			cost_label.text = "$%s" % GameState.format_number(cost)
 			btn.disabled = level <= 0 if refund_mode else GameState.money < cost
 
-func _add_medal_icon(label: Label) -> void:
-	# remove existing medal icons to avoid duplicates on refresh
-	for child in label.get_children():
-		if child is TextureRect:
+func _clear_medal_icons(row: Control) -> void:
+	for child in row.get_children():
+		if child is TextureRect and str(child.name).begins_with("MedalCostIcon"):
 			child.queue_free()
-	var medal_icon = TextureRect.new()
-	medal_icon.texture = preload("res://MedalIcon.png")
-	medal_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	medal_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	medal_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	medal_icon.custom_minimum_size = Vector2(16, 16)
-	label.add_child(medal_icon)
-	medal_icon.position = Vector2(0, (label.size.y - 16) / 2)
+
+	var cost_label := row.get_node_or_null("VBoxContainer/CostLabel") as Label
+	if cost_label != null:
+		for child in cost_label.get_children():
+			if child is TextureRect:
+				child.queue_free()
 
 func _on_buy_input(event: InputEvent, key: String) -> void:
 	if not event is InputEventMouseButton:
@@ -106,6 +162,8 @@ func _on_buy_input(event: InputEvent, key: String) -> void:
 		AudioManager.play_sfx("button")
 
 func _buy_one(key: String) -> bool:
+	if GameState.is_demo_hidden_upgrade(key):
+		return false
 	var upgrade = GameState.upgrades[key]
 	var max_lvl = upgrade.get("max_level", -1)
 	if max_lvl >= 0 and upgrade["level"] >= max_lvl:
@@ -127,6 +185,8 @@ func _buy_one(key: String) -> bool:
 	return false
 
 func _refund_one(key: String) -> bool:
+	if GameState.is_demo_hidden_upgrade(key):
+		return false
 	var upgrade = GameState.upgrades[key]
 	var level = int(upgrade["level"])
 	if level <= 0:

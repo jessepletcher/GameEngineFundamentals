@@ -27,6 +27,11 @@ const GOLDEN_BOUNCE_FREQ := 0.8
 const GOLDEN_LETTER_PHASE := 0.6
 
 func _process(delta: float) -> void:
+	if not is_instance_valid(camera):
+		camera = get_viewport().get_camera_3d()
+	if not is_instance_valid(camera):
+		return
+
 	var distance = global_position.distance_to(camera.global_position)
 	var scale_factor = pow(distance * 0.6, .6)
 	sprite.scale = Vector3(scale_factor, scale_factor, scale_factor)

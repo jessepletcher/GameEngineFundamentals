@@ -1,0 +1,32 @@
+Idle Golf Demo Changelog
+
+v0.1.0-demo
+- Added public demo content locks with visible Full Game shop states.
+- Limited playable demo content to Course 1, Standard/Pin Seeker/Firework balls, and Standard/Shop Keep/Lion Trees golfers.
+- Hid Multi Ball Spread and Consistency Mult upgrades from the public demo.
+- Sorted shop content by demo availability and unlock level, and hid full-game item descriptions.
+- Added saved PC display settings for window mode, resolution, and VSync.
+- Defaulted VSync off, made resolution changes switch to windowed mode, and aligned medal upgrade costs.
+- Made windowed mode force a real OS window before resizing, and moved medal upgrade text back over the icon area.
+- Renamed Speedy Golfer to Shop Keep, changed the passive to +50% money, and added character icons for the demo golfers.
+- Added Shop Keep's in-game swing sprite.
+- Scaled down the new demo golfer shop icons.
+- Stabilized medal upgrade cost icons and added the LockedIcon art for demo-locked shop items.
+- Added the Big Piney course icon, scaled it up in the shop, kept LockedIcon unscaled, and updated locked golfer names.
+- Removed medal icons from medal upgrade costs.
+- Applied item icon scaling to unlock animations.
+- Fixed exported shop script loading so shop items, medal count, and the exit button work.
+- Replaced demo golfer shop icons with unscaled portrait sprites.
+- Scaled the demo golfer portrait shop icons to 500%.
+- Added a Balatro-font in-game help guide with a top-right info button, centered scroll panel, and multi-page mechanic sections.
+- Updated the help guide and retirement prompt wording to match current mechanics.
+- Restyled the retirement prompt to match the player guide panel, moved the info button below settings, and centered the settings menu.
+- Added a saved one-time wiggle hint for the info button that resets only with Reset Game.
+- Fixed the info button layout so its 5x art no longer overlaps the settings button.
+- Restyled the Reset Game confirmation to match the player guide and retirement panels.
+- Hardened camera-dependent helper scenes so standalone scene validation does not throw null-camera errors.
+- Added a Linux x86_64 demo export preset and package target.
+- Disabled public debug camera shortcuts, UI/spawn debug shortcuts, and settings-menu cheat buttons.
+- Switched the demo to a separate versioned save path.
+- Updated Windows export metadata and build path for Itch packaging.
+- Added player-facing README, credits stub, changelog, and Itch page asset scaffolding.

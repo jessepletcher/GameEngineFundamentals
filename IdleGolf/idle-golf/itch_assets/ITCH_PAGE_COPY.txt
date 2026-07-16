@@ -1,0 +1,26 @@
+Idle Golf Demo
+
+Short description:
+An idle golf game about launching endless shots, earning cash, upgrading your range, retiring for medals, and unlocking stranger golf gear.
+
+Demo contents:
+- Play on the Big Piney course.
+- Unlock and try Standard Ball, Pin Seeker, and Firework Ball.
+- Unlock and try Standard Golfer, Shop Keep, and Lion Trees.
+- Preview full-game balls, golfers, and courses in the shop.
+
+Controls:
+- Shots are automatic.
+- Drag the launch control to shape shots.
+- Use the aim slider to steer shots.
+- Spend cash on upgrades and medals on shop unlocks.
+- Use settings for window mode, resolution, VSync, SFX, music, reset, and exit.
+
+Recommended Itch metadata:
+- Platform: Windows
+- Version: v0.1.0-demo
+- Status: Demo / Work in progress
+- Upload file: IdleGolf_Demo_v0.1.0_Windows.zip
+
+Public note:
+This is an early demo. Balance, art, audio mix, and some item icons are still work in progress.

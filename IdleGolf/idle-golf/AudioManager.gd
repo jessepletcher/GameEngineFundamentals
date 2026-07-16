@@ -131,12 +131,20 @@ func _notification(what: int) -> void:
 		cleanup_audio()
 
 func toggle_sfx_mute() -> void:
-	sfx_muted = !sfx_muted
+	set_sfx_muted(not sfx_muted)
 
 func toggle_music_mute() -> void:
-	music_muted = !music_muted
-	music_player.stream_paused = music_muted
-	ambience_player.stream_paused = music_muted
+	set_music_muted(not music_muted)
+
+func set_sfx_muted(muted: bool) -> void:
+	sfx_muted = muted
+
+func set_music_muted(muted: bool) -> void:
+	music_muted = muted
+	if music_player:
+		music_player.stream_paused = music_muted
+	if ambience_player:
+		ambience_player.stream_paused = music_muted
 
 func set_sfx_ducked(ducked: bool) -> void:
 	if ducked:

@@ -3,6 +3,7 @@ extends Control
 signal shop_closed
 
 const ShopItem = preload("res://ShopItem.tscn")
+const UNLOCK_ICON_SCALE_MULTIPLIER := 3.2
 
 @onready var medals_label: Label = $MedalAndExitTexture/MedalsLabel
 @onready var back_button: Button = $BackButton
@@ -53,29 +54,56 @@ func _populate_shop() -> void:
 	for child in course_list.get_children():
 		child.queue_free()
 
-	for id in GameState.balls:
+	for id in _sorted_shop_ids(GameState.balls):
 		var data = GameState.balls[id]
 		var item = ShopItem.instantiate()
 		ball_list.add_child(item)
-		item.setup(id, data["name"], data["desc"], 0.0, data.get("texture", null), data["owned"], GameState.equipped_ball == id, data.get("medal_cost", 0), data.get("unlock_level", 1))
+		item.setup(id, data["name"], data["desc"], 0.0, data.get("texture", null), data["owned"], GameState.equipped_ball == id, data.get("medal_cost", 0), data.get("unlock_level", 1), GameState.is_demo_locked(data), GameState.get_demo_lock_text(data), data.get("icon_scale", 5.0))
 		item.purchase_requested.connect(_on_ball_purchase)
 
-	for id in GameState.golfers:
+	for id in _sorted_shop_ids(GameState.golfers):
 		var data = GameState.golfers[id]
 		var item = ShopItem.instantiate()
 		golfer_list.add_child(item)
-		item.setup(id, data["name"], data["desc"], 0.0, data.get("texture", null), data["owned"], GameState.equipped_golfer == id, data.get("medal_cost", 0), data.get("unlock_level", 1))
+		item.setup(id, data["name"], data["desc"], 0.0, data.get("texture", null), data["owned"], GameState.equipped_golfer == id, data.get("medal_cost", 0), data.get("unlock_level", 1), GameState.is_demo_locked(data), GameState.get_demo_lock_text(data), data.get("icon_scale", 5.0))
 		item.purchase_requested.connect(_on_golfer_purchase)
 
-	for id in GameState.courses:
+	for id in _sorted_shop_ids(GameState.courses):
 		var data = GameState.courses[id]
 		var item = ShopItem.instantiate()
 		course_list.add_child(item)
-		item.setup(id, data["name"], data["desc"], 0.0, data.get("texture", null), data["owned"], GameState.equipped_course == id, data.get("medal_cost", 0), data.get("unlock_level", 1))
+		item.setup(id, data["name"], data["desc"], 0.0, data.get("texture", null), data["owned"], GameState.equipped_course == id, data.get("medal_cost", 0), data.get("unlock_level", 1), GameState.is_demo_locked(data), GameState.get_demo_lock_text(data), data.get("icon_scale", 5.0))
 		item.purchase_requested.connect(_on_course_purchase)
+
+func _sorted_shop_ids(item_data: Dictionary) -> Array:
+	var ids := item_data.keys()
+	ids.sort_custom(func(a, b): return _is_shop_item_before(str(a), str(b), item_data))
+	return ids
+
+func _is_shop_item_before(a: String, b: String, item_data: Dictionary) -> bool:
+	var a_data: Dictionary = item_data[a]
+	var b_data: Dictionary = item_data[b]
+	var a_demo_rank := 1 if GameState.is_demo_locked(a_data) else 0
+	var b_demo_rank := 1 if GameState.is_demo_locked(b_data) else 0
+	if a_demo_rank != b_demo_rank:
+		return a_demo_rank < b_demo_rank
+
+	var a_level := int(a_data.get("unlock_level", 1))
+	var b_level := int(b_data.get("unlock_level", 1))
+	if a_level != b_level:
+		return a_level < b_level
+
+	var a_medals := int(a_data.get("medal_cost", 0))
+	var b_medals := int(b_data.get("medal_cost", 0))
+	if a_medals != b_medals:
+		return a_medals < b_medals
+
+	return str(a_data.get("name", a)).nocasecmp_to(str(b_data.get("name", b))) < 0
 
 func _on_ball_purchase(id: String) -> void:
 	var data = GameState.balls[id]
+	if GameState.is_demo_locked(data):
+		return
 	if not data["owned"] and GameState.level < data.get("unlock_level", 1):
 		return
 	var was_owned: bool = data["owned"]
@@ -87,12 +115,14 @@ func _on_ball_purchase(id: String) -> void:
 		GameState.balls[id]["owned"] = true
 		GameState.equipped_ball = id
 	if not was_owned and data["owned"]:
-		_play_unlock_animation(data.get("texture", null), data.get("name", ""))
+		_play_unlock_animation(data.get("texture", null), data.get("name", ""), data.get("icon_scale", 5.0))
 	_update_medals_label()
 	_populate_shop()
 
 func _on_golfer_purchase(id: String) -> void:
 	var data = GameState.golfers[id]
+	if GameState.is_demo_locked(data):
+		return
 	if not data["owned"] and GameState.level < data.get("unlock_level", 1):
 		return
 	var was_owned: bool = data["owned"]
@@ -104,7 +134,7 @@ func _on_golfer_purchase(id: String) -> void:
 		GameState.golfers[id]["owned"] = true
 		GameState.equipped_golfer = id
 	if not was_owned and data["owned"]:
-		_play_unlock_animation(data.get("texture", null), data.get("name", ""))
+		_play_unlock_animation(data.get("texture", null), data.get("name", ""), data.get("icon_scale", 5.0))
 	GameState.golfer_changed.emit()
 	_update_medals_label()
 	_populate_shop()
@@ -112,6 +142,8 @@ func _on_golfer_purchase(id: String) -> void:
 
 func _on_course_purchase(id: String) -> void:
 	var data = GameState.courses[id]
+	if GameState.is_demo_locked(data):
+		return
 	if not data["owned"] and GameState.level < data.get("unlock_level", 1):
 		return
 	var was_owned: bool = data["owned"]
@@ -123,12 +155,12 @@ func _on_course_purchase(id: String) -> void:
 		GameState.courses[id]["owned"] = true
 		GameState.equipped_course = id
 	if not was_owned and data["owned"]:
-		_play_unlock_animation(data.get("texture", null), data.get("name", ""))
+		_play_unlock_animation(data.get("texture", null), data.get("name", ""), data.get("icon_scale", 5.0))
 	GameState.course_changed.emit()
 	_update_medals_label()
 	_populate_shop()
 
-func _play_unlock_animation(item_texture: Texture2D, item_name: String = "") -> void:
+func _play_unlock_animation(item_texture: Texture2D, item_name: String = "", item_icon_scale: float = 5.0) -> void:
 	var screen := get_viewport().get_visible_rect().size
 	var center := screen / 2.0
 
@@ -187,7 +219,9 @@ func _play_unlock_animation(item_texture: Texture2D, item_name: String = "") -> 
 
 		var item_tween := item_sprite.create_tween()
 		item_tween.tween_interval(0.48)
-		item_tween.tween_property(item_sprite, "scale", Vector2(16, 16), 1.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		var target_icon_scale: float = maxf(item_icon_scale, 0.0)
+		var target_scale: Vector2 = Vector2.ONE * target_icon_scale * UNLOCK_ICON_SCALE_MULTIPLIER
+		item_tween.tween_property(item_sprite, "scale", target_scale, 1.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 	if item_name != "":
 		var name_label := Label.new()

@@ -1,0 +1,11 @@
+Itch Screenshot/Cover Checklist
+
+Capture real screenshots from the exported Windows build before public upload:
+- Screenshot 1: first-run Big Piney with cash, XP, aim slider, and shot control visible.
+- Screenshot 2: shop Balls tab showing playable balls and Full Game locks.
+- Screenshot 3: shop Golfers or Courses tab showing Lion Trees and locked courses.
+- Screenshot 4: a Firework Ball or Pin Seeker shot effect in flight.
+
+Cover image:
+- Use IdleGolf_Demo_Cover.svg as a temporary source/placeholder.
+- Replace it with a polished PNG cover if time allows.

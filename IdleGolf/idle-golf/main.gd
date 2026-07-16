@@ -26,6 +26,7 @@ const Ball = preload("res://scenes/Ball.tscn")
 @onready var shot_control = $CanvasLayer/ShotControl
 @onready var reset_button: Button = $CanvasLayer/ResetButton
 @onready var reset_dialog = $CanvasLayer/ResetDialog
+@onready var reset_info_label: Label = $CanvasLayer/ResetDialog/VBoxContainer/Label
 @onready var confirm_reset: Button = $CanvasLayer/ResetDialog/VBoxContainer/ConfirmResetButton
 @onready var cancel_reset: Button = $CanvasLayer/ResetDialog/VBoxContainer/CancelResetButton
 
@@ -44,8 +45,26 @@ const TEXT_QUEUE_INTERVAL := 0.15
 const MAX_INDIVIDUAL_TEXTS := 4  # show this many individually, then batch the rest
 const HIDE_WITH_UI_GROUP := "hide_with_ui"
 var _settings_panel: PanelContainer
+var _help_panel: PanelContainer
+var _help_page_label: Label
+var _help_content: VBoxContainer
+var _help_scroll: ScrollContainer
+var _help_page_index := 0
+var _help_pages: Array = []
+var _help_button: TextureButton
+var _help_button_base_scale := Vector2.ONE
+var _help_wiggle_tween: Tween
+var _help_wiggle_timer: Timer
 var _ui_hidden := false
 var _spawning_disabled := false
+const DISPLAY_MODE_FULLSCREEN := "fullscreen"
+const DISPLAY_MODE_WINDOWED := "windowed"
+const DISPLAY_MODE_ORDER := [DISPLAY_MODE_FULLSCREEN, DISPLAY_MODE_WINDOWED]
+const WINDOWED_RESOLUTIONS := [
+	Vector2i(1280, 720),
+	Vector2i(1600, 900),
+	Vector2i(1920, 1080),
+]
 
 # hole-out combo
 var _combo_count: int = 0
@@ -95,14 +114,6 @@ func _process(delta: float) -> void:
 			continue
 		_market_investments[flag] *= (1.0 + MARKET_GROWTH_RATE * delta)
 		_update_market_label(flag)
-
-func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F2:
-		_set_ui_hidden(not _ui_hidden)
-		get_viewport().set_input_as_handled()
-	elif event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F3:
-		_set_spawning_disabled(not _spawning_disabled)
-		get_viewport().set_input_as_handled()
 
 func _set_ui_hidden(hidden: bool) -> void:
 	_ui_hidden = hidden
@@ -163,6 +174,7 @@ func _switch_course() -> void:
 	_show_all_yardage()
 
 func _ready() -> void:
+	_apply_saved_runtime_settings()
 	_course_data["course1"]["sprites"] = level1_sprites
 	_course_data["course1"]["flags"] = level1_flags
 	_course_data["course2"]["sprites"] = level2_sprites
@@ -188,6 +200,7 @@ func _ready() -> void:
 	retire_button.pressed.connect(_on_retire_pressed)
 	confirm_retire.pressed.connect(_on_confirm_retire)
 	cancel_retire.pressed.connect(_on_cancel_retire)
+	_setup_retire_dialog_style()
 	retire_dialog.visible = false
 	GameState.medals_changed.connect(_on_medals_changed)
 	medals_label.text = GameState.format_number(GameState.medals)
@@ -219,6 +232,7 @@ func _ready() -> void:
 	add_child(loop_timer)
 	confirm_reset.pressed.connect(_on_confirm_reset)
 	cancel_reset.pressed.connect(_on_cancel_reset)
+	_setup_reset_dialog_style()
 	reset_dialog.visible = false
 
 	# settings menu
@@ -274,9 +288,8 @@ func _on_medals_changed(amount: float) -> void:
 	medals_label.text = " " + GameState.format_number(amount)
 
 func _on_retire_pressed() -> void:
-	print("DEBUG: lifetime_money=", GameState.lifetime_money, " money=", GameState.money)
 	var medals = GameState.get_medal_reward()
-	retire_info_label.text = "You will earn %s Medals!\n\nUpgrades will be reset.\nBalls, clubs, levels and level bonuses are kept." % GameState.format_number(medals)
+	retire_info_label.text = "You will earn %s Medals!\n\nRetiring resets run money and cash upgrades.\nLevels, unlocks, balls, golfers, courses, and medal upgrades stay." % GameState.format_number(medals)
 	retire_dialog.visible = true
 
 func _on_leveled_up(new_level: int, stat_boosted: String) -> void:
@@ -863,6 +876,231 @@ func _on_confirm_reset() -> void:
 func _on_cancel_reset() -> void:
 	reset_dialog.visible = false
 
+func _apply_saved_runtime_settings() -> void:
+	GameState.window_mode = _normalize_window_mode(GameState.window_mode)
+	if _get_window_size_index(GameState.window_size) == -1:
+		GameState.window_size = _format_window_size(WINDOWED_RESOLUTIONS[1])
+	AudioManager.set_sfx_muted(GameState.sfx_muted)
+	AudioManager.set_music_muted(GameState.music_muted)
+	_apply_display_settings()
+
+func _apply_display_settings() -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+
+	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if GameState.vsync_enabled else DisplayServer.VSYNC_DISABLED)
+	match _normalize_window_mode(GameState.window_mode):
+		DISPLAY_MODE_FULLSCREEN:
+			_apply_fullscreen()
+		_:
+			var window_size := _get_window_size(GameState.window_size)
+			_apply_windowed_size(window_size)
+
+func _apply_fullscreen() -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	var window := get_window()
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	window.borderless = false
+	window.mode = Window.MODE_FULLSCREEN
+
+func _center_window(window_size: Vector2i) -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	var screen := DisplayServer.window_get_current_screen()
+	var screen_position := DisplayServer.screen_get_position(screen)
+	var screen_size := DisplayServer.screen_get_size(screen)
+	get_window().position = screen_position + (screen_size - window_size) / 2
+
+func _apply_windowed_size(window_size: Vector2i) -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	var window := get_window()
+	window.mode = Window.MODE_WINDOWED
+	window.borderless = false
+	window.unresizable = false
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	_finish_windowed_resize.call_deferred(window_size)
+	get_tree().create_timer(0.20).timeout.connect(_finish_windowed_resize.bind(window_size))
+
+func _finish_windowed_resize(window_size: Vector2i) -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	var window := get_window()
+	window.mode = Window.MODE_WINDOWED
+	window.borderless = false
+	window.unresizable = false
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	DisplayServer.window_set_size(window_size)
+	window.size = window_size
+	_center_window(window_size)
+
+func _normalize_window_mode(mode: String) -> String:
+	if DISPLAY_MODE_ORDER.has(mode):
+		return mode
+	return DISPLAY_MODE_FULLSCREEN
+
+func _next_window_mode(mode: String) -> String:
+	var current := DISPLAY_MODE_ORDER.find(_normalize_window_mode(mode))
+	return DISPLAY_MODE_ORDER[(current + 1) % DISPLAY_MODE_ORDER.size()]
+
+func _window_mode_label(mode: String) -> String:
+	match _normalize_window_mode(mode):
+		DISPLAY_MODE_WINDOWED:
+			return "Windowed"
+		_:
+			return "Fullscreen"
+
+func _format_window_size(window_size: Vector2i) -> String:
+	return "%dx%d" % [window_size.x, window_size.y]
+
+func _get_window_size(size_key: String) -> Vector2i:
+	var index := _get_window_size_index(size_key)
+	if index == -1:
+		return WINDOWED_RESOLUTIONS[1]
+	return WINDOWED_RESOLUTIONS[index]
+
+func _get_window_size_index(size_key: String) -> int:
+	for i in range(WINDOWED_RESOLUTIONS.size()):
+		if _format_window_size(WINDOWED_RESOLUTIONS[i]) == size_key:
+			return i
+	return -1
+
+func _next_window_size(size_key: String) -> String:
+	var index := _get_window_size_index(size_key)
+	if index == -1:
+		index = 0
+	else:
+		index = (index + 1) % WINDOWED_RESOLUTIONS.size()
+	return _format_window_size(WINDOWED_RESOLUTIONS[index])
+
+func _make_settings_button(text: String, font: Font) -> Button:
+	var button := Button.new()
+	button.text = text
+	button.custom_minimum_size = Vector2(250, 34)
+	button.add_theme_font_override("font", font)
+	button.add_theme_font_size_override("font_size", 16)
+	return button
+
+func _make_help_text_button(text: String, font: Font, min_size: Vector2 = Vector2(96, 34)) -> Button:
+	var button := Button.new()
+	button.text = text
+	button.custom_minimum_size = min_size
+	button.add_theme_font_override("font", font)
+	button.add_theme_font_size_override("font_size", 16)
+	return button
+
+func _make_guide_button_style(bg_color: Color) -> StyleBoxFlat:
+	var button_style := StyleBoxFlat.new()
+	button_style.bg_color = bg_color
+	button_style.border_color = Color(0.32, 0.22, 0.16)
+	button_style.border_width_left = 4
+	button_style.border_width_top = 4
+	button_style.border_width_right = 4
+	button_style.border_width_bottom = 4
+	button_style.expand_margin_top = 4.0
+	button_style.expand_margin_bottom = 4.0
+	return button_style
+
+func _apply_guide_button_style(button: Button, font: Font, text: String = "") -> void:
+	if not text.is_empty():
+		button.text = text
+	button.custom_minimum_size = Vector2(250, 36)
+	button.add_theme_font_override("font", font)
+	button.add_theme_font_size_override("font_size", 18)
+	button.add_theme_color_override("font_color", Color.WHITE)
+	button.add_theme_color_override("font_hover_color", Color.WHITE)
+	button.add_theme_color_override("font_pressed_color", Color(1.0, 0.92, 0.70))
+	button.add_theme_stylebox_override("normal", _make_guide_button_style(Color(0.49, 0.35, 0.26)))
+	button.add_theme_stylebox_override("hover", _make_guide_button_style(Color(0.58, 0.42, 0.30)))
+	button.add_theme_stylebox_override("pressed", _make_guide_button_style(Color(0.36, 0.24, 0.17)))
+
+func _make_guide_panel_style() -> StyleBoxFlat:
+	var panel_style := StyleBoxFlat.new()
+	panel_style.bg_color = Color(0.10, 0.08, 0.07, 0.96)
+	panel_style.border_color = Color(0.45, 0.30, 0.24)
+	panel_style.border_width_left = 4
+	panel_style.border_width_top = 4
+	panel_style.border_width_right = 4
+	panel_style.border_width_bottom = 4
+	panel_style.content_margin_left = 18
+	panel_style.content_margin_top = 14
+	panel_style.content_margin_right = 18
+	panel_style.content_margin_bottom = 14
+	return panel_style
+
+func _setup_retire_dialog_style() -> void:
+	var font: Font = load("res://balatro.otf")
+	retire_dialog.anchor_left = 0.5
+	retire_dialog.anchor_right = 0.5
+	retire_dialog.anchor_top = 0.5
+	retire_dialog.anchor_bottom = 0.5
+	retire_dialog.offset_left = -360
+	retire_dialog.offset_right = 360
+	retire_dialog.offset_top = -135
+	retire_dialog.offset_bottom = 135
+	retire_dialog.add_theme_stylebox_override("panel", _make_guide_panel_style())
+	retire_dialog.z_index = 20
+
+	var vbox := retire_dialog.get_node_or_null("VBoxContainer") as VBoxContainer
+	if vbox:
+		vbox.add_theme_constant_override("separation", 8)
+
+	retire_info_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	retire_info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	retire_info_label.add_theme_font_override("font", font)
+	retire_info_label.add_theme_font_size_override("font_size", 22)
+	retire_info_label.add_theme_color_override("font_color", Color(1.0, 0.92, 0.70))
+	retire_info_label.add_theme_constant_override("outline_size", 0)
+	retire_info_label.custom_minimum_size = Vector2(650, 98)
+
+	for button in [confirm_retire, cancel_retire]:
+		button.custom_minimum_size = Vector2(250, 36)
+		button.add_theme_font_override("font", font)
+		button.add_theme_font_size_override("font_size", 18)
+
+func _setup_reset_dialog_style() -> void:
+	var font: Font = load("res://balatro.otf")
+	reset_dialog.anchor_left = 0.5
+	reset_dialog.anchor_right = 0.5
+	reset_dialog.anchor_top = 0.5
+	reset_dialog.anchor_bottom = 0.5
+	reset_dialog.offset_left = -360
+	reset_dialog.offset_right = 360
+	reset_dialog.offset_top = -125
+	reset_dialog.offset_bottom = 125
+	reset_dialog.add_theme_stylebox_override("panel", _make_guide_panel_style())
+	reset_dialog.z_index = 20
+	reset_dialog.mouse_filter = Control.MOUSE_FILTER_STOP
+
+	var vbox := reset_dialog.get_node_or_null("VBoxContainer") as VBoxContainer
+	if vbox:
+		vbox.anchor_left = 0.0
+		vbox.anchor_right = 1.0
+		vbox.anchor_top = 0.0
+		vbox.anchor_bottom = 1.0
+		vbox.offset_left = 18
+		vbox.offset_right = -18
+		vbox.offset_top = 14
+		vbox.offset_bottom = -14
+		vbox.add_theme_constant_override("separation", 8)
+
+	reset_info_label.text = "Are you sure?\nThis will erase ALL progress."
+	reset_info_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	reset_info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	reset_info_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	reset_info_label.add_theme_font_override("font", font)
+	reset_info_label.add_theme_font_size_override("font_size", 22)
+	reset_info_label.add_theme_color_override("font_color", Color(1.0, 0.92, 0.70))
+	reset_info_label.add_theme_constant_override("outline_size", 0)
+	reset_info_label.custom_minimum_size = Vector2(650, 84)
+
+	_apply_guide_button_style(confirm_reset, font, "Confirm Reset")
+	_apply_guide_button_style(cancel_reset, font, "Cancel")
+
 func _setup_settings_menu() -> void:
 	var font = load("res://balatro.otf")
 
@@ -882,82 +1120,99 @@ func _setup_settings_menu() -> void:
 	settings_btn.offset_top = 10
 	settings_btn.offset_bottom = 10 + tex_size.y
 	$CanvasLayer.add_child(settings_btn)
+	_setup_help_menu(font, settings_btn)
 
 	# settings panel
 	_settings_panel = PanelContainer.new()
-	_settings_panel.anchor_left = 1.0
-	_settings_panel.anchor_right = 1.0
-	_settings_panel.anchor_top = 0.0
-	_settings_panel.anchor_bottom = 0.0
-	_settings_panel.offset_left = -200
-	_settings_panel.offset_right = -10
-	_settings_panel.offset_top = 55
-	_settings_panel.offset_bottom = 285
+	_settings_panel.anchor_left = 0.5
+	_settings_panel.anchor_right = 0.5
+	_settings_panel.anchor_top = 0.5
+	_settings_panel.anchor_bottom = 0.5
+	_settings_panel.offset_left = -150
+	_settings_panel.offset_right = 150
+	_settings_panel.offset_top = -175
+	_settings_panel.offset_bottom = 175
 	_settings_panel.visible = false
+	_settings_panel.z_index = 20
+	_settings_panel.add_theme_stylebox_override("panel", _make_guide_panel_style())
 	$CanvasLayer.add_child(_settings_panel)
 
 	var vbox = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 8)
+	vbox.add_theme_constant_override("separation", 6)
 	_settings_panel.add_child(vbox)
 
-	var sfx_btn = Button.new()
-	sfx_btn.text = "Disable SFX"
-	sfx_btn.add_theme_font_override("font", font)
-	sfx_btn.add_theme_font_size_override("font_size", 16)
+	var window_mode_btn := _make_settings_button("", font)
+	vbox.add_child(window_mode_btn)
+
+	var resolution_btn := _make_settings_button("", font)
+	vbox.add_child(resolution_btn)
+
+	var vsync_btn := _make_settings_button("", font)
+	vbox.add_child(vsync_btn)
+
+	var sfx_btn := _make_settings_button("", font)
 	vbox.add_child(sfx_btn)
 
-	var music_btn = Button.new()
-	music_btn.text = "Disable Music"
-	music_btn.add_theme_font_override("font", font)
-	music_btn.add_theme_font_size_override("font_size", 16)
+	var music_btn := _make_settings_button("", font)
 	vbox.add_child(music_btn)
 
-	var exit_btn = Button.new()
-	exit_btn.text = "Exit Game"
-	exit_btn.add_theme_font_override("font", font)
-	exit_btn.add_theme_font_size_override("font_size", 16)
-	vbox.add_child(exit_btn)
-
-	var reset_btn = Button.new()
-	reset_btn.text = "Reset Game"
-	reset_btn.add_theme_font_override("font", font)
-	reset_btn.add_theme_font_size_override("font_size", 16)
+	var reset_btn := _make_settings_button("Reset Game", font)
 	vbox.add_child(reset_btn)
 
-	var medals_btn = Button.new()
-	medals_btn.text = "+100 Medals"
-	medals_btn.add_theme_font_override("font", font)
-	medals_btn.add_theme_font_size_override("font_size", 16)
-	vbox.add_child(medals_btn)
+	var exit_btn := _make_settings_button("Exit Game", font)
+	vbox.add_child(exit_btn)
 
-	var small_money_btn = Button.new()
-	small_money_btn.text = "+$1,000"
-	small_money_btn.add_theme_font_override("font", font)
-	small_money_btn.add_theme_font_size_override("font_size", 16)
-	vbox.add_child(small_money_btn)
+	var refresh_buttons := func() -> void:
+		window_mode_btn.text = "Window: %s" % _window_mode_label(GameState.window_mode)
+		resolution_btn.text = "Resolution: %s" % GameState.window_size
+		vsync_btn.text = "VSync: %s" % ("On" if GameState.vsync_enabled else "Off")
+		sfx_btn.text = "SFX: %s" % ("Off" if AudioManager.sfx_muted else "On")
+		music_btn.text = "Music: %s" % ("Off" if AudioManager.music_muted else "On")
 
-	var money_btn = Button.new()
-	money_btn.text = "+$1,000,000"
-	money_btn.add_theme_font_override("font", font)
-	money_btn.add_theme_font_size_override("font_size", 16)
-	vbox.add_child(money_btn)
+	refresh_buttons.call()
 
-	var level_btn = Button.new()
-	level_btn.text = "+1 Level"
-	level_btn.add_theme_font_override("font", font)
-	level_btn.add_theme_font_size_override("font_size", 16)
-	vbox.add_child(level_btn)
+	settings_btn.pressed.connect(func():
+		_settings_panel.visible = !_settings_panel.visible
+		if _settings_panel.visible:
+			if _help_panel:
+				_help_panel.visible = false
+			refresh_buttons.call()
+	)
 
-	settings_btn.pressed.connect(func(): _settings_panel.visible = !_settings_panel.visible)
+	window_mode_btn.pressed.connect(func():
+		GameState.window_mode = _next_window_mode(GameState.window_mode)
+		_apply_display_settings()
+		refresh_buttons.call()
+		GameState.save()
+	)
+
+	resolution_btn.pressed.connect(func():
+		GameState.window_size = _next_window_size(GameState.window_size)
+		GameState.window_mode = DISPLAY_MODE_WINDOWED
+		_apply_display_settings()
+		refresh_buttons.call()
+		GameState.save()
+	)
+
+	vsync_btn.pressed.connect(func():
+		GameState.vsync_enabled = not GameState.vsync_enabled
+		_apply_display_settings()
+		refresh_buttons.call()
+		GameState.save()
+	)
 
 	sfx_btn.pressed.connect(func():
 		AudioManager.toggle_sfx_mute()
-		sfx_btn.text = "Enable SFX" if AudioManager.sfx_muted else "Disable SFX"
+		GameState.sfx_muted = AudioManager.sfx_muted
+		refresh_buttons.call()
+		GameState.save()
 	)
 
 	music_btn.pressed.connect(func():
 		AudioManager.toggle_music_mute()
-		music_btn.text = "Enable Music" if AudioManager.music_muted else "Disable Music"
+		GameState.music_muted = AudioManager.music_muted
+		refresh_buttons.call()
+		GameState.save()
 	)
 
 	exit_btn.pressed.connect(func():
@@ -970,26 +1225,254 @@ func _setup_settings_menu() -> void:
 		_on_reset_pressed()
 	)
 
-	medals_btn.pressed.connect(func():
-		GameState.medals += 100
-		GameState.medals_changed.emit(GameState.medals)
+func _setup_help_menu(font: Font, settings_btn: TextureButton) -> void:
+	_help_pages = _build_help_pages()
+
+	var help_btn := TextureButton.new()
+	help_btn.texture_normal = load("res://HelpButton.png")
+	help_btn.stretch_mode = TextureButton.STRETCH_SCALE
+	help_btn.ignore_texture_size = true
+	help_btn.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	help_btn.anchor_left = 1.0
+	help_btn.anchor_right = 1.0
+	help_btn.anchor_top = 0.0
+	help_btn.anchor_bottom = 0.0
+	var tex_size := help_btn.texture_normal.get_size() if help_btn.texture_normal else Vector2(32, 32)
+	var help_button_scale := 5.0
+	var help_button_size := tex_size * help_button_scale
+	help_btn.custom_minimum_size = help_button_size
+	help_btn.offset_left = settings_btn.offset_right - help_button_size.x
+	help_btn.offset_right = settings_btn.offset_right
+	help_btn.offset_top = settings_btn.offset_bottom + 8.0
+	help_btn.offset_bottom = help_btn.offset_top + help_button_size.y
+	$CanvasLayer.add_child(help_btn)
+	_help_button = help_btn
+	_help_button_base_scale = help_btn.scale
+
+	_help_panel = PanelContainer.new()
+	_help_panel.anchor_left = 0.5
+	_help_panel.anchor_right = 0.5
+	_help_panel.anchor_top = 0.5
+	_help_panel.anchor_bottom = 0.5
+	_help_panel.offset_left = -360
+	_help_panel.offset_right = 360
+	_help_panel.offset_top = -255
+	_help_panel.offset_bottom = 255
+	_help_panel.visible = false
+	_help_panel.z_index = 20
+	_help_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	$CanvasLayer.add_child(_help_panel)
+
+	_help_panel.add_theme_stylebox_override("panel", _make_guide_panel_style())
+
+	var root := VBoxContainer.new()
+	root.add_theme_constant_override("separation", 8)
+	_help_panel.add_child(root)
+
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 8)
+	root.add_child(header)
+
+	var title := Label.new()
+	title.text = "PLAYER GUIDE"
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title.add_theme_font_override("font", font)
+	title.add_theme_font_size_override("font_size", 32)
+	title.add_theme_color_override("font_color", Color(1.0, 0.92, 0.70))
+	title.add_theme_constant_override("outline_size", 0)
+	header.add_child(title)
+
+	var close_btn := _make_help_text_button("Close", font, Vector2(94, 34))
+	header.add_child(close_btn)
+
+	var nav := HBoxContainer.new()
+	nav.add_theme_constant_override("separation", 8)
+	root.add_child(nav)
+
+	var prev_btn := _make_help_text_button("<", font, Vector2(52, 34))
+	nav.add_child(prev_btn)
+
+	_help_page_label = Label.new()
+	_help_page_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_help_page_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_help_page_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_help_page_label.add_theme_font_override("font", font)
+	_help_page_label.add_theme_font_size_override("font_size", 20)
+	_help_page_label.add_theme_color_override("font_color", Color.WHITE)
+	_help_page_label.add_theme_constant_override("outline_size", 0)
+	nav.add_child(_help_page_label)
+
+	var next_btn := _make_help_text_button(">", font, Vector2(52, 34))
+	nav.add_child(next_btn)
+
+	_help_scroll = ScrollContainer.new()
+	_help_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_help_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	_help_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_help_scroll.custom_minimum_size = Vector2(650, 368)
+	root.add_child(_help_scroll)
+
+	_help_content = VBoxContainer.new()
+	_help_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_help_content.add_theme_constant_override("separation", 10)
+	_help_scroll.add_child(_help_content)
+
+	close_btn.pressed.connect(func():
+		_help_panel.visible = false
+	)
+	prev_btn.pressed.connect(func():
+		_change_help_page(-1)
+	)
+	next_btn.pressed.connect(func():
+		_change_help_page(1)
+	)
+	help_btn.pressed.connect(func():
+		_mark_help_button_clicked()
+		_help_panel.visible = !_help_panel.visible
+		if _help_panel.visible:
+			if _settings_panel:
+				_settings_panel.visible = false
+			_show_help_page(_help_page_index)
 	)
 
-	small_money_btn.pressed.connect(func():
-		GameState.money += 1000
-		GameState.lifetime_money += 1000
-		GameState.money_changed.emit(GameState.money)
+	_show_help_page(0)
+	_setup_help_button_wiggle()
+
+func _setup_help_button_wiggle() -> void:
+	if GameState.has_clicked_help_button or not is_instance_valid(_help_button):
+		return
+	_help_wiggle_timer = Timer.new()
+	_help_wiggle_timer.wait_time = 4.5
+	_help_wiggle_timer.one_shot = false
+	_help_wiggle_timer.autostart = true
+	_help_wiggle_timer.timeout.connect(_play_help_button_wiggle)
+	add_child(_help_wiggle_timer)
+	get_tree().create_timer(0.7).timeout.connect(_play_help_button_wiggle)
+
+func _mark_help_button_clicked() -> void:
+	if GameState.has_clicked_help_button:
+		return
+	GameState.has_clicked_help_button = true
+	GameState.save()
+	_stop_help_button_wiggle()
+
+func _stop_help_button_wiggle() -> void:
+	if is_instance_valid(_help_wiggle_timer):
+		_help_wiggle_timer.stop()
+		_help_wiggle_timer.queue_free()
+	_help_wiggle_timer = null
+	if _help_wiggle_tween and _help_wiggle_tween.is_valid():
+		_help_wiggle_tween.kill()
+	_help_wiggle_tween = null
+	if is_instance_valid(_help_button):
+		_help_button.rotation_degrees = 0.0
+		_help_button.scale = _help_button_base_scale
+
+func _play_help_button_wiggle() -> void:
+	if GameState.has_clicked_help_button or not is_instance_valid(_help_button):
+		_stop_help_button_wiggle()
+		return
+	if _help_wiggle_tween and _help_wiggle_tween.is_valid() and _help_wiggle_tween.is_running():
+		return
+	_help_button.pivot_offset = _help_button.size * 0.5
+	_help_button.rotation_degrees = 0.0
+	_help_wiggle_tween = create_tween()
+	_help_wiggle_tween.tween_property(_help_button, "rotation_degrees", -7.0, 0.06)
+	_help_wiggle_tween.tween_property(_help_button, "rotation_degrees", 7.0, 0.09)
+	_help_wiggle_tween.tween_property(_help_button, "rotation_degrees", -5.0, 0.08)
+	_help_wiggle_tween.tween_property(_help_button, "rotation_degrees", 4.0, 0.07)
+	_help_wiggle_tween.tween_property(_help_button, "rotation_degrees", 0.0, 0.08)
+	_help_wiggle_tween.finished.connect(func():
+		_help_wiggle_tween = null
 	)
 
-	money_btn.pressed.connect(func():
-		GameState.money += 1000000
-		GameState.lifetime_money += 1000000
-		GameState.money_changed.emit(GameState.money)
-	)
+func _change_help_page(direction: int) -> void:
+	if _help_pages.is_empty():
+		return
+	_help_page_index = (_help_page_index + direction + _help_pages.size()) % _help_pages.size()
+	_show_help_page(_help_page_index)
 
-	level_btn.pressed.connect(func():
-		GameState.add_level()
-	)
+func _show_help_page(page_index: int) -> void:
+	if _help_pages.is_empty() or not _help_content:
+		return
+	_help_page_index = clampi(page_index, 0, _help_pages.size() - 1)
+	for child in _help_content.get_children():
+		child.queue_free()
+
+	var page: Dictionary = _help_pages[_help_page_index]
+	_help_page_label.text = "%s  %d/%d" % [str(page.get("title", "")), _help_page_index + 1, _help_pages.size()]
+	var font: Font = load("res://balatro.otf")
+	for section in page.get("sections", []):
+		var section_data: Dictionary = section
+		_add_help_section(str(section_data.get("category", "")), str(section_data.get("text", "")), font)
+
+	if _help_scroll:
+		_help_scroll.set_deferred("scroll_vertical", 0)
+
+func _add_help_section(category_name: String, body: String, font: Font) -> void:
+	var section := VBoxContainer.new()
+	section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	section.add_theme_constant_override("separation", 2)
+	_help_content.add_child(section)
+
+	var category := Label.new()
+	category.text = category_name
+	category.add_theme_font_override("font", font)
+	category.add_theme_font_size_override("font_size", 22)
+	category.add_theme_color_override("font_color", Color(1.0, 0.78, 0.34))
+	category.add_theme_constant_override("outline_size", 0)
+	section.add_child(category)
+
+	var text := Label.new()
+	text.text = body
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text.add_theme_font_override("font", font)
+	text.add_theme_font_size_override("font_size", 16)
+	text.add_theme_color_override("font_color", Color(0.92, 0.88, 0.82))
+	text.add_theme_constant_override("outline_size", 0)
+	section.add_child(text)
+
+func _build_help_pages() -> Array:
+	return [
+		{
+			"title": "Basics",
+			"sections": [
+				{"category": "Core Loop", "text": "Your golfer swings automatically. Each shot earns money from distance, flags, direct hits, and course objects."},
+				{"category": "Aiming", "text": "The aim slider curves shots left or right. Center is straight, and stronger stats make shots travel farther."},
+				{"category": "Spin Control", "text": "The bottom-right spin control changes the shot shape. Drag left or right to bend the ball in flight. Drag up for a higher launch or down for a flatter launch. Heavy side spin reduces forward distance."},
+				{"category": "Money", "text": "Money buys run upgrades. Bigger shots, flag bonuses, special balls, and golfer passives all stack into the payout."},
+				{"category": "XP And Level", "text": "Earning money also gives XP. Leveling grants stat bonuses and unlocks more shop items."},
+			],
+		},
+		{
+			"title": "Upgrades",
+			"sections": [
+				{"category": "Cash Upgrades", "text": "Cash cost = base cost x 1.08^current level.\nBall Speed: total speed = (1 + level x 0.04) x level bonus x golfer speed.\nFire Rate: total fire rate = (1 + level x 0.03) x level bonus x golfer fire rate. Swing timer = 5 / total fire rate.\nMoney Multiplier: total money = (1 + level x 0.09) x level bonus x golfer money.\nXP Multiplier: total XP = (1 + level x 0.09) x level bonus. XP gained = final money x 0.1 x total XP.\nConsistency: total consistency = (0.5 + level x 0.1) x level bonus x medal bonus. Higher consistency tightens spread and lowers whiffs."},
+				{"category": "Medal Upgrades", "text": "Flat Distance: +1 flat distance per level, added directly to horizontal shot speed. Cost = 8 x 1.8^level medals.\nMulti Ball: +1 ball per level. Ball count = 1 + level. Cost = 150 x 3^level medals. Max level 3.\nMulti Ball Spread: reduces fan spread by 2 degrees per level. Spread = max(8, 20 - level x 2). Cost = 75 x 1.9^level medals. Max level 6.\nConsistency Mult: +50% consistency per level. Medal multiplier = 1 + level x 0.5. Cost = 100 x 2^level medals. Max level 10."},
+				{"category": "How To Earn Medals?", "text": "Retire a strong run to turn progress into medals. The first medal payout scales with lifetime money. After that, medals are earned when the current run beats your best run money, with bigger improvements paying more and a soft cap toward 250 medals."},
+				{"category": "Retirement", "text": "Retiring resets run money and cash upgrades. Levels, unlocks, balls, golfers, courses, and medal upgrades stay."},
+			],
+		},
+		{
+			"title": "Shop",
+			"sections": [
+				{"category": "Golf Balls", "text": "Balls change the rules of the shot. Standard is reliable, Pin Seeker boosts flags, and Firework splits into scoring fragments."},
+				{"category": "Golfers", "text": "Golfers change passive stats. Standard Golfer is balanced, Shop Keep earns extra money, and Lion Trees adds money plus distance."},
+				{"category": "Courses", "text": "Courses change the playable layout and targets. Big Piney is the first course."},
+			],
+		},
+		{
+			"title": "Bonus Money",
+			"sections": [
+				{"category": "Flags", "text": "Landing near a flag adds bonus money. A direct hit pays more and can trigger special ball effects."},
+				{"category": "Golden Flags", "text": "A random flag can turn golden. Directly hitting it creates a large bonus payout."},
+				{"category": "Hole-Out Combo", "text": "Back-to-back direct flag hits build a combo banner and celebrate clean accuracy."},
+				{"category": "Destructibles", "text": "Some course objects take repeated hits, pay out when destroyed, and return after a respawn timer."},
+				{"category": "Bonus Money", "text": "Base shot payout = yards^2 x 0.0002 + 5. Flag bonuses are added to that base, direct hits multiply the result by 2.5, and money multipliers apply last."},
+			],
+		},
+	]
 
 # ---------- hole-out combo ----------
 

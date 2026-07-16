@@ -42,15 +42,18 @@ func _ready() -> void:
 		sprite.texture = texture
 
 func _process(delta: float) -> void:
-	# scaling — use camera-space Z depth for correct perspective
-	var cam_space = camera.global_transform.affine_inverse() * global_position
-	var depth = max(-cam_space.z, 0.01)
-	var fov_rad = deg_to_rad(camera.fov)
-	var visible_height = 2.0 * depth * tan(fov_rad / 2.0)
-	var sprite_height = 216.0 * sprite.pixel_size
-	var scale_factor = visible_height / sprite_height
-	var final_scale = scale_factor * sprite_scale
-	sprite.scale = Vector3(final_scale, final_scale, final_scale)
+	if not is_instance_valid(camera):
+		camera = get_viewport().get_camera_3d()
+	if is_instance_valid(camera):
+		# Scaling uses camera-space Z depth for correct perspective.
+		var cam_space = camera.global_transform.affine_inverse() * global_position
+		var depth = max(-cam_space.z, 0.01)
+		var fov_rad = deg_to_rad(camera.fov)
+		var visible_height = 2.0 * depth * tan(fov_rad / 2.0)
+		var sprite_height = 216.0 * sprite.pixel_size
+		var scale_factor = visible_height / sprite_height
+		var final_scale = scale_factor * sprite_scale
+		sprite.scale = Vector3(final_scale, final_scale, final_scale)
 
 	# bob
 	if bob_enabled:

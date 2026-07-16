@@ -8,8 +8,13 @@ var _sensitivity := 0.003
 
 func _ready() -> void:
 	current = false
+	if GameState.IS_DEMO_BUILD:
+		set_process(false)
+		set_process_unhandled_input(false)
 
 func _unhandled_input(event: InputEvent) -> void:
+	if GameState.IS_DEMO_BUILD:
+		return
 	if event is InputEventKey and event.pressed and event.keycode == KEY_F1:
 		_active = !_active
 		current = _active

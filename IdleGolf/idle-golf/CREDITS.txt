@@ -1,0 +1,32 @@
+Idle Golf Demo Credits
+
+Game, programming, and integration:
+- Jesse
+
+Engine:
+- Godot Engine 4.6
+
+Fonts:
+- balatro.otf - attribution/source needs final confirmation before public upload.
+
+Audio:
+- GolfHit.mp3
+- FlagHit.mp3
+- FlagStickHit.mp3
+- Destruction.mp3
+- ButtonPress.mp3
+- Blink.mp3
+- BellSound.mp3
+- Casino2.mp3
+- Coin.mp3
+- Thud.mp3
+- Beep.mp3
+- Firework.mp3
+- good golf.wav
+- u_vr5icvkppa-nature-ambience-323729.mp3
+
+Art:
+- Idle Golf UI, course, ball, golfer, flag, target, and shop sprites.
+
+Release note:
+- Confirm each third-party asset source/license before uploading a public Itch build.

@@ -11,6 +11,15 @@ var lifetime_xp: float = 0.0  # total xp earned this run
 var lifetime_money: float = 0.0  # total money earned this run
 var best_run_xp: float = 0.0  # best xp from any run
 var best_run_money: float = 0.0  # best money from any run
+var window_mode: String = "fullscreen"
+var window_size: String = "1600x900"
+var vsync_enabled: bool = false
+var sfx_muted: bool = false
+var music_muted: bool = false
+var has_clicked_help_button: bool = false
+
+const IS_DEMO_BUILD := true
+const DEMO_LOCK_TEXT := "Full Game"
 
 signal medals_changed(new_amount: float)
 signal money_changed(new_amount: float)
@@ -30,7 +39,7 @@ static func format_number(value: float) -> String:
 		count += 1
 	return result
 
-const SAVE_PATH = "user://save.cfg"
+const SAVE_PATH = "user://idle_golf_demo_v0_1.cfg"
 
 const LEVEL_REWARDS = [
 	"ball_speed",
@@ -54,35 +63,35 @@ var upgrades = {
 	"xp_mult":      {"level": 0, "base_cost": 20.0,  "label": "XP Multiplier"},
 	"flat_distance": {"level": 0, "base_cost": 8.0, "label": "Flat Distance", "use_medals": true},
 	"multi_ball": {"level": 0, "base_cost": 150.0, "label": "Multi Ball", "use_medals": true, "max_level": 3},
-	"multi_ball_spread": {"level": 0, "base_cost": 75.0, "label": "Multi Ball Spread", "use_medals": true, "max_level": 6},
-	"consistency_mult": {"level": 0, "base_cost": 100.0, "label": "Consistency Mult", "use_medals": true, "max_level": 10},
+	"multi_ball_spread": {"level": 0, "base_cost": 75.0, "label": "Multi Ball Spread", "use_medals": true, "max_level": 6, "demo_hidden": true},
+	"consistency_mult": {"level": 0, "base_cost": 100.0, "label": "Consistency Mult", "use_medals": true, "max_level": 10, "demo_hidden": true},
 }
 
 var balls = {
 	"standard": {"name": "Standard Ball", "desc": "Your trusty golf ball", "medal_cost": 0.0, "owned": true, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.WHITE, "texture": preload("res://BallIcon.png"), "flag_mult": 1.0, "unlock_level": 1},
-	"homing_ball": {"name": "Homing Ball", "desc": "Homes in on nearest flag", "medal_cost": 5, "owned": false, "speed_mult": 1.0, "money_mult": 1.5, "can_home": true, "trail_color": Color.LIME_GREEN, "texture": preload("res://HomingBalllIcon.png"), "flag_mult": 1.0, "unlock_level": 5},
+	"homing_ball": {"name": "Homing Ball", "desc": "Homes in on nearest flag", "medal_cost": 5, "owned": false, "speed_mult": 1.0, "money_mult": 1.5, "can_home": true, "trail_color": Color.LIME_GREEN, "texture": preload("res://HomingBalllIcon.png"), "flag_mult": 1.0, "unlock_level": 5, "demo_locked": true},
 	"pin_seeker": {"name": "Pin Seeker", "desc": "2x flag bonus money", "medal_cost": 25, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.GOLD, "texture": preload("res://PinSeekBalllIcon.png"), "flag_mult": 2.0, "unlock_level": 15},
 	"firework": {"name": "Firework Ball", "desc": "Explodes into 6 balls at apex", "medal_cost": 60, "owned": false, "speed_mult": 1.0, "money_mult": 0.5, "can_home": false, "trail_color": Color.ORANGE_RED, "texture": preload("res://FireWorksBalllIcon.png"), "flag_mult": 1.0, "is_firework": true, "unlock_level": 30},
-	"market": {"name": "Market Ball", "desc": "Flag hits invest money, grows 10%/s. Miss to cash out!", "medal_cost": 40, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.CYAN, "texture": preload("res://BallIcon.png"), "flag_mult": 1.5, "is_market": true, "unlock_level": 20, "consistency_mult": 1.5},
-	"wrecking": {"name": "Wrecking Ball", "desc": "1.5x distance, 2x destructible money", "medal_cost": 30, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.DARK_GRAY, "texture": preload("res://BallIcon.png"), "flag_mult": 1.0, "destruct_mult": 2.0, "unlock_level": 12},
-	"pinball": {"name": "Pin Ball", "desc": "Hits a flag then flies to every other flag! 1.5x consistency", "medal_cost": 50, "owned": false, "speed_mult": 1.0, "money_mult": 0.7, "can_home": false, "trail_color": Color.MAGENTA, "texture": preload("res://BallIcon.png"), "flag_mult": 1.0, "consistency_mult": 10.5, "is_pinball": true, "unlock_level": 18},
+	"market": {"name": "Market Ball", "desc": "Flag hits invest money, grows 10%/s. Miss to cash out!", "medal_cost": 40, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.CYAN, "texture": preload("res://BallIcon.png"), "flag_mult": 1.5, "is_market": true, "unlock_level": 20, "consistency_mult": 1.5, "demo_locked": true},
+	"wrecking": {"name": "Wrecking Ball", "desc": "1.5x distance, 2x destructible money", "medal_cost": 30, "owned": false, "speed_mult": 1.0, "money_mult": 1.0, "can_home": false, "trail_color": Color.DARK_GRAY, "texture": preload("res://BallIcon.png"), "flag_mult": 1.0, "destruct_mult": 2.0, "unlock_level": 12, "demo_locked": true},
+	"pinball": {"name": "Pin Ball", "desc": "Hits a flag then flies to every other flag! 1.5x consistency", "medal_cost": 50, "owned": false, "speed_mult": 1.0, "money_mult": 0.7, "can_home": false, "trail_color": Color.MAGENTA, "texture": preload("res://BallIcon.png"), "flag_mult": 1.0, "consistency_mult": 10.5, "is_pinball": true, "unlock_level": 18, "demo_locked": true},
 }
 
 var golfers = {
-	"standard":    {"name": "Standard Golfer", "desc": "A reliable swing",             "medal_cost": 0,  "owned": true,  "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 1, "texture": preload("res://BallIcon.png")},
-	"power":       {"name": "Power Golfer",    "desc": "+15% distance, -5% fire rate", "medal_cost": 5,  "owned": false, "speed_mult": 1.15, "fire_rate_mult": 0.95, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 3, "texture": preload("res://BallIcon.png")},
-	"speedy":      {"name": "Speedy Golfer",   "desc": "+25% fire rate",               "medal_cost": 20, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.25, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 10, "texture": preload("res://BallIcon.png")},
-	"Lion Trees":      {"name": "Lion Trees",   "desc": "+25% money, +20% distance",   "medal_cost": 50, "owned": false, "speed_mult": 1.2, "fire_rate_mult": 1.0, "money_mult": 1.25, "spritesheet": "res://LionTreesSwing.png", "h_frames": 5, "frame_size": 96, "unlock_level": 25, "texture": preload("res://BallIcon.png")},
-	"construction":    {"name": "Construction Worker", "desc": "Destructibles respawn 50% faster", "medal_cost": 15, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.0, "respawn_mult": 0.5, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 7, "texture": preload("res://BallIcon.png")},
-	"golfer1": {"name": "Golfer 1", "desc": "+10% distance", "medal_cost": 8, "owned": false, "speed_mult": 1.1, "fire_rate_mult": 1.0, "money_mult": 1.0, "spritesheet": "res://Golfer1.png", "h_frames": 1, "frame_size": 96, "unlock_level": 4, "texture": preload("res://BallIcon.png")},
-	"golfer2": {"name": "Golfer 2", "desc": "+15% fire rate", "medal_cost": 18, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.15, "money_mult": 1.0, "spritesheet": "res://Golfer2.png", "h_frames": 1, "frame_size": 96, "unlock_level": 9, "texture": preload("res://BallIcon.png")},
-	"golfer4": {"name": "Golfer 4", "desc": "+15% money", "medal_cost": 35, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.15, "spritesheet": "res://Golfer4.png", "h_frames": 1, "frame_size": 96, "unlock_level": 14, "texture": preload("res://BallIcon.png")},
+	"standard":    {"name": "Standard Golfer", "desc": "A reliable swing",             "medal_cost": 0,  "owned": true,  "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 1, "texture": preload("res://StandardGolferPortrait.png"), "icon_scale": 5.0},
+	"power":       {"name": "Dyson",           "desc": "+15% distance, -5% fire rate", "medal_cost": 5,  "owned": false, "speed_mult": 1.15, "fire_rate_mult": 0.95, "money_mult": 1.0, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 3, "texture": preload("res://BallIcon.png"), "demo_locked": true},
+	"speedy":      {"name": "Shop Keep",       "desc": "+50% money",                   "medal_cost": 20, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.5, "spritesheet": "res://ShopKeepSwing.png", "h_frames": 5, "frame_size": 96, "unlock_level": 10, "texture": preload("res://ShopKeepPortrait.png"), "icon_scale": 5.0},
+	"Lion Trees":      {"name": "Lion Trees",   "desc": "+25% money, +20% distance",   "medal_cost": 50, "owned": false, "speed_mult": 1.2, "fire_rate_mult": 1.0, "money_mult": 1.25, "spritesheet": "res://LionTreesSwing.png", "h_frames": 5, "frame_size": 96, "unlock_level": 25, "texture": preload("res://LionTreesPortrait.png"), "icon_scale": 5.0},
+	"construction":    {"name": "Blue Collar", "desc": "Destructibles respawn 50% faster", "medal_cost": 15, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.0, "respawn_mult": 0.5, "spritesheet": "res://GolfSwing-Sheet.png", "h_frames": 5, "frame_size": 96, "unlock_level": 7, "texture": preload("res://BallIcon.png"), "demo_locked": true},
+	"golfer1": {"name": "Zoomer", "desc": "+10% distance", "medal_cost": 8, "owned": false, "speed_mult": 1.1, "fire_rate_mult": 1.0, "money_mult": 1.0, "spritesheet": "res://Golfer1.png", "h_frames": 1, "frame_size": 96, "unlock_level": 4, "texture": preload("res://BallIcon.png"), "demo_locked": true},
+	"golfer2": {"name": "Lamb", "desc": "+15% fire rate", "medal_cost": 18, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.15, "money_mult": 1.0, "spritesheet": "res://Golfer2.png", "h_frames": 1, "frame_size": 96, "unlock_level": 9, "texture": preload("res://BallIcon.png"), "demo_locked": true},
+	"golfer4": {"name": "Money Daily", "desc": "+15% money", "medal_cost": 35, "owned": false, "speed_mult": 1.0, "fire_rate_mult": 1.0, "money_mult": 1.15, "spritesheet": "res://Golfer4.png", "h_frames": 1, "frame_size": 96, "unlock_level": 14, "texture": preload("res://BallIcon.png"), "demo_locked": true},
 }
 
 var courses = {
-	"course1": {"name": "Driving Range", "desc": "The classic range", "medal_cost": 0, "owned": true, "unlock_level": 1, "texture": preload("res://BallIcon.png")},
-	"course2": {"name": "Course 2", "desc": "A new challenge", "medal_cost": 10, "owned": false, "unlock_level": 8, "texture": preload("res://BallIcon.png")},
-	"course3": {"name": "Course 3", "desc": "A longer course with tighter payouts", "medal_cost": 25, "owned": false, "unlock_level": 15, "texture": preload("res://BallIcon.png")},
+	"course1": {"name": "Big Piney", "desc": "The classic range", "medal_cost": 0, "owned": true, "unlock_level": 1, "texture": preload("res://Course1Icon.png"), "icon_scale": 5.0},
+	"course2": {"name": "Course 2", "desc": "A new challenge", "medal_cost": 10, "owned": false, "unlock_level": 8, "texture": preload("res://BallIcon.png"), "demo_locked": true},
+	"course3": {"name": "Course 3", "desc": "A longer course with tighter payouts", "medal_cost": 25, "owned": false, "unlock_level": 15, "texture": preload("res://BallIcon.png"), "demo_locked": true},
 }
 
 
@@ -139,6 +148,15 @@ func _play_button_sound() -> void:
 func get_flat_distance() -> float:
 	return upgrades["flat_distance"]["level"] * 1.0  # +2 yards per level → 100 yds at lv50
 
+func is_demo_locked(data: Dictionary) -> bool:
+	return IS_DEMO_BUILD and bool(data.get("demo_locked", false))
+
+func get_demo_lock_text(data: Dictionary) -> String:
+	return str(data.get("demo_lock_text", DEMO_LOCK_TEXT))
+
+func is_demo_hidden_upgrade(upgrade_key: String) -> bool:
+	return IS_DEMO_BUILD and upgrades.has(upgrade_key) and bool(upgrades[upgrade_key].get("demo_hidden", false))
+
 func get_medal_reward() -> float:
 	if lifetime_money <= 1.0:
 		return 0.0
@@ -189,6 +207,7 @@ func full_reset() -> void:
 	equipped_ball = "standard"
 	equipped_golfer = "standard"
 	equipped_course = "course1"
+	has_clicked_help_button = false
 
 	for key in upgrades:
 		upgrades[key]["level"] = 0
@@ -246,6 +265,13 @@ func save() -> void:
 	for key in courses:
 		config.set_value("courses", key, courses[key]["owned"])
 
+	config.set_value("settings", "window_mode", window_mode)
+	config.set_value("settings", "window_size", window_size)
+	config.set_value("settings", "vsync_enabled", vsync_enabled)
+	config.set_value("settings", "sfx_muted", sfx_muted)
+	config.set_value("settings", "music_muted", music_muted)
+	config.set_value("ui", "has_clicked_help_button", has_clicked_help_button)
+
 	config.save(SAVE_PATH)
 
 func load_game() -> void:
@@ -266,6 +292,12 @@ func load_game() -> void:
 	lifetime_money = config.get_value("player", "lifetime_money", 0.0)
 	best_run_xp = config.get_value("player", "best_run_xp", 0.0)
 	best_run_money = config.get_value("player", "best_run_money", 0.0)
+	window_mode = config.get_value("settings", "window_mode", "fullscreen")
+	window_size = config.get_value("settings", "window_size", "1600x900")
+	vsync_enabled = config.get_value("settings", "vsync_enabled", false)
+	sfx_muted = config.get_value("settings", "sfx_muted", false)
+	music_muted = config.get_value("settings", "music_muted", false)
+	has_clicked_help_button = config.get_value("ui", "has_clicked_help_button", false)
 	
 	for key in upgrades:
 		upgrades[key]["level"] = config.get_value("upgrades", key, 0)
@@ -343,6 +375,8 @@ func get_cost(upgrade: String) -> float:
 	return get_cost_for_level(upgrade, level)
 
 func try_purchase(upgrade: String) -> bool:
+	if is_demo_hidden_upgrade(upgrade):
+		return false
 	var cost = get_cost(upgrade)
 	if money >= cost:
 		money -= cost
@@ -386,11 +420,24 @@ func _sanitize_progress() -> void:
 		var max_level: int = int(upgrades[key].get("max_level", -1))
 		if max_level >= 0:
 			level_value = min(level_value, max_level)
+		if is_demo_hidden_upgrade(key):
+			level_value = 0
 		upgrades[key]["level"] = level_value
 
 	balls["standard"]["owned"] = true
 	golfers["standard"]["owned"] = true
 	courses["course1"]["owned"] = true
+
+	if IS_DEMO_BUILD:
+		for key in balls:
+			if is_demo_locked(balls[key]):
+				balls[key]["owned"] = false
+		for key in golfers:
+			if is_demo_locked(golfers[key]):
+				golfers[key]["owned"] = false
+		for key in courses:
+			if is_demo_locked(courses[key]):
+				courses[key]["owned"] = false
 
 	if not balls.has(equipped_ball) or not balls[equipped_ball].get("owned", false):
 		equipped_ball = "standard"
